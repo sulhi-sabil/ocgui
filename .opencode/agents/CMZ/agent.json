@@ -1,0 +1,48 @@
+{
+  "name": "CMZ",
+  "version": "1.0.0",
+  "description": "Self-healing, self-learning, self-evolving agent designed to maximize potential through continuous improvement",
+  "behavior": {
+    "self_heal": true,
+    "self_learn": true,
+    "self_evolve": true,
+    "maximize_potential": true
+  },
+  "model": "opencode/kimi-k2.5-free",
+  "capabilities": [
+    "code-generation",
+    "code-review",
+    "refactoring",
+    "debugging",
+    "architecture-design",
+    "documentation",
+    "testing",
+    "optimization"
+  ],
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true,
+    "git": true,
+    "network": true
+  },
+  "hooks": {
+    "pre_tool_use": [],
+    "post_tool_use": [],
+    "user_prompt_submit": [],
+    "stop": []
+  },
+  "mcp_servers": [],
+  "skills": [
+    "self-healing",
+    "self-learning",
+    "self-evolution",
+    "continuous-improvement"
+  ],
+  "config": {
+    "temperature": 0.7,
+    "max_tokens": 8000,
+    "context_window": 128000,
+    "response_format": "text"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "ocgui",
+    "description": "OpenCode GUI - Desktop application for OpenCode CLI",
+    "type": "desktop-app"
+  },
+  "agents": {
+    "default": "CMZ",
+    "available": [
+      {
+        "name": "CMZ",
+        "path": ".opencode/agents/CMZ",
+        "model": "opencode/kimi-k2.5-free",
+        "enabled": true
+      }
+    ]
+  },
+  "models": {
+    "preferred": [
+      "opencode/glm-4.7-free",
+      "opencode/kimi-k2.5-free",
+      "opencode/minimax-m2.1-free"
+    ],
+    "configuration": {
+      "opencode/glm-4.7-free": {
+        "temperature": 0.7,
+        "max_tokens": 8000,
+        "context_window": 128000
+      },
+      "opencode/kimi-k2.5-free": {
+        "temperature": 0.7,
+        "max_tokens": 8000,
+        "context_window": 128000
+      },
+      "opencode/minimax-m2.1-free": {
+        "temperature": 0.7,
+        "max_tokens": 8000,
+        "context_window": 128000
+      }
+    }
+  },
+  "skills": {
+    "directory": ".opencode/skills",
+    "auto_load": true,
+    "installed": []
+  },
+  "workflows": {
+    "iterate": ".github/workflows/iterate.yml",
+    "pull": ".github/workflows/pull.yml"
+  },
+  "integrations": {
+    "oh_my_opencode": {
+      "enabled": true,
+      "config_path": ".opencode/oh-my-opencode.json"
+    }
+  },
+  "settings": {
+    "auto_save": true,
+    "backup_enabled": true,
+    "log_level": "info",
+    "max_concurrent_agents": 3,
+    "timeout": 300000
+  }
+}

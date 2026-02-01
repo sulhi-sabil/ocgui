@@ -1,0 +1,90 @@
+{
+  "version": "3.2.0",
+  "agent": {
+    "name": "Sisyphus",
+    "model": "opencode/kimi-k2.5-free",
+    "temperature": 0.7,
+    "max_tokens": 8000
+  },
+  "agents": {
+    "CMZ": {
+      "model": "opencode/kimi-k2.5-free",
+      "temperature": 0.7,
+      "prompt": ".opencode/agents/CMZ/prompt.md",
+      "permissions": ["read", "write", "execute", "git", "network"]
+    },
+    "Sisyphus": {
+      "model": "opencode/glm-4.7-free",
+      "temperature": 0.7,
+      "permissions": ["read", "write", "execute", "git", "network"]
+    },
+    "Oracle": {
+      "model": "opencode/kimi-k2.5-free",
+      "temperature": 0.6,
+      "permissions": ["read", "write", "execute", "git"]
+    },
+    "Librarian": {
+      "model": "opencode/minimax-m2.1-free",
+      "temperature": 0.5,
+      "permissions": ["read", "network"]
+    },
+    "Explore": {
+      "model": "opencode/glm-4.7-free",
+      "temperature": 0.3,
+      "permissions": ["read"]
+    },
+    "Frontend": {
+      "model": "opencode/kimi-k2.5-free",
+      "temperature": 0.7,
+      "permissions": ["read", "write", "execute"]
+    }
+  },
+  "skills": {
+    "directory": ".opencode/skills",
+    "enabled": [
+      "agentic-qe-testing",
+      "backend-models-standards",
+      "systematic-debugging",
+      "moai-adk-tool",
+      "context-engineering-memory",
+      "debugging-strategies",
+      "git-commit-message"
+    ]
+  },
+  "mcp": {
+    "enabled": [
+      "websearch",
+      "context7",
+      "grep_app"
+    ]
+  },
+  "features": {
+    "todo_enforcer": true,
+    "comment_checker": true,
+    "lsp_support": true,
+    "ast_grep": true,
+    "background_tasks": true,
+    "parallel_agents": true,
+    "ultrawork": true
+  },
+  "hooks": {
+    "pre_tool_use": [],
+    "post_tool_use": [],
+    "user_prompt_submit": [],
+    "stop": []
+  },
+  "categories": {
+    "visual-engineering": {
+      "agent": "Frontend",
+      "skills": ["frontend-ui-ux"]
+    },
+    "ultrabrain": {
+      "agent": "CMZ",
+      "skills": ["architecture", "complex-logic"]
+    },
+    "quick": {
+      "agent": "Explore",
+      "skills": ["fast-exploration"]
+    }
+  }
+}
