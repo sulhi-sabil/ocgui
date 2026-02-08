@@ -14,7 +14,12 @@
       "permissions": ["read", "write", "execute", "git", "network"]
     },
     "Sisyphus": {
-      "model": "opencode/glm-4.7-free",
+      "model": "opencode/big-pickle",
+      "temperature": 0.7,
+      "permissions": ["read", "write", "execute", "git", "network"]
+    },
+    "BigPickle": {
+      "model": "opencode/big-pickle",
       "temperature": 0.7,
       "permissions": ["read", "write", "execute", "git", "network"]
     },
