@@ -1,5 +1,5 @@
 ---
-name: TechLead-DecisionEngine
+name: TechLead
 description: Senior Tech Lead & Auditor with strict logic-driven operational flow.
 mode: primary
 tools:
