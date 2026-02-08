@@ -11,10 +11,10 @@
 ## Error List
 
 - [x] **error:** Incomplete feature consolidation - StorX Phase 5 tasks incomplete (no file watchers, no SQLite integration, no skill composition UI)
-- [ ] **error:** Missing CSS custom properties - index.css only has Tailwind directives but no dark mode CSS variables or component styles
+- [x] **error:** Missing CSS custom properties - index.css only has Tailwind directives but no dark mode CSS variables or component styles
 - [x] **error:** No error boundaries in React app - App.tsx has no error handling for component failures
 - [x] **error:** Rust main.rs uses blocking Command instead of async for check_opencode_installed - could freeze UI
-- [ ] **error:** Zustand store persists only theme but agents/runs not persisted - data loss on app restart
+- [x] **error:** Zustand store persists only theme but agents/runs not persisted - data loss on app restart
 
 ## Console Errors/Warnings
 

@@ -70,7 +70,13 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'ocgui-storage',
-      partialize: (state) => ({ theme: state.theme }),
+      partialize: (state) => ({ 
+        theme: state.theme,
+        agents: state.agents,
+        selectedAgentId: state.selectedAgentId,
+        skills: state.skills,
+        config: state.config,
+      }),
     }
   )
 )

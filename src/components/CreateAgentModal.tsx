@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAppStore } from '@store/index'
 import { Button } from './ui/Button'
+import { useToast } from './ui/Toast'
 import { generateId } from '@utils/index'
 import type { Agent } from '../types'
 
@@ -11,12 +12,34 @@ interface CreateAgentModalProps {
 
 export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
   const { addAgent } = useAppStore()
+  const { addToast } = useToast()
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     model: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Handle Escape key and click outside
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'hidden'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = ''
+    }
+  }, [isOpen, onClose])
+
+  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) onClose()
+  }, [onClose])
 
   if (!isOpen) return null
 
@@ -48,15 +71,22 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     }
 
     addAgent(newAgent)
+    addToast(`Agent "${newAgent.name}" created successfully`, 'success')
     setFormData({ name: '', description: '', model: '' })
     setErrors({})
     onClose()
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+        <h2 id="modal-title" className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Create New Agent
         </h2>
         
