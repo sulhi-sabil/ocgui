@@ -69,4 +69,21 @@ export const typography = {
 
 export const focus = {
   ring: 'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800',
+  ringVisible: 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-800',
+} as const
+
+export const animations = {
+  pulse: 'animate-pulse',
+  spin: 'animate-spin',
+  bounce: 'animate-bounce',
+  fadeIn: 'animate-fadeIn',
+  slideIn: 'animate-slideIn',
+} as const
+
+export const skeleton = {
+  base: 'bg-gray-200 dark:bg-gray-700 rounded animate-pulse',
+  text: 'h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse',
+  title: 'h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse',
+  card: 'h-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse',
+  circle: 'w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse',
 } as const

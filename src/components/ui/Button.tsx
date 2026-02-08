@@ -36,7 +36,7 @@ export function Button({
         baseStyles,
         variants[variant],
         sizes[size],
-        focus.ring,
+        focus.ringVisible,
         transitions.colors,
         className
       )}
