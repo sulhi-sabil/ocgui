@@ -24,10 +24,11 @@ async fn run_opencode_command(args: Vec<String>) -> Result<String, String> {
 }
 
 #[tauri::command]
-fn check_opencode_installed() -> bool {
-    Command::new("opencode")
+async fn check_opencode_installed() -> bool {
+    tokio::process::Command::new("opencode")
         .arg("--version")
         .output()
+        .await
         .map(|output| output.status.success())
         .unwrap_or(false)
 }

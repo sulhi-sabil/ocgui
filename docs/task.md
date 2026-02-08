@@ -34,10 +34,20 @@
 - [x] Create type definitions tests
 - [x] Add test configuration files
 
-### PHASE 5 - StorX (IN PROGRESS)
+### PHASE 1 - BugLover (COMPLETED)
+- [x] Fix workflow branch reference (develop → main)
+- [x] Create missing Tauri icons directory and placeholder icons
+- [x] Add error boundaries to React app
+- [x] Fix Rust async blocking issue
+- [x] Add theme toggle UI component
+
+### PHASE 5 - StorX (PENDING)
 - [STRENGTHEN] Create store infrastructure for state management
 - [STRENGTHEN] Add utility functions
 - [STRENGTHEN] Create basic React components
+- [CONNECT] Add agent creation UI
+- [CONNECT] Implement file watchers for AGENTS.md
+- [STRENGTHEN] Add SQLite integration for run history
 
 ### Pending Phases
 - [ ] PHASE 6: CodeKeep - Code quality review

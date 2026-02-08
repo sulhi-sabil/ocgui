@@ -11,10 +11,10 @@ export function AgentCard({ agent, isSelected, onSelect }: AgentCardProps) {
     <div
       onClick={onSelect}
       className={`
-        relative p-4 rounded-lg border cursor-pointer transition-all
+        relative p-4 rounded-lg border cursor-pointer transition-all duration-200 ease-in-out
         ${isSelected 
-          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400' 
-          : 'border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400 scale-[1.02] shadow-md' 
+          : 'border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md hover:-translate-y-0.5'
         }
       `}
     >
