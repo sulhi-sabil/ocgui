@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useState, useCallback, createContext } from 'react'
+import { generateId } from '@utils/index'
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning'
 
@@ -25,7 +26,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
   const addToast = useCallback((message: string, type: ToastType = 'info') => {
-    const id = Math.random().toString(36).substring(2, 9)
+    const id = generateId()
     setToasts((prev) => [...prev, { id, message, type }])
     
     setTimeout(() => {

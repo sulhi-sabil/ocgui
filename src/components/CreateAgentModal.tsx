@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAppStore } from '@store/index'
 import { Button } from './ui/Button'
 import { useToast } from './ui/Toast'
@@ -13,6 +13,7 @@ interface CreateAgentModalProps {
 export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
   const { addAgent } = useAppStore()
   const { addToast } = useToast()
+  const nameInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -20,7 +21,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // Handle Escape key and click outside
+  // Handle Escape key, click outside, and auto-focus
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -29,6 +30,8 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
+      // Auto-focus name input after modal animation
+      setTimeout(() => nameInputRef.current?.focus(), 50)
     }
 
     return () => {
@@ -99,6 +102,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               Name *
             </label>
             <input
+              ref={nameInputRef}
               type="text"
               id="name"
               value={formData.name}
