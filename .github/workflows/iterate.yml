@@ -244,5 +244,5 @@ jobs:
           PROMPT
           )" \
             --model opencode/kimi-k2.5-free \
-            --agent techlead
+            --agent TechLead
             --share false \
