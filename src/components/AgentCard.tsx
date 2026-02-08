@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { Agent } from '../types'
 import { cn } from '@utils/cn'
 import { colors, spacing, borders, transitions, shadows } from '@styles/tokens'
@@ -6,9 +7,10 @@ interface AgentCardProps {
   agent: Agent
   isSelected: boolean
   onSelect: () => void
+  onToggleEnabled?: () => void
 }
 
-export function AgentCard({ agent, isSelected, onSelect }: AgentCardProps) {
+function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled }: AgentCardProps) {
   return (
     <div
       onClick={onSelect}
@@ -31,14 +33,21 @@ export function AgentCard({ agent, isSelected, onSelect }: AgentCardProps) {
             {agent.description}
           </p>
         </div>
-        <span
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onToggleEnabled?.()
+          }}
           className={cn(
-            'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',
-            agent.enabled ? colors.status.enabled : colors.status.disabled
+            'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium transition-colors',
+            agent.enabled ? colors.status.enabled : colors.status.disabled,
+            onToggleEnabled && 'hover:opacity-80 cursor-pointer'
           )}
+          disabled={!onToggleEnabled}
+          title={onToggleEnabled ? `Click to ${agent.enabled ? 'disable' : 'enable'} agent` : undefined}
         >
           {agent.enabled ? 'Enabled' : 'Disabled'}
-        </span>
+        </button>
       </div>
       
       <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
@@ -57,3 +66,5 @@ export function AgentCard({ agent, isSelected, onSelect }: AgentCardProps) {
     </div>
   )
 }
+
+export const AgentCard = memo(AgentCardComponent)

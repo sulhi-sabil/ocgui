@@ -174,3 +174,6 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     </div>
   )
 }
+
+// Default export for lazy loading
+export default CreateAgentModal

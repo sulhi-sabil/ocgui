@@ -28,6 +28,10 @@ interface AppState {
   // UI State
   theme: 'light' | 'dark'
   setTheme: (theme: 'light' | 'dark') => void
+  
+  // Search State
+  lastSearchQuery: string
+  setLastSearchQuery: (query: string) => void
 }
 
 export const useAppStore = create<AppState>()(
@@ -67,6 +71,10 @@ export const useAppStore = create<AppState>()(
       // Theme
       theme: 'light',
       setTheme: (theme) => set({ theme }),
+      
+      // Search
+      lastSearchQuery: '',
+      setLastSearchQuery: (query) => set({ lastSearchQuery: query }),
     }),
     {
       name: 'ocgui-storage',
@@ -76,6 +84,7 @@ export const useAppStore = create<AppState>()(
         selectedAgentId: state.selectedAgentId,
         skills: state.skills,
         config: state.config,
+        lastSearchQuery: state.lastSearchQuery,
       }),
     }
   )
