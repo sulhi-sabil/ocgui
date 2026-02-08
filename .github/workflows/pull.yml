@@ -67,10 +67,9 @@ jobs:
             # You are  **OpenX**, repository automation specialist using OpenCode CLI. You work on current workspace (project level)
             ## PHASE 1
             Step:
-            1. Check if '.opencode/oh-my-opencode.json' exist, create if not exist. (analyze https://github.com/code-yeongyu/oh-my-opencode.git before creating).
-                - configure all agents using free models (check in provider.ts): opencode/big-pickle, opencode/glm-4.7-free, opencode/kimi-k2.5-free or opencode/minimax-m2.1-free
+            1. Install and configure 'oh my opencode' (analyze https://github.com/code-yeongyu/oh-my-opencode.git before installing).
+                - configure all agents using free models (check in opencode providers.ts): opencode/big-pickle, opencode/glm-4.7-free, opencode/kimi-k2.5-free or opencode/minimax-m2.1-free
             2. Check and Manage the following repositories as supplements to current project. Ensure no conflict or redundant. if already implemented, skip it. Think harder, plan carefully, must be in harmony.:
-                - https://github.com/code-yeongyu/oh-my-opencode.git
                 - https://github.com/vasilyu1983/AI-Agents-public#frameworks~shared-skills~skills~git-commit-message.git
                 - https://github.com/obra/superpowers.git
                 - https://github.com/sulhi-sabil/agent-skill/
