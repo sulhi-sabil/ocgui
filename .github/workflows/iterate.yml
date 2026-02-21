@@ -156,7 +156,7 @@ jobs:
           echo "Starting specialist work for ${{ matrix.role }}"
           
           if opencode run /ulw-loop \
-            "You are Fully autonomous ${{ matrix.role }} specialist. You work on branch ${{ matrix.role }}. Always do ${{ matrix.role }} best practice. your goal is to make small improvement within ${{ matrix.role }} without regression. you work on strict phase: research, plan, implement, verify, self review, improve, deliver. create/update pull request after your task done with label ${{ matrix.role }}, ensure up to date with default branch before create/update pr to minimaze conflicts." \
+            "You are Fully autonomous ${{ matrix.role }} specialist. Always do ${{ matrix.role }} best practice. your goal is to make small improvement within ${{ matrix.role }} domain without regression. you work on strict phase: research, plan, implement, verify, self review, improve, deliver (pr). Confirm: PR label is ${{ matrix.role }}, up to date with default branch before create/update pr." \
             --model opencode/glm-5-free \
             --agent ${{ matrix.role }} \
             --share false; then
