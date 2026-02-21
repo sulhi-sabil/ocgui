@@ -19,6 +19,7 @@ describe('Store - Agent Management', () => {
       tools: { bash: 'allow', edit: 'ask' },
       permissions: { '*': 'ask' },
       skills: ['skill-1', 'skill-2'],
+      tags: ['testing', 'automation'],
       enabled: true,
     }
 

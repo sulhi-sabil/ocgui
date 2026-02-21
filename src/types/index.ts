@@ -6,6 +6,7 @@ export interface Agent {
   tools: Record<string, string>;
   permissions: Record<string, string>;
   skills: string[];
+  tags: string[];
   enabled: boolean;
 }
 

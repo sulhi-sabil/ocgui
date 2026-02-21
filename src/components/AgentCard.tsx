@@ -90,6 +90,24 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
         </div>
       </div>
       
+      {agent.tags && agent.tags.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {agent.tags.slice(0, 3).map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+            >
+              {tag}
+            </span>
+          ))}
+          {agent.tags.length > 3 && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              +{agent.tags.length - 3} more
+            </span>
+          )}
+        </div>
+      )}
+      
       <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
         <div className={cn('flex items-center text-xs space-x-3', colors.gray[500])}>
           <span>{agent.skills.length} skills</span>

@@ -20,6 +20,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     name: '',
     description: '',
     model: '',
+    tags: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -70,12 +71,13 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
       tools: {},
       permissions: {},
       skills: [],
+      tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
       enabled: true,
     }
 
     addAgent(newAgent)
     addToast(`Agent "${newAgent.name}" created successfully`, 'success')
-    setFormData({ name: '', description: '', model: '' })
+    setFormData({ name: '', description: '', model: '', tags: '' })
     setErrors({})
     onClose()
   }
@@ -152,6 +154,26 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
             />
             <p className={cn('mt-1', typography.small, colors.gray[500])}>
               Leave empty to use default model from config
+            </p>
+          </div>
+
+          <div>
+            <label 
+              htmlFor="tags" 
+              className={cn(label.base, label.default)}
+            >
+              Tags (optional)
+            </label>
+            <input
+              type="text"
+              id="tags"
+              value={formData.tags}
+              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+              className={cn(formInput.base, formInput.default, focus.ring)}
+              placeholder="e.g., code-review, testing, documentation"
+            />
+            <p className={cn('mt-1', typography.small, colors.gray[500])}>
+              Comma-separated tags for categorization
             </p>
           </div>
 

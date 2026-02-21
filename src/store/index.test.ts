@@ -34,6 +34,7 @@ describe('useAppStore', () => {
     tools: { read: 'allow' },
     permissions: { file: 'ask' },
     skills: ['skill-1'],
+    tags: ['testing', 'automation'],
     enabled: true,
   }
 
