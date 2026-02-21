@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, lazy, Suspense } from 'react'
+import { useEffect, useState, useRef, lazy, Suspense, useCallback } from 'react'
 import { useAppStore } from '@store/index'
 import { AgentCard } from '@components/AgentCard'
 import { ThemeToggle } from '@components/ThemeToggle'
@@ -39,8 +39,11 @@ function App() {
     setLastSearchQuery(searchQuery)
   }, [searchQuery, setLastSearchQuery])
 
-  const openModal = () => setIsModalOpen(true)
-  const closeModal = () => setIsModalOpen(false)
+  const openModal = useCallback(() => setIsModalOpen(true), [])
+  const closeModal = useCallback(() => setIsModalOpen(false), [])
+  const handleSelectAgent = useCallback((id: string) => selectAgent(id), [selectAgent])
+  const handleToggleEnabled = useCallback((id: string, enabled: boolean) => 
+    updateAgent(id, { enabled: !enabled }), [updateAgent])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -114,8 +117,8 @@ function App() {
                   key={agent.id}
                   agent={agent}
                   isSelected={selectedAgentId === agent.id}
-                  onSelect={() => selectAgent(agent.id)}
-                  onToggleEnabled={() => updateAgent(agent.id, { enabled: !agent.enabled })}
+                  onSelect={() => handleSelectAgent(agent.id)}
+                  onToggleEnabled={() => handleToggleEnabled(agent.id, agent.enabled)}
                 />
               ))}
             </div>

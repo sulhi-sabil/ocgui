@@ -1,19 +1,19 @@
+import { useCallback } from 'react'
 import { useAppStore } from '../store'
 
 export function ThemeToggle() {
   const { theme, setTheme } = useAppStore()
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     const newTheme = theme === 'light' ? 'dark' : 'light'
     setTheme(newTheme)
     
-    // Apply theme to document
     if (newTheme === 'dark') {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')
     }
-  }
+  }, [theme, setTheme])
 
   return (
     <button
