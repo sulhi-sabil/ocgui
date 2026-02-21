@@ -25,7 +25,6 @@ function App() {
   const [searchQuery, setSearchQuery] = useState(lastSearchQuery)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  // Initialize theme on mount
   useEffect(() => {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark')
@@ -34,15 +33,12 @@ function App() {
     }
   }, [theme])
 
-  // Keyboard shortcut: Cmd/Ctrl + K to focus search
   usePlatformShortcut('k', () => {
     searchInputRef.current?.focus()
   })
 
-  // Filter agents based on search query
   const { filteredAgents, hasResults, resultCount } = useAgentSearch(agents, searchQuery)
 
-  // Persist search query when it changes
   useEffect(() => {
     setLastSearchQuery(searchQuery)
   }, [searchQuery, setLastSearchQuery])
@@ -56,6 +52,14 @@ function App() {
       addToast(`Agent "${duplicated.name}" created from duplicate`, 'success')
     }
   }, [duplicateAgent, addToast])
+
+  const handleSelectAgent = useCallback((id: string) => selectAgent(id), [selectAgent])
+  const handleToggleEnabled = useCallback((id: string) => {
+    const agent = agents.find(a => a.id === id)
+    if (agent) {
+      updateAgent(id, { enabled: !agent.enabled })
+    }
+  }, [agents, updateAgent])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -93,7 +97,6 @@ function App() {
               )}
             </h2>
             
-            {/* Search Bar */}
             <SearchInput
               ref={searchInputRef}
               value={searchQuery}
@@ -129,8 +132,8 @@ function App() {
                   key={agent.id}
                   agent={agent}
                   isSelected={selectedAgentId === agent.id}
-                  onSelect={() => selectAgent(agent.id)}
-                  onToggleEnabled={() => updateAgent(agent.id, { enabled: !agent.enabled })}
+                  onSelect={() => handleSelectAgent(agent.id)}
+                  onToggleEnabled={() => handleToggleEnabled(agent.id)}
                   onDuplicate={() => handleDuplicate(agent.id)}
                 />
               ))}

@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { memo, forwardRef } from 'react'
 import { cn } from '@utils/cn'
 import { formInput, focus, transitions, iconSize } from '@styles/tokens'
 
@@ -10,7 +10,7 @@ interface SearchInputProps {
   shortcutHint?: string
 }
 
-export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
+const SearchInputComponent = forwardRef<HTMLInputElement, SearchInputProps>(
   ({ value, onChange, placeholder = 'Search...', className, shortcutHint = '⌘K' }, ref) => {
     return (
       <div className={cn('relative', className)}>
@@ -78,4 +78,6 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   }
 )
 
-SearchInput.displayName = 'SearchInput'
+SearchInputComponent.displayName = 'SearchInput'
+
+export const SearchInput = memo(SearchInputComponent)
