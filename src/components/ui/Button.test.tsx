@@ -46,4 +46,14 @@ describe('Button', () => {
     rerender(<Button size="lg">Large</Button>)
     expect(screen.getByText('Large')).toHaveClass('px-6')
   })
+
+  it('defaults to type="button" to prevent accidental form submission', () => {
+    render(<Button>Click me</Button>)
+    expect(screen.getByRole('button')).toHaveAttribute('type', 'button')
+  })
+
+  it('allows type prop to be overridden', () => {
+    render(<Button type="submit">Submit</Button>)
+    expect(screen.getByRole('button')).toHaveAttribute('type', 'submit')
+  })
 })

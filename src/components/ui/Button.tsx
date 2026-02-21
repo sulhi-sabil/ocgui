@@ -14,6 +14,7 @@ export function Button({
   isLoading,
   className,
   disabled,
+  type = 'button',
   ...props
 }: ButtonProps) {
   const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
@@ -32,6 +33,7 @@ export function Button({
   
   return (
     <button
+      type={type}
       className={cn(
         baseStyles,
         variants[variant],
