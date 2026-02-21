@@ -1,0 +1,26 @@
+---
+name: Documentation Issue
+about: Report an issue with documentation
+title: '[Docs]: '
+labels: documentation, P3
+assignees: ''
+---
+
+## Documentation Location
+Provide the location of the documentation issue (file path or URL).
+
+## Issue Type
+- [ ] Typo or grammatical error
+- [ ] Missing documentation
+- [ ] Outdated documentation
+- [ ] Incorrect information
+- [ ] Other (please describe below)
+
+## Current Documentation
+Copy/paste the relevant section of the documentation, or describe what is currently documented.
+
+## Suggested Improvement
+Describe how the documentation should be improved.
+
+## Additional Context
+Add any other context about the documentation issue here.
