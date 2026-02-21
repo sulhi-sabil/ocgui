@@ -1,0 +1,312 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { act } from '@testing-library/react'
+import { useAppStore } from './index'
+import type { Agent, Skill, Config, Run } from '../types'
+
+describe('useAppStore', () => {
+  beforeEach(() => {
+    vi.stubGlobal('localStorage', {
+      getItem: vi.fn(() => null),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+      clear: vi.fn(),
+    })
+    useAppStore.setState({
+      agents: [],
+      selectedAgentId: null,
+      skills: [],
+      config: null,
+      runs: [],
+      theme: 'light',
+      lastSearchQuery: '',
+    })
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  const mockAgent: Agent = {
+    id: 'agent-1',
+    name: 'Test Agent',
+    description: 'A test agent',
+    model: 'gpt-4',
+    tools: { read: 'allow' },
+    permissions: { file: 'ask' },
+    skills: ['skill-1'],
+    enabled: true,
+  }
+
+  const mockSkill: Skill = {
+    id: 'skill-1',
+    name: 'Test Skill',
+    description: 'A test skill',
+    content: 'skill content',
+    commands: ['/test'],
+    path: '/path/to/skill',
+  }
+
+  const mockConfig: Config = {
+    providers: { openai: { apiKey: 'test' } },
+    agents: [],
+    tools: {},
+    experimental: {},
+  }
+
+  const mockRun: Run = {
+    id: 'run-1',
+    sessionId: 'session-1',
+    timestamp: Date.now(),
+    agent: 'agent-1',
+    model: 'gpt-4',
+    input: 'test input',
+    output: 'test output',
+    toolsUsed: ['read'],
+    exitStatus: 0,
+  }
+
+  describe('agent management', () => {
+    it('should have initial empty agents array', () => {
+      expect(useAppStore.getState().agents).toEqual([])
+    })
+
+    it('should set agents', () => {
+      act(() => {
+        useAppStore.getState().setAgents([mockAgent])
+      })
+
+      expect(useAppStore.getState().agents).toHaveLength(1)
+      expect(useAppStore.getState().agents[0]).toEqual(mockAgent)
+    })
+
+    it('should add an agent', () => {
+      act(() => {
+        useAppStore.getState().addAgent(mockAgent)
+      })
+
+      expect(useAppStore.getState().agents).toHaveLength(1)
+      expect(useAppStore.getState().agents[0]).toEqual(mockAgent)
+    })
+
+    it('should update an agent', () => {
+      act(() => {
+        useAppStore.getState().addAgent(mockAgent)
+      })
+
+      act(() => {
+        useAppStore.getState().updateAgent('agent-1', { name: 'Updated Agent' })
+      })
+
+      expect(useAppStore.getState().agents[0].name).toBe('Updated Agent')
+      expect(useAppStore.getState().agents[0].description).toBe(mockAgent.description)
+    })
+
+    it('should not update non-existent agent', () => {
+      act(() => {
+        useAppStore.getState().addAgent(mockAgent)
+        useAppStore.getState().updateAgent('non-existent', { name: 'Updated' })
+      })
+
+      expect(useAppStore.getState().agents[0].name).toBe(mockAgent.name)
+    })
+
+    it('should delete an agent', () => {
+      act(() => {
+        useAppStore.getState().addAgent(mockAgent)
+      })
+
+      act(() => {
+        useAppStore.getState().deleteAgent('agent-1')
+      })
+
+      expect(useAppStore.getState().agents).toHaveLength(0)
+    })
+
+    it('should clear selectedAgentId when deleting selected agent', () => {
+      act(() => {
+        useAppStore.getState().addAgent(mockAgent)
+        useAppStore.getState().selectAgent('agent-1')
+      })
+
+      expect(useAppStore.getState().selectedAgentId).toBe('agent-1')
+
+      act(() => {
+        useAppStore.getState().deleteAgent('agent-1')
+      })
+
+      expect(useAppStore.getState().selectedAgentId).toBeNull()
+    })
+
+    it('should select an agent', () => {
+      act(() => {
+        useAppStore.getState().selectAgent('agent-1')
+      })
+
+      expect(useAppStore.getState().selectedAgentId).toBe('agent-1')
+    })
+
+    it('should deselect an agent', () => {
+      act(() => {
+        useAppStore.getState().selectAgent('agent-1')
+      })
+
+      act(() => {
+        useAppStore.getState().selectAgent(null)
+      })
+
+      expect(useAppStore.getState().selectedAgentId).toBeNull()
+    })
+
+    it('should duplicate an agent', () => {
+      act(() => {
+        useAppStore.getState().addAgent(mockAgent)
+      })
+
+      const duplicated = useAppStore.getState().duplicateAgent('agent-1')
+
+      expect(useAppStore.getState().agents).toHaveLength(2)
+      expect(duplicated).not.toBeNull()
+      expect(duplicated!.name).toBe('Test Agent (Copy)')
+      expect(duplicated!.id).not.toBe('agent-1')
+    })
+
+    it('should return null when duplicating non-existent agent', () => {
+      const result = useAppStore.getState().duplicateAgent('non-existent')
+      expect(result).toBeNull()
+    })
+  })
+
+  describe('skill management', () => {
+    it('should have initial empty skills array', () => {
+      expect(useAppStore.getState().skills).toEqual([])
+    })
+
+    it('should set skills', () => {
+      act(() => {
+        useAppStore.getState().setSkills([mockSkill])
+      })
+
+      expect(useAppStore.getState().skills).toHaveLength(1)
+      expect(useAppStore.getState().skills[0]).toEqual(mockSkill)
+    })
+
+    it('should add a skill', () => {
+      act(() => {
+        useAppStore.getState().addSkill(mockSkill)
+      })
+
+      expect(useAppStore.getState().skills).toHaveLength(1)
+      expect(useAppStore.getState().skills[0]).toEqual(mockSkill)
+    })
+
+    it('should update a skill', () => {
+      act(() => {
+        useAppStore.getState().addSkill(mockSkill)
+      })
+
+      act(() => {
+        useAppStore.getState().updateSkill('skill-1', { name: 'Updated Skill' })
+      })
+
+      expect(useAppStore.getState().skills[0].name).toBe('Updated Skill')
+    })
+
+    it('should delete a skill', () => {
+      act(() => {
+        useAppStore.getState().addSkill(mockSkill)
+      })
+
+      act(() => {
+        useAppStore.getState().deleteSkill('skill-1')
+      })
+
+      expect(useAppStore.getState().skills).toHaveLength(0)
+    })
+  })
+
+  describe('configuration', () => {
+    it('should have initial null config', () => {
+      expect(useAppStore.getState().config).toBeNull()
+    })
+
+    it('should set config', () => {
+      act(() => {
+        useAppStore.getState().setConfig(mockConfig)
+      })
+
+      expect(useAppStore.getState().config).toEqual(mockConfig)
+    })
+  })
+
+  describe('execution runs', () => {
+    it('should have initial empty runs array', () => {
+      expect(useAppStore.getState().runs).toEqual([])
+    })
+
+    it('should add a run to the beginning', () => {
+      const run1 = { ...mockRun, id: 'run-1', timestamp: 1000 }
+      const run2 = { ...mockRun, id: 'run-2', timestamp: 2000 }
+
+      act(() => {
+        useAppStore.getState().addRun(run1)
+        useAppStore.getState().addRun(run2)
+      })
+
+      expect(useAppStore.getState().runs).toHaveLength(2)
+      expect(useAppStore.getState().runs[0].id).toBe('run-2')
+    })
+
+    it('should delete a run', () => {
+      act(() => {
+        useAppStore.getState().addRun(mockRun)
+      })
+
+      act(() => {
+        useAppStore.getState().deleteRun('run-1')
+      })
+
+      expect(useAppStore.getState().runs).toHaveLength(0)
+    })
+
+    it('should clear all runs', () => {
+      act(() => {
+        useAppStore.getState().addRun(mockRun)
+        useAppStore.getState().addRun({ ...mockRun, id: 'run-2' })
+      })
+
+      act(() => {
+        useAppStore.getState().clearRuns()
+      })
+
+      expect(useAppStore.getState().runs).toHaveLength(0)
+    })
+  })
+
+  describe('theme', () => {
+    it('should have initial light theme', () => {
+      expect(useAppStore.getState().theme).toBe('light')
+    })
+
+    it('should set theme', () => {
+      act(() => {
+        useAppStore.getState().setTheme('dark')
+      })
+
+      expect(useAppStore.getState().theme).toBe('dark')
+    })
+  })
+
+  describe('search', () => {
+    it('should have initial empty lastSearchQuery', () => {
+      expect(useAppStore.getState().lastSearchQuery).toBe('')
+    })
+
+    it('should set lastSearchQuery', () => {
+      act(() => {
+        useAppStore.getState().setLastSearchQuery('test query')
+      })
+
+      expect(useAppStore.getState().lastSearchQuery).toBe('test query')
+    })
+  })
+})

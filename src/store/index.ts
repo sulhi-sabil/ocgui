@@ -1,54 +1,43 @@
-import { useAgentStore } from './agentStore'
-import { useSkillStore } from './skillStore'
-import { useConfigStore } from './configStore'
-import { useRunStore } from './runStore'
-import { useUIStore } from './uiStore'
-import type { Agent, Skill, Config, Run } from '../types'
+import { create, type StateCreator } from 'zustand'
+import { persist } from 'zustand/middleware'
+import { 
+  createAgentSlice, 
+  createSkillSlice, 
+  createRunSlice, 
+  createConfigSlice,
+  createUISlice,
+  type AgentSlice,
+  type SkillSlice,
+  type RunSlice,
+  type ConfigSlice,
+  type UISlice
+} from './slices'
 
-export { useAgentStore } from './agentStore'
-export { useSkillStore } from './skillStore'
-export { useConfigStore } from './configStore'
-export { useRunStore } from './runStore'
-export { useUIStore } from './uiStore'
+type AppState = AgentSlice & SkillSlice & RunSlice & ConfigSlice & UISlice
 
-interface AppState {
-  agents: Agent[]
-  selectedAgentId: string | null
-  setAgents: (agents: Agent[]) => void
-  addAgent: (agent: Agent) => void
-  updateAgent: (id: string, updates: Partial<Agent>) => void
-  deleteAgent: (id: string) => void
-  selectAgent: (id: string | null) => void
-  
-  skills: Skill[]
-  setSkills: (skills: Skill[]) => void
-  addSkill: (skill: Skill) => void
-  
-  config: Config | null
-  setConfig: (config: Config) => void
-  
-  runs: Run[]
-  addRun: (run: Run) => void
-  
-  theme: 'light' | 'dark'
-  setTheme: (theme: 'light' | 'dark') => void
-  
-  lastSearchQuery: string
-  setLastSearchQuery: (query: string) => void
-}
+const createCombinedSlice: StateCreator<AppState, [], [], AppState> = (...args) => ({
+  ...createAgentSlice(...args),
+  ...createSkillSlice(...args),
+  ...createRunSlice(...args),
+  ...createConfigSlice(...args),
+  ...createUISlice(...args),
+})
 
-export function useAppStore(): AppState {
-  const agentState = useAgentStore()
-  const skillState = useSkillStore()
-  const configState = useConfigStore()
-  const runState = useRunStore()
-  const uiState = useUIStore()
-  
-  return {
-    ...agentState,
-    ...skillState,
-    ...configState,
-    ...runState,
-    ...uiState,
-  }
-}
+export const useAppStore = create<AppState>()(
+  persist(
+    createCombinedSlice,
+    {
+      name: 'ocgui-storage',
+      partialize: (state) => ({ 
+        theme: state.theme,
+        agents: state.agents,
+        selectedAgentId: state.selectedAgentId,
+        skills: state.skills,
+        config: state.config,
+        lastSearchQuery: state.lastSearchQuery,
+      }),
+    }
+  )
+)
+
+export type { AppState }
