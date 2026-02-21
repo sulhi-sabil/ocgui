@@ -4,15 +4,7 @@ export function ThemeToggle() {
   const { theme, setTheme } = useAppStore()
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newTheme)
-    
-    // Apply theme to document
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
+    setTheme(theme === 'light' ? 'dark' : 'light')
   }
 
   return (
