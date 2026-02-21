@@ -1,8 +1,8 @@
-import { memo } from 'react'
+import { memo, useCallback } from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import type { Agent } from '../types'
 import { cn } from '@utils/cn'
-import { colors, spacing, borders, transitions, shadows } from '@styles/tokens'
+import { colors, spacing, borders, transitions, shadows, focus } from '@styles/tokens'
 
 interface AgentCardProps {
   agent: Agent
@@ -13,14 +13,27 @@ interface AgentCardProps {
 }
 
 function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDuplicate }: AgentCardProps) {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onSelect()
+    }
+  }, [onSelect])
+
   return (
     <div
       onClick={onSelect}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-pressed={isSelected}
+      aria-label={`${agent.name} - ${agent.enabled ? 'Enabled' : 'Disabled'}`}
       className={cn(
         'relative cursor-pointer',
         spacing.card,
         borders.card,
         transitions.default,
+        focus.ringVisible,
         isSelected 
           ? `${colors.primary[500]} ${colors.primary[50]} scale-[1.02] ${shadows.md}` 
           : `${colors.gray[200]} ${colors.white} hover:border-gray-300 dark:hover:border-gray-600 hover:${shadows.md} hover:-translate-y-0.5`
