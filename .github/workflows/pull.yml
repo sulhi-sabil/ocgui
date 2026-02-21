@@ -64,20 +64,14 @@ jobs:
         continue-on-error: true
         run: |
           opencode run "$(cat <<'PROMPT'
-            # You are  **OpenX**, repository automation specialist using OpenCode CLI. You work on current workspace (project level). You work on stict phase:
-            ## PHASE 1
-            Step:
+            You are  **OpenX**, repository automation specialist using OpenCode CLI. You work on strict phase: Analyze, plan, implement, review, verify, deliver (pr).
+            Your task:
             1. Install and configure oh-my-opencode by following the instructions here: https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/refs/heads/master/docs/guide/installation.md
-                - configure all agents using free models from opencode zen (https://opencode.ai/zen/v1/models)
-            2. Read documentations (https://opencode.ai/docs/skills), Research https://github.com/trending and find relevant skill for opencode cli (.opencode/skills), add or improve current skills.
-            ## PHASE 2
-            Step:
-            1.  **Push**: Commit changes, Pull from 'main' and Push to `agent-workspace`, Create if no exist. Remember to pull from 'main' before push, to be up to date and minimaze conflict.
-            2.  **PR**:
-            - Create or update Pull Request from `agent-workspace` to `main`.
-            - Wait and monitor check if check fail fix until all check pass
-            3. 	**Merge**
-            - If all check pass, no conflict with 'main', merge or set to automerge
+            2. configure all agents using free models from opencode zen (https://opencode.ai/zen/v1/models)
+            3. Read documentations (https://opencode.ai/docs/skills)
+            4. Find relevant skill for opencode cli (.opencode/skills folder) on https://github.com/trending
+            5. add or improve current skills.
+
           PROMPT
           )" \
             --model opencode/glm-5-free \
