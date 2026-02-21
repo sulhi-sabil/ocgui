@@ -46,13 +46,24 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
 
   if (!isOpen) return null
 
+  const MAX_NAME_LENGTH = 100
+  const MAX_DESCRIPTION_LENGTH = 2000
+  const MAX_MODEL_LENGTH = 100
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required'
+    } else if (formData.name.length > MAX_NAME_LENGTH) {
+      newErrors.name = `Name must be ${MAX_NAME_LENGTH} characters or less`
     }
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required'
+    } else if (formData.description.length > MAX_DESCRIPTION_LENGTH) {
+      newErrors.description = `Description must be ${MAX_DESCRIPTION_LENGTH} characters or less`
+    }
+    if (formData.model.length > MAX_MODEL_LENGTH) {
+      newErrors.model = `Model must be ${MAX_MODEL_LENGTH} characters or less`
     }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0

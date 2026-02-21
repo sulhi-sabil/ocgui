@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
+const isDev = process.env.NODE_ENV !== 'production'
+
 export default defineConfig(async () => ({
   plugins: [react()],
   resolve: {
@@ -24,7 +26,7 @@ export default defineConfig(async () => ({
     },
   },
   build: {
-    sourcemap: true,
+    sourcemap: isDev,
     rollupOptions: {
       output: {
         manualChunks: {

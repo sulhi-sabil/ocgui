@@ -167,9 +167,14 @@ fn init_database(app_handle: &AppHandle) -> SqlResult<Connection> {
     Ok(conn)
 }
 
+fn sanitize_db_error(e: rusqlite::Error) -> String {
+    eprintln!("Database error: {:?}", e);
+    "Database operation failed".to_string()
+}
+
 #[tauri::command]
 fn add_run(state: State<DbState>, run: Run) -> Result<(), String> {
-    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    let conn = state.conn.lock().map_err(|e| sanitize_db_error(rusqlite::Error::ToSqlConversionFailure(e.into())))?;
     
     conn.execute(
         "INSERT INTO runs_v2 (id, session_id, timestamp, agent, model, input, output, tools_used, exit_status)
@@ -185,19 +190,19 @@ fn add_run(state: State<DbState>, run: Run) -> Result<(), String> {
             &run.tools_used,
             &run.exit_status
         ],
-    ).map_err(|e| e.to_string())?;
+    ).map_err(sanitize_db_error)?;
     
     Ok(())
 }
 
 #[tauri::command]
 fn get_runs(state: State<DbState>, limit: i64) -> Result<Vec<Run>, String> {
-    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    let conn = state.conn.lock().map_err(|e| sanitize_db_error(rusqlite::Error::ToSqlConversionFailure(e.into())))?;
     
     let mut stmt = conn
         .prepare("SELECT id, session_id, timestamp, agent, model, input, output, tools_used, exit_status 
                   FROM runs_v2 ORDER BY timestamp DESC LIMIT ?1")
-        .map_err(|e| e.to_string())?;
+        .map_err(sanitize_db_error)?;
     
     let runs = stmt
         .query_map([limit], |row| {
@@ -213,21 +218,21 @@ fn get_runs(state: State<DbState>, limit: i64) -> Result<Vec<Run>, String> {
                 exit_status: row.get(8)?,
             })
         })
-        .map_err(|e| e.to_string())?
+        .map_err(sanitize_db_error)?
         .collect::<SqlResult<Vec<Run>>>()
-        .map_err(|e| e.to_string())?;
+        .map_err(sanitize_db_error)?;
     
     Ok(runs)
 }
 
 #[tauri::command]
 fn get_run_by_id(state: State<DbState>, run_id: String) -> Result<Option<Run>, String> {
-    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    let conn = state.conn.lock().map_err(|e| sanitize_db_error(rusqlite::Error::ToSqlConversionFailure(e.into())))?;
     
     let mut stmt = conn
         .prepare("SELECT id, session_id, timestamp, agent, model, input, output, tools_used, exit_status 
                   FROM runs_v2 WHERE id = ?1")
-        .map_err(|e| e.to_string())?;
+        .map_err(sanitize_db_error)?;
     
     let run = stmt
         .query_row([&run_id], |row| {
@@ -244,36 +249,36 @@ fn get_run_by_id(state: State<DbState>, run_id: String) -> Result<Option<Run>, S
             })
         })
         .optional()
-        .map_err(|e| e.to_string())?;
+        .map_err(sanitize_db_error)?;
     
     Ok(run)
 }
 
 #[tauri::command]
 fn delete_run(state: State<DbState>, run_id: String) -> Result<(), String> {
-    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    let conn = state.conn.lock().map_err(|e| sanitize_db_error(rusqlite::Error::ToSqlConversionFailure(e.into())))?;
     
     conn.execute(
         "DELETE FROM runs_v2 WHERE id = ?1",
         [&run_id],
-    ).map_err(|e| e.to_string())?;
+    ).map_err(sanitize_db_error)?;
     
     conn.execute(
         "DELETE FROM run_logs WHERE run_id = ?1",
         [&run_id],
-    ).map_err(|e| e.to_string())?;
+    ).map_err(sanitize_db_error)?;
     
     Ok(())
 }
 
 #[tauri::command]
 fn get_runs_by_session(state: State<DbState>, session_id: String) -> Result<Vec<Run>, String> {
-    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    let conn = state.conn.lock().map_err(|e| sanitize_db_error(rusqlite::Error::ToSqlConversionFailure(e.into())))?;
     
     let mut stmt = conn
         .prepare("SELECT id, session_id, timestamp, agent, model, input, output, tools_used, exit_status 
                   FROM runs_v2 WHERE session_id = ?1 ORDER BY timestamp ASC")
-        .map_err(|e| e.to_string())?;
+        .map_err(sanitize_db_error)?;
     
     let runs = stmt
         .query_map([&session_id], |row| {
@@ -289,34 +294,34 @@ fn get_runs_by_session(state: State<DbState>, session_id: String) -> Result<Vec<
                 exit_status: row.get(8)?,
             })
         })
-        .map_err(|e| e.to_string())?
+        .map_err(sanitize_db_error)?
         .collect::<SqlResult<Vec<Run>>>()
-        .map_err(|e| e.to_string())?;
+        .map_err(sanitize_db_error)?;
     
     Ok(runs)
 }
 
 #[tauri::command]
 fn add_run_log(state: State<DbState>, log: RunLog) -> Result<i64, String> {
-    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    let conn = state.conn.lock().map_err(|e| sanitize_db_error(rusqlite::Error::ToSqlConversionFailure(e.into())))?;
     
     conn.execute(
         "INSERT INTO run_logs (run_id, log_line, log_type, timestamp)
          VALUES (?1, ?2, ?3, ?4)",
         params![&log.run_id, &log.log_line, &log.log_type, &log.timestamp],
-    ).map_err(|e| e.to_string())?;
+    ).map_err(sanitize_db_error)?;
     
     Ok(conn.last_insert_rowid())
 }
 
 #[tauri::command]
 fn get_run_logs(state: State<DbState>, run_id: String) -> Result<Vec<RunLog>, String> {
-    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    let conn = state.conn.lock().map_err(|e| sanitize_db_error(rusqlite::Error::ToSqlConversionFailure(e.into())))?;
     
     let mut stmt = conn
         .prepare("SELECT id, run_id, log_line, log_type, timestamp 
                   FROM run_logs WHERE run_id = ?1 ORDER BY timestamp ASC")
-        .map_err(|e| e.to_string())?;
+        .map_err(sanitize_db_error)?;
     
     let logs = stmt
         .query_map([&run_id], |row| {
@@ -328,9 +333,9 @@ fn get_run_logs(state: State<DbState>, run_id: String) -> Result<Vec<RunLog>, St
                 timestamp: row.get(4)?,
             })
         })
-        .map_err(|e| e.to_string())?
+        .map_err(sanitize_db_error)?
         .collect::<SqlResult<Vec<RunLog>>>()
-        .map_err(|e| e.to_string())?;
+        .map_err(sanitize_db_error)?;
     
     Ok(logs)
 }

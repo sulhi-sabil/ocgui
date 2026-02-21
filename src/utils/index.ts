@@ -8,7 +8,12 @@ export { cn } from './cn'
  * Generate a unique ID
  */
 export function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  const array = new Uint32Array(4)
+  crypto.getRandomValues(array)
+  return Array.from(array, n => n.toString(16).padStart(8, '0')).join('-')
 }
 
 /**
