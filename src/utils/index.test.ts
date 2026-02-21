@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateId, formatDate, deepClone, validateAgent, mergeConfig } from './index'
+import { generateId, formatDate, deepClone, validateAgent, mergeConfig, sanitize, isSafeKey } from './index'
 
 describe('generateId', () => {
   it('should generate a unique ID string', () => {
@@ -11,25 +11,53 @@ describe('generateId', () => {
     expect(id1).not.toBe(id2)
   })
 
-  it('should include timestamp in the ID', () => {
-    const before = Date.now()
+  it('should generate a valid UUID format when crypto.randomUUID is available', () => {
     const id = generateId()
-    const after = Date.now()
-    
-    const timestampPart = parseInt(id.split('-')[0], 10)
-    expect(timestampPart).toBeGreaterThanOrEqual(before)
-    expect(timestampPart).toBeLessThanOrEqual(after)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    expect(uuidRegex.test(id)).toBe(true)
   })
 
-  it('should have a random suffix', () => {
+  it('should generate unique IDs for multiple calls', () => {
     const ids = new Set<string>()
     for (let i = 0; i < 100; i++) {
-      const id = generateId()
-      const suffix = id.split('-')[1]
-      ids.add(suffix)
+      ids.add(generateId())
     }
     
     expect(ids.size).toBe(100)
+  })
+})
+
+describe('sanitize', () => {
+  it('should trim whitespace from input', () => {
+    expect(sanitize('  hello  ')).toBe('hello')
+  })
+
+  it('should remove control characters', () => {
+    expect(sanitize('hello\x00world')).toBe('helloworld')
+    expect(sanitize('test\x1Fvalue')).toBe('testvalue')
+  })
+
+  it('should truncate to maxLength', () => {
+    expect(sanitize('hello world', 5)).toBe('hello')
+  })
+
+  it('should return empty string for non-string input', () => {
+    expect(sanitize(null as unknown as string)).toBe('')
+    expect(sanitize(undefined as unknown as string)).toBe('')
+  })
+})
+
+describe('isSafeKey', () => {
+  it('should return false for dangerous keys', () => {
+    expect(isSafeKey('__proto__')).toBe(false)
+    expect(isSafeKey('constructor')).toBe(false)
+    expect(isSafeKey('prototype')).toBe(false)
+  })
+
+  it('should return true for safe keys', () => {
+    expect(isSafeKey('name')).toBe(true)
+    expect(isSafeKey('id')).toBe(true)
+    expect(isSafeKey('value')).toBe(true)
   })
 })
 
@@ -96,6 +124,28 @@ describe('deepClone', () => {
     const cloned = deepClone(original)
     
     expect(cloned).toEqual(original)
+  })
+
+  it('should prevent prototype pollution', () => {
+    const malicious = JSON.parse('{"__proto__": {"polluted": true}}')
+    deepClone(malicious)
+    
+    expect({}.polluted).toBeUndefined()
+  })
+
+  it('should skip dangerous keys during clone', () => {
+    const original = { 
+      name: 'test', 
+      __proto__: { polluted: true } as unknown,
+      constructor: { polluted: true } as unknown,
+      prototype: { polluted: true } as unknown
+    }
+    const cloned = deepClone(original as Record<string, unknown>)
+    
+    expect(cloned.name).toBe('test')
+    expect(Object.keys(cloned)).not.toContain('__proto__')
+    expect(Object.keys(cloned)).not.toContain('constructor')
+    expect(Object.keys(cloned)).not.toContain('prototype')
   })
 })
 

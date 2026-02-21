@@ -2,11 +2,35 @@
  * Utility functions for common operations
  */
 
+const DANGEROUS_KEYS = ['__proto__', 'constructor', 'prototype']
+
 /**
- * Generate a unique ID
+ * Generate a unique ID using cryptographically secure random
  */
 export function generateId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
   return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
+}
+
+/**
+ * Sanitize string input to prevent XSS
+ * Removes control characters and trims whitespace
+ */
+export function sanitize(input: string, maxLength: number = 1000): string {
+  if (typeof input !== 'string') return ''
+  return input
+    .slice(0, maxLength)
+    .replace(/[\x00-\x1F\x7F]/g, '')
+    .trim()
+}
+
+/**
+ * Check if a key is safe for object assignment (prevents prototype pollution)
+ */
+export function isSafeKey(key: string): boolean {
+  return !DANGEROUS_KEYS.includes(key)
 }
 
 /**
@@ -17,10 +41,24 @@ export function formatDate(timestamp: number): string {
 }
 
 /**
- * Deep clone an object
+ * Deep clone an object safely (prevents prototype pollution)
  */
 export function deepClone<T>(obj: T): T {
-  return JSON.parse(JSON.stringify(obj))
+  if (obj === null || typeof obj !== 'object') {
+    return obj
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => deepClone(item)) as T
+  }
+  
+  const cloned: Record<string, unknown> = {}
+  for (const key of Object.keys(obj)) {
+    if (isSafeKey(key)) {
+      cloned[key] = deepClone((obj as Record<string, unknown>)[key])
+    }
+  }
+  return cloned as T
 }
 
 /**

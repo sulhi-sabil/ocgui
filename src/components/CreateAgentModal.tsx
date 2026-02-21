@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAppStore } from '@store/index'
 import { Button } from './ui/Button'
 import { useToast } from './ui/Toast'
-import { generateId } from '@utils/index'
+import { generateId, sanitize } from '@utils/index'
 import { cn } from '@utils/cn'
 import { colors, zIndex, modal, formInput, focus, label, typography } from '@styles/tokens'
 import type { Agent } from '../types'
@@ -48,11 +48,21 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
-    if (!formData.name.trim()) {
+    const trimmedName = formData.name.trim()
+    const trimmedDesc = formData.description.trim()
+    
+    if (!trimmedName) {
       newErrors.name = 'Name is required'
+    } else if (trimmedName.length > 100) {
+      newErrors.name = 'Name must be 100 characters or less'
     }
-    if (!formData.description.trim()) {
+    if (!trimmedDesc) {
       newErrors.description = 'Description is required'
+    } else if (trimmedDesc.length > 500) {
+      newErrors.description = 'Description must be 500 characters or less'
+    }
+    if (formData.model.trim().length > 100) {
+      newErrors.model = 'Model must be 100 characters or less'
     }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -62,11 +72,15 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     e.preventDefault()
     if (!validateForm()) return
 
+    const sanitizedName = sanitize(formData.name, 100)
+    const sanitizedDescription = sanitize(formData.description, 500)
+    const sanitizedModel = sanitize(formData.model, 100)
+
     const newAgent: Agent = {
       id: generateId(),
-      name: formData.name.trim(),
-      description: formData.description.trim(),
-      model: formData.model.trim() || undefined,
+      name: sanitizedName,
+      description: sanitizedDescription,
+      model: sanitizedModel || undefined,
       tools: {},
       permissions: {},
       skills: [],
@@ -107,6 +121,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              maxLength={100}
               className={cn(formInput.base, formInput.default, focus.ring)}
               placeholder="e.g., Code Reviewer"
             />
@@ -126,6 +141,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              maxLength={500}
               className={cn(formInput.base, formInput.default, focus.ring)}
               rows={3}
               placeholder="Describe what this agent does..."
@@ -147,6 +163,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               id="model"
               value={formData.model}
               onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+              maxLength={100}
               className={cn(formInput.base, formInput.default, focus.ring)}
               placeholder="e.g., gpt-4, claude-3-opus"
             />
