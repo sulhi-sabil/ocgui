@@ -99,6 +99,15 @@ export function validateAgent(agent: unknown): { valid: boolean; errors: string[
     }
   }
   
+  if (!Array.isArray(a.tags)) {
+    errors.push('Agent must have a tags array')
+  } else {
+    const invalidTags = a.tags.filter(t => typeof t !== 'string')
+    if (invalidTags.length > 0) {
+      errors.push('Agent tags must be strings')
+    }
+  }
+  
   if (typeof a.enabled !== 'boolean') {
     errors.push('Agent must have an enabled boolean')
   }
