@@ -1,7 +1,13 @@
+---
+name: git-commit-message
+description: Generate high-quality, conventional commit messages that follow best practices
+license: MIT
+compatibility: opencode
+---
+
 # Git Commit Message Skill
 
-## Description
-Generate high-quality, conventional commit messages that follow best practices.
+## When to Use
 
 ## When to Use
 - Before committing changes

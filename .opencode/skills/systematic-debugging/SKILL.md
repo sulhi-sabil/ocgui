@@ -1,7 +1,13 @@
+---
+name: systematic-debugging
+description: A systematic 4-phase root cause analysis debugging process
+license: MIT
+compatibility: opencode
+---
+
 # Systematic Debugging Skill
 
-## Description
-A systematic approach to debugging that uses a 4-phase root cause analysis process.
+## When to Use
 
 ## When to Use
 - When encountering bugs or unexpected behavior

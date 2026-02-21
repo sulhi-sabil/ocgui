@@ -1,7 +1,11 @@
-# Context Engineering & Memory Systems Skill
+---
+name: context-engineering-memory
+description: Advanced techniques for context management and memory systems in AI agents
+license: MIT
+compatibility: opencode
+---
 
-## Description
-Advanced techniques for context management and memory systems in AI agents.
+# Context Engineering & Memory Systems Skill
 
 ## When to Use
 - Managing large codebases

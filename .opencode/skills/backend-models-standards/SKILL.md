@@ -1,7 +1,11 @@
-# Backend Models & Standards Skill
+---
+name: backend-models-standards
+description: Standards and best practices for backend model implementation and API design
+license: MIT
+compatibility: opencode
+---
 
-## Description
-Standards and best practices for backend model implementation and API design.
+# Backend Models & Standards Skill
 
 ## When to Use
 - Designing backend APIs

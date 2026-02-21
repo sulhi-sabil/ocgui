@@ -1,7 +1,11 @@
-# Debugging Strategies Skill
+---
+name: debugging-strategies
+description: Comprehensive debugging strategies and techniques for efficient problem resolution
+license: MIT
+compatibility: opencode
+---
 
-## Description
-Comprehensive debugging strategies and techniques for efficient problem resolution.
+# Debugging Strategies Skill
 
 ## When to Use
 - Investigating bugs or errors
