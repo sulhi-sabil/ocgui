@@ -2,7 +2,7 @@
   "version": "3.2.0",
   "agent": {
     "name": "Sisyphus",
-    "model": "opencode/kimi-k2.5-free",
+    "model": "opencode/claude-opus-4-5",
     "temperature": 0.7,
     "max_tokens": 8000
   },
@@ -14,7 +14,7 @@
       "permissions": ["read", "write", "execute", "git", "network"]
     },
     "Sisyphus": {
-      "model": "opencode/big-pickle",
+      "model": "opencode/claude-opus-4-5",
       "temperature": 0.7,
       "permissions": ["read", "write", "execute", "git", "network"]
     },
@@ -24,17 +24,17 @@
       "permissions": ["read", "write", "execute", "git", "network"]
     },
     "Oracle": {
-      "model": "opencode/kimi-k2.5-free",
+      "model": "opencode/gpt-5.2",
       "temperature": 0.6,
       "permissions": ["read", "write", "execute", "git"]
     },
     "Librarian": {
-      "model": "opencode/minimax-m2.1-free",
+      "model": "opencode/glm-5-free",
       "temperature": 0.5,
       "permissions": ["read", "network"]
     },
     "Explore": {
-      "model": "opencode/glm-4.7-free",
+      "model": "opencode/gpt-5-nano",
       "temperature": 0.3,
       "permissions": ["read"]
     },
@@ -53,7 +53,10 @@
       "moai-adk-tool",
       "context-engineering-memory",
       "debugging-strategies",
-      "git-commit-message"
+      "git-commit-message",
+      "tauri-react-patterns",
+      "agentic-workflows",
+      "cli-development"
     ]
   },
   "mcp": {

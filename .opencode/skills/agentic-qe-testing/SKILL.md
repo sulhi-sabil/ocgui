@@ -1,7 +1,13 @@
+---
+name: agentic-qe-testing
+description: Quality engineering approach using AI agents for comprehensive testing automation
+license: MIT
+compatibility: opencode
+---
+
 # Agentic QE Testing Skill
 
-## Description
-Quality engineering approach using AI agents for comprehensive testing automation.
+## When to Use
 
 ## When to Use
 - Creating test strategies

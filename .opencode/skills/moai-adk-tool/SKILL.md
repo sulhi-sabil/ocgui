@@ -1,7 +1,11 @@
-# MOAI ADK Tool Skill
+---
+name: moai-adk-tool
+description: Integration with MOAI ADK for advanced agent tooling and orchestration
+license: MIT
+compatibility: opencode
+---
 
-## Description
-Integration with MOAI (Multi-Objective AI) ADK for advanced agent tooling and orchestration.
+# MOAI ADK Tool Skill
 
 ## When to Use
 - Multi-agent coordination
