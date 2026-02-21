@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAppStore } from '@store/index'
 import { Button } from './ui/Button'
-import { useToast } from './ui/Toast'
+import { useToast } from './ui/useToast'
 import { generateId } from '@utils/index'
 import type { Agent } from '../types'
 
