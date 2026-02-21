@@ -159,3 +159,12 @@ export const toast = {
 export const grid = {
   cards: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4',
 } as const
+
+export const timing = {
+  toast: {
+    autoDismiss: 5000,
+  },
+  modal: {
+    focusDelay: 50,
+  },
+} as const

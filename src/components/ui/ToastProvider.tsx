@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useState, useCallback, createContext, useRef, useEffect } from 'react'
 import { generateId } from '@utils/index'
+import { timing } from '@styles/tokens'
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning'
 
@@ -41,7 +42,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
     const timeoutId = setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id))
       timeoutRefs.current.delete(id)
-    }, 5000)
+    }, timing.toast.autoDismiss)
     
     timeoutRefs.current.set(id, timeoutId)
   }, [])
