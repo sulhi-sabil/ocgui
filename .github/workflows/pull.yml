@@ -71,6 +71,10 @@ jobs:
             3. Read documentations (https://opencode.ai/docs/skills)
             4. Find relevant skill for opencode cli (.opencode/skills folder) on https://github.com/trending
             5. add or improve current skills.
+            Rules:
+            - work on current workspace, dont work outside workspace. do projek config level, not global.
+            - always fetch and pull from default branch before and after work
+            - strick on one task before move to next task
 
           PROMPT
           )" \
