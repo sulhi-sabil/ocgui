@@ -104,8 +104,11 @@ describe('validateAgent', () => {
     const agent = {
       id: 'test-id',
       name: 'Test Agent',
+      description: 'A test agent',
       tools: {},
       permissions: {},
+      skills: ['skill-1'],
+      enabled: true,
     }
     
     const result = validateAgent(agent)
@@ -198,6 +201,136 @@ describe('validateAgent', () => {
     
     expect(result.valid).toBe(false)
     expect(result.errors.length).toBeGreaterThan(1)
+  })
+
+  it('should fail for missing description', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      skills: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent must have a string description')
+  })
+
+  it('should fail for non-string description', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 123,
+      skills: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent must have a string description')
+  })
+
+  it('should fail for missing skills array', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent must have a skills array')
+  })
+
+  it('should fail for non-array skills', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: 'not-an-array',
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent must have a skills array')
+  })
+
+  it('should fail for non-string skill items', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: ['valid', 123, 'also-valid'],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent skills must be strings')
+  })
+
+  it('should accept empty skills array', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for missing enabled boolean', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent must have an enabled boolean')
+  })
+
+  it('should fail for non-boolean enabled', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      enabled: 'true',
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent must have an enabled boolean')
+  })
+
+  it('should accept enabled: false', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      enabled: false,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(true)
   })
 })
 
