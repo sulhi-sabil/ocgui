@@ -1,6 +1,19 @@
 # OpenCode GUI (ocgui)
 
+[![Tauri](https://img.shields.io/badge/Tauri-v2-blue?logo=tauri)](https://tauri.app/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-MIT-green)](./LICENSE)
+
 > A native desktop application that transforms OpenCode CLI into a visually orchestrated control plane.
+
+**Status:** 🚧 Early Development
+
+## Prerequisites
+
+- **OpenCode CLI** >= 1.0.0 - [Install](https://opencode.ai/download)
+- **Node.js** >= 18
+- **Rust** >= 1.70 (for Tauri builds)
 
 ## Quick Start
 
@@ -39,6 +52,16 @@ npm run dev
 - **State Management**: Zustand
 - **Code Editor**: Monaco Editor
 
+## Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run TypeScript check |
+| `npm test` | Run test suite |
+
 ## Documentation
 
 - [Blueprint](./blueprint.md) - Complete project specification
@@ -47,7 +70,15 @@ npm run dev
 
 ## Contributing
 
-Contributions welcome! Please read our workflow documentation before submitting PRs.
+Contributions welcome! 
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit changes (`git commit -m 'Add your feature'`)
+4. Push to branch (`git push origin feature/your-feature`)
+5. Open a Pull Request
+
+Please read the [Blueprint](./blueprint.md) to understand project direction before submitting PRs.
 
 ## License
 
