@@ -49,6 +49,10 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
             disabled={!onToggleEnabled}
             title={onToggleEnabled ? `Click to ${agent.enabled ? 'disable' : 'enable'} agent` : undefined}
           >
+            <span className={cn(
+              'w-1.5 h-1.5 rounded-full mr-1.5 flex-shrink-0',
+              agent.enabled ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
+            )} />
             {agent.enabled ? 'Enabled' : 'Disabled'}
           </button>
           
