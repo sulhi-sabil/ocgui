@@ -6,6 +6,8 @@ import { Button, SearchInput, EmptyState } from '@components/ui'
 import { useAgentSearch } from '@hooks/useAgentSearch'
 import { usePlatformShortcut } from '@hooks/useKeyboardShortcut'
 import { useToast } from '@components/ui/Toast'
+import { cn } from '@utils/cn'
+import { iconSize, strokeWidth, grid, colors } from '@styles/tokens'
 
 // Lazy load modal for better initial load performance
 const CreateAgentModal = lazy(() => import('@components/CreateAgentModal'))
@@ -63,8 +65,8 @@ function App() {
           </div>
           <div className="flex items-center gap-3">
             <Button onClick={openModal} size="sm">
-              <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              <svg className={cn(iconSize.sm, 'mr-2')} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               Add Agent
             </Button>
@@ -105,8 +107,8 @@ function App() {
                   : 'Get started by creating your first agent. Agents help you automate tasks and orchestrate workflows.'
               }
               icon={
-                <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                <svg className={cn(iconSize.xl, colors.primary.text)} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               }
               actionLabel={searchQuery ? undefined : 'Create Your First Agent'}
@@ -115,7 +117,7 @@ function App() {
               onSecondaryAction={searchQuery ? () => setSearchQuery('') : undefined}
             />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className={grid.cards}>
               {filteredAgents.map((agent) => (
                 <AgentCard
                   key={agent.id}

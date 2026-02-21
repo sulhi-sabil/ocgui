@@ -2,7 +2,7 @@ import { memo } from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import type { Agent } from '../types'
 import { cn } from '@utils/cn'
-import { colors, spacing, borders, transitions, shadows } from '@styles/tokens'
+import { colors, spacing, borders, transitions, shadows, iconSize, strokeWidth } from '@styles/tokens'
 
 interface AgentCardProps {
   agent: Agent
@@ -64,8 +64,8 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
                   className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                   aria-label="Agent actions"
                 >
-                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                  <svg className={cn(iconSize.sm, colors.gray[500])} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                   </svg>
                 </button>
               </DropdownMenu.Trigger>
@@ -82,8 +82,8 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
                       onDuplicate()
                     }}
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    <svg className={iconSize.sm} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
                     Duplicate
                   </DropdownMenu.Item>

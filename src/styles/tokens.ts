@@ -143,3 +143,19 @@ export const iconSize = {
   lg: 'w-6 h-6',
   xl: 'w-8 h-8',
 } as const
+
+export const strokeWidth = {
+  thin: 1,
+  default: 2,
+  thick: 3,
+  spinner: 4,
+} as const
+
+export const toast = {
+  minWidth: 'min-w-[300px]',
+  maxWidth: 'max-w-md',
+} as const
+
+export const grid = {
+  cards: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4',
+} as const
