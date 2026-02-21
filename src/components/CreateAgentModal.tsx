@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, memo } from 'react'
 import { useAppStore } from '@store/index'
 import { Button } from './ui/Button'
 import { useToast } from './ui/Toast'
@@ -10,8 +10,8 @@ interface CreateAgentModalProps {
   onClose: () => void
 }
 
-export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
-  const { addAgent } = useAppStore()
+function CreateAgentModalComponent({ isOpen, onClose }: CreateAgentModalProps) {
+  const addAgent = useAppStore((state) => state.addAgent)
   const { addToast } = useToast()
   const nameInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState({
@@ -21,7 +21,6 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // Handle Escape key, click outside, and auto-focus
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -30,7 +29,6 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
-      // Auto-focus name input after modal animation
       setTimeout(() => nameInputRef.current?.focus(), 50)
     }
 
@@ -44,9 +42,19 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     if (e.target === e.currentTarget) onClose()
   }, [onClose])
 
-  if (!isOpen) return null
+  const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, name: e.target.value }))
+  }, [])
 
-  const validateForm = () => {
+  const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setFormData((prev) => ({ ...prev, description: e.target.value }))
+  }, [])
+
+  const handleModelChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, model: e.target.value }))
+  }, [])
+
+  const validateForm = useCallback(() => {
     const newErrors: Record<string, string> = {}
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required'
@@ -56,9 +64,9 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
-  }
+  }, [formData.name, formData.description])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
     if (!validateForm()) return
 
@@ -78,7 +86,9 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     setFormData({ name: '', description: '', model: '' })
     setErrors({})
     onClose()
-  }
+  }, [formData, validateForm, addAgent, addToast, onClose])
+
+  if (!isOpen) return null
 
   return (
     <div 
@@ -106,7 +116,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               type="text"
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={handleNameChange}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
                        bg-white dark:bg-gray-700 text-gray-900 dark:text-white
                        focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -127,7 +137,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
             <textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={handleDescriptionChange}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
                        bg-white dark:bg-gray-700 text-gray-900 dark:text-white
                        focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -150,7 +160,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               type="text"
               id="model"
               value={formData.model}
-              onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+              onChange={handleModelChange}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
                        bg-white dark:bg-gray-700 text-gray-900 dark:text-white
                        focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -175,5 +185,6 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
   )
 }
 
-// Default export for lazy loading
+export const CreateAgentModal = memo(CreateAgentModalComponent)
+
 export default CreateAgentModal

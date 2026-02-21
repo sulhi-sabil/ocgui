@@ -8,11 +8,17 @@ import { EmptyState } from '@components/ui/EmptyState'
 import { useAgentSearch } from '@hooks/useAgentSearch'
 import { usePlatformShortcut } from '@hooks/useKeyboardShortcut'
 
-// Lazy load modal for better initial load performance
 const CreateAgentModal = lazy(() => import('@components/CreateAgentModal'))
 
 function App() {
-  const { agents, selectedAgentId, selectAgent, theme, lastSearchQuery, setLastSearchQuery, updateAgent } = useAppStore()
+  const agents = useAppStore((state) => state.agents)
+  const selectedAgentId = useAppStore((state) => state.selectedAgentId)
+  const theme = useAppStore((state) => state.theme)
+  const lastSearchQuery = useAppStore((state) => state.lastSearchQuery)
+  const selectAgent = useAppStore((state) => state.selectAgent)
+  const updateAgent = useAppStore((state) => state.updateAgent)
+  const setLastSearchQuery = useAppStore((state) => state.setLastSearchQuery)
+  
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState(lastSearchQuery)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -44,6 +50,7 @@ function App() {
   const handleSelectAgent = useCallback((id: string) => selectAgent(id), [selectAgent])
   const handleToggleEnabled = useCallback((id: string, enabled: boolean) => 
     updateAgent(id, { enabled: !enabled }), [updateAgent])
+  const handleClearSearch = useCallback(() => setSearchQuery(''), [])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -108,7 +115,7 @@ function App() {
               actionLabel={searchQuery ? undefined : 'Create Your First Agent'}
               onAction={searchQuery ? undefined : openModal}
               secondaryActionLabel={searchQuery ? 'Clear Search' : undefined}
-              onSecondaryAction={searchQuery ? () => setSearchQuery('') : undefined}
+              onSecondaryAction={searchQuery ? handleClearSearch : undefined}
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

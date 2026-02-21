@@ -1,8 +1,9 @@
-import { useCallback } from 'react'
+import { memo, useCallback } from 'react'
 import { useAppStore } from '../store'
 
-export function ThemeToggle() {
-  const { theme, setTheme } = useAppStore()
+function ThemeToggleComponent() {
+  const theme = useAppStore((state) => state.theme)
+  const setTheme = useAppStore((state) => state.setTheme)
 
   const toggleTheme = useCallback(() => {
     const newTheme = theme === 'light' ? 'dark' : 'light'
@@ -43,3 +44,5 @@ export function ThemeToggle() {
     </button>
   )
 }
+
+export const ThemeToggle = memo(ThemeToggleComponent)
