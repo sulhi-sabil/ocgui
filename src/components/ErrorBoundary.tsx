@@ -7,20 +7,27 @@ interface Props {
 interface State {
   hasError: boolean
   error: Error | null
+  errorInfo: ErrorInfo | null
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
     error: null,
+    errorInfo: null,
   }
 
   public static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error }
+    return { hasError: true, error, errorInfo: null }
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    this.setState({ errorInfo })
     console.error('Uncaught error:', error, errorInfo)
+  }
+
+  private handleReset = () => {
+    this.setState({ hasError: false, error: null, errorInfo: null })
   }
 
   public render() {
@@ -32,19 +39,27 @@ export class ErrorBoundary extends Component<Props, State> {
               Something went wrong
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              The application encountered an unexpected error. Please try refreshing the page.
+              The application encountered an unexpected error.
             </p>
             {this.state.error && (
-              <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-sm text-gray-800 dark:text-gray-200 overflow-auto">
+              <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-sm text-gray-800 dark:text-gray-200 overflow-auto max-h-32">
                 {this.state.error.message}
               </pre>
             )}
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
-            >
-              Reload Application
-            </button>
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={this.handleReset}
+                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded transition-colors"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
+              >
+                Reload App
+              </button>
+            </div>
           </div>
         </div>
       )
