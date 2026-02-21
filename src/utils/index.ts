@@ -19,10 +19,42 @@ export function formatDate(timestamp: number): string {
 }
 
 /**
- * Deep clone an object
+ * Deep clone an object with proper handling for Dates and error recovery
  */
 export function deepClone<T>(obj: T): T {
-  return JSON.parse(JSON.stringify(obj))
+  return deepCloneInternal(obj, new WeakSet())
+}
+
+function deepCloneInternal<T>(obj: T, visited: WeakSet<object>): T {
+  if (obj === null || typeof obj !== 'object') {
+    return obj
+  }
+
+  if (visited.has(obj as object)) {
+    return obj
+  }
+
+  if (obj instanceof Date) {
+    return new Date(obj.getTime()) as T
+  }
+
+  if (Array.isArray(obj)) {
+    visited.add(obj)
+    return obj.map((item) => deepCloneInternal(item, visited)) as T
+  }
+
+  try {
+    visited.add(obj as object)
+    const cloned: Record<string, unknown> = {}
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        cloned[key] = deepCloneInternal((obj as Record<string, unknown>)[key], visited)
+      }
+    }
+    return cloned as T
+  } catch {
+    return obj
+  }
 }
 
 /**
