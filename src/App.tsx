@@ -7,7 +7,7 @@ import { SearchInput } from '@components/ui/SearchInput'
 import { EmptyState } from '@components/ui/EmptyState'
 import { useAgentSearch } from '@hooks/useAgentSearch'
 import { usePlatformShortcut } from '@hooks/useKeyboardShortcut'
-import { useToast } from '@components/ui/Toast'
+import { useToast } from '@components/ui'
 
 // Lazy load modal for better initial load performance
 const CreateAgentModal = lazy(() => import('@components/CreateAgentModal'))

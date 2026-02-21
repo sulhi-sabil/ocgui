@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAppStore } from '@store/index'
 import { Button } from './ui/Button'
-import { useToast } from './ui/Toast'
+import { useToast } from './ui'
 import { generateId } from '@utils/index'
 import { cn } from '@utils/cn'
 import { colors, zIndex, modal, formInput, focus, label, typography } from '@styles/tokens'
