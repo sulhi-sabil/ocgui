@@ -44,12 +44,29 @@ export function validateAgent(agent: unknown): { valid: boolean; errors: string[
     errors.push('Agent must have a string name')
   }
   
+  if (a.description === undefined || typeof a.description !== 'string') {
+    errors.push('Agent must have a string description')
+  }
+  
   if (a.tools && typeof a.tools !== 'object') {
     errors.push('Agent tools must be an object')
   }
   
   if (a.permissions && typeof a.permissions !== 'object') {
     errors.push('Agent permissions must be an object')
+  }
+  
+  if (!Array.isArray(a.skills)) {
+    errors.push('Agent must have a skills array')
+  } else {
+    const invalidSkills = a.skills.filter(s => typeof s !== 'string')
+    if (invalidSkills.length > 0) {
+      errors.push('Agent skills must be strings')
+    }
+  }
+  
+  if (typeof a.enabled !== 'boolean') {
+    errors.push('Agent must have an enabled boolean')
   }
   
   return { valid: errors.length === 0, errors }
