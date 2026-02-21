@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useState, useCallback, createContext } from 'react'
 import { generateId } from '@utils/index'
+import { TOAST_DURATION } from '@config/constants'
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning'
 
@@ -31,7 +32,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
     
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id))
-    }, 5000)
+    }, TOAST_DURATION)
   }, [])
 
   const removeToast = useCallback((id: string) => {

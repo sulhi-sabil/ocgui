@@ -5,6 +5,7 @@ import { useToast } from './ui/Toast'
 import { generateId } from '@utils/index'
 import { cn } from '@utils/cn'
 import { colors, zIndex, modal, formInput, focus, label, typography } from '@styles/tokens'
+import { MODAL_FOCUS_DELAY } from '@config/constants'
 import type { Agent } from '../types'
 
 interface CreateAgentModalProps {
@@ -31,7 +32,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
-      setTimeout(() => nameInputRef.current?.focus(), 50)
+      setTimeout(() => nameInputRef.current?.focus(), MODAL_FOCUS_DELAY)
     }
 
     return () => {

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Agent, Skill, Config, Run } from '../types'
+import { ID_RANDOM_LENGTH, STORAGE_KEY, DEFAULT_THEME, DUPLICATE_NAME_SUFFIX } from '@config/constants'
 
 interface AppState {
   // Agent management
@@ -64,8 +65,8 @@ export const useAppStore = create<AppState>()(
         
         const duplicated: Agent = {
           ...agent,
-          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          name: `${agent.name} (Copy)`,
+          id: `${Date.now()}-${Math.random().toString(36).substring(2, ID_RANDOM_LENGTH + 2)}`,
+          name: `${agent.name}${DUPLICATE_NAME_SUFFIX}`,
         }
         
         set((state) => ({ agents: [...state.agents, duplicated] }))
@@ -102,7 +103,7 @@ export const useAppStore = create<AppState>()(
       clearRuns: () => set({ runs: [] }),
       
       // Theme
-      theme: 'light',
+      theme: DEFAULT_THEME,
       setTheme: (theme) => set({ theme }),
       
       // Search
@@ -110,7 +111,7 @@ export const useAppStore = create<AppState>()(
       setLastSearchQuery: (query) => set({ lastSearchQuery: query }),
     }),
     {
-      name: 'ocgui-storage',
+      name: STORAGE_KEY,
       partialize: (state) => ({ 
         theme: state.theme,
         agents: state.agents,
