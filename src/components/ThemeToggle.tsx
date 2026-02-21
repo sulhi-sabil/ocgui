@@ -1,11 +1,13 @@
+import { memo, useCallback } from 'react'
 import { useAppStore } from '../store'
 import { cn } from '@utils/cn'
 import { colors, transitions, iconSize } from '@styles/tokens'
 
-export function ThemeToggle() {
-  const { theme, setTheme } = useAppStore()
+function ThemeToggleComponent() {
+  const theme = useAppStore((state) => state.theme)
+  const setTheme = useAppStore((state) => state.setTheme)
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     const newTheme = theme === 'light' ? 'dark' : 'light'
     setTheme(newTheme)
     
@@ -14,7 +16,7 @@ export function ThemeToggle() {
     } else {
       document.documentElement.classList.remove('dark')
     }
-  }
+  }, [theme, setTheme])
 
   return (
     <button
@@ -49,3 +51,5 @@ export function ThemeToggle() {
     </button>
   )
 }
+
+export const ThemeToggle = memo(ThemeToggleComponent)

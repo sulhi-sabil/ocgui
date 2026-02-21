@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, lazy, Suspense } from 'react'
+import { useEffect, useState, useRef, lazy, Suspense, useCallback } from 'react'
 import { useAppStore } from '@store/index'
 import { AgentCard } from '@components/AgentCard'
 import { ThemeToggle } from '@components/ThemeToggle'
@@ -9,11 +9,17 @@ import { useToast } from '@components/ui/Toast'
 import { cn } from '@utils/cn'
 import { iconSize, strokeWidth, grid, colors } from '@styles/tokens'
 
-// Lazy load modal for better initial load performance
 const CreateAgentModal = lazy(() => import('@components/CreateAgentModal'))
 
 function App() {
-  const { agents, selectedAgentId, selectAgent, theme, lastSearchQuery, setLastSearchQuery, updateAgent, duplicateAgent } = useAppStore()
+  const agents = useAppStore((state) => state.agents)
+  const selectedAgentId = useAppStore((state) => state.selectedAgentId)
+  const selectAgent = useAppStore((state) => state.selectAgent)
+  const theme = useAppStore((state) => state.theme)
+  const lastSearchQuery = useAppStore((state) => state.lastSearchQuery)
+  const setLastSearchQuery = useAppStore((state) => state.setLastSearchQuery)
+  const updateAgent = useAppStore((state) => state.updateAgent)
+  const duplicateAgent = useAppStore((state) => state.duplicateAgent)
   const { addToast } = useToast()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState(lastSearchQuery)
@@ -41,15 +47,15 @@ function App() {
     setLastSearchQuery(searchQuery)
   }, [searchQuery, setLastSearchQuery])
 
-  const openModal = () => setIsModalOpen(true)
-  const closeModal = () => setIsModalOpen(false)
+  const openModal = useCallback(() => setIsModalOpen(true), [])
+  const closeModal = useCallback(() => setIsModalOpen(false), [])
   
-  const handleDuplicate = (id: string) => {
+  const handleDuplicate = useCallback((id: string) => {
     const duplicated = duplicateAgent(id)
     if (duplicated) {
       addToast(`Agent "${duplicated.name}" created from duplicate`, 'success')
     }
-  }
+  }, [duplicateAgent, addToast])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

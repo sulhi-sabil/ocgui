@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Button } from './Button'
 import { cn } from '@utils/cn'
 import { colors, spacing, borders, typography } from '@styles/tokens'
@@ -13,7 +14,7 @@ interface EmptyStateProps {
   className?: string
 }
 
-export function EmptyState({
+function EmptyStateComponent({
   title,
   description,
   icon,
@@ -70,3 +71,5 @@ export function EmptyState({
     </div>
   )
 }
+
+export const EmptyState = memo(EmptyStateComponent)
