@@ -3,6 +3,8 @@ import { useAppStore } from '@store/index'
 import { Button } from './ui/Button'
 import { useToast } from './ui/Toast'
 import { generateId } from '@utils/index'
+import { cn } from '@utils/cn'
+import { colors, zIndex, modal, formInput, focus, label, typography } from '@styles/tokens'
 import type { Agent } from '../types'
 
 interface CreateAgentModalProps {
@@ -21,7 +23,6 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // Handle Escape key, click outside, and auto-focus
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -30,7 +31,6 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
-      // Auto-focus name input after modal animation
       setTimeout(() => nameInputRef.current?.focus(), 50)
     }
 
@@ -82,14 +82,14 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      className={cn(modal.backdrop, zIndex.modal)}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-        <h2 id="modal-title" className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+      <div className={modal.container}>
+        <h2 id="modal-title" className={modal.title}>
           Create New Agent
         </h2>
         
@@ -97,7 +97,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
           <div>
             <label 
               htmlFor="name" 
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className={cn(label.base, label.default)}
             >
               Name *
             </label>
@@ -107,20 +107,18 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                       bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                       focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={cn(formInput.base, formInput.default, focus.ring)}
               placeholder="e.g., Code Reviewer"
             />
             {errors.name && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
+              <p className={cn('mt-1', typography.body, colors.error.text)}>{errors.name}</p>
             )}
           </div>
 
           <div>
             <label 
               htmlFor="description" 
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className={cn(label.base, label.default)}
             >
               Description *
             </label>
@@ -128,21 +126,19 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                       bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                       focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={cn(formInput.base, formInput.default, focus.ring)}
               rows={3}
               placeholder="Describe what this agent does..."
             />
             {errors.description && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.description}</p>
+              <p className={cn('mt-1', typography.body, colors.error.text)}>{errors.description}</p>
             )}
           </div>
 
           <div>
             <label 
               htmlFor="model" 
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className={cn(label.base, label.default)}
             >
               Model Override (optional)
             </label>
@@ -151,12 +147,10 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               id="model"
               value={formData.model}
               onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                       bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                       focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={cn(formInput.base, formInput.default, focus.ring)}
               placeholder="e.g., gpt-4, claude-3-opus"
             />
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p className={cn('mt-1', typography.small, colors.gray[500])}>
               Leave empty to use default model from config
             </p>
           </div>
@@ -175,5 +169,4 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
   )
 }
 
-// Default export for lazy loading
 export default CreateAgentModal

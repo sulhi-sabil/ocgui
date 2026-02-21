@@ -1,5 +1,5 @@
 import { cn } from '@utils/cn'
-import { focus, transitions } from '@styles/tokens'
+import { focus, transitions, colors, iconSize } from '@styles/tokens'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost'
@@ -19,9 +19,9 @@ export function Button({
   const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
   
   const variants = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white',
-    secondary: 'bg-gray-100 hover:bg-gray-200 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white',
-    ghost: 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300',
+    primary: `${colors.primary[600]} text-white`,
+    secondary: `${colors.gray[100]} hover:bg-gray-200 ${colors.gray[900]} dark:hover:bg-gray-600 dark:text-white`,
+    ghost: `hover:bg-gray-100 dark:hover:bg-gray-700 ${colors.gray[600]}`,
   }
   
   const sizes = {
@@ -45,7 +45,7 @@ export function Button({
     >
       {isLoading ? (
         <>
-          <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+          <svg className={cn('animate-spin -ml-1 mr-2', iconSize.sm)} fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>

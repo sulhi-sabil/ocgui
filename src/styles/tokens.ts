@@ -29,6 +29,19 @@ export const colors = {
     enabled: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
     disabled: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
   },
+  error: {
+    text: 'text-red-600 dark:text-red-400',
+    bg: 'bg-red-500 text-white',
+  },
+  success: {
+    bg: 'bg-green-500 text-white',
+  },
+  warning: {
+    bg: 'bg-yellow-500 text-white',
+  },
+  info: {
+    bg: 'bg-blue-500 text-white',
+  },
 } as const
 
 export const spacing = {
@@ -86,4 +99,47 @@ export const skeleton = {
   title: 'h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse',
   card: 'h-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse',
   circle: 'w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse',
+} as const
+
+export const zIndex = {
+  base: 'z-0',
+  dropdown: 'z-10',
+  sticky: 'z-20',
+  fixed: 'z-30',
+  modalBackdrop: 'z-40',
+  modal: 'z-50',
+  popover: 'z-60',
+  tooltip: 'z-70',
+  toast: 'z-50',
+} as const
+
+export const formInput = {
+  base: 'w-full px-3 py-2 border rounded-lg transition-colors',
+  default: 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white',
+  focus: 'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+  error: 'border-red-500 dark:border-red-400',
+  placeholder: 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+}
+
+export const label = {
+  base: 'block text-sm font-medium mb-1',
+  default: 'text-gray-700 dark:text-gray-300',
+}
+
+export const modal = {
+  backdrop: 'fixed inset-0 flex items-center justify-center p-4 bg-black/50',
+  container: 'bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6',
+  title: 'text-xl font-semibold text-gray-900 dark:text-white mb-4',
+}
+
+export const overlay = {
+  backdrop: 'fixed inset-0 bg-black/50',
+}
+
+export const iconSize = {
+  xs: 'w-3 h-3',
+  sm: 'w-4 h-4',
+  md: 'w-5 h-5',
+  lg: 'w-6 h-6',
+  xl: 'w-8 h-8',
 } as const
