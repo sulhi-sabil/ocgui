@@ -108,8 +108,8 @@ export const zIndex = {
   fixed: 'z-30',
   modalBackdrop: 'z-40',
   modal: 'z-50',
-  popover: 'z-60',
-  tooltip: 'z-70',
+  popover: 'z-[60]',
+  tooltip: 'z-[70]',
   toast: 'z-50',
 } as const
 
