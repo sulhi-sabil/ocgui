@@ -7,12 +7,14 @@ import { SearchInput } from '@components/ui/SearchInput'
 import { EmptyState } from '@components/ui/EmptyState'
 import { useAgentSearch } from '@hooks/useAgentSearch'
 import { usePlatformShortcut } from '@hooks/useKeyboardShortcut'
+import { useToast } from '@components/ui/Toast'
 
 // Lazy load modal for better initial load performance
 const CreateAgentModal = lazy(() => import('@components/CreateAgentModal'))
 
 function App() {
-  const { agents, selectedAgentId, selectAgent, theme, lastSearchQuery, setLastSearchQuery, updateAgent } = useAppStore()
+  const { agents, selectedAgentId, selectAgent, theme, lastSearchQuery, setLastSearchQuery, updateAgent, duplicateAgent } = useAppStore()
+  const { addToast } = useToast()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState(lastSearchQuery)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -41,6 +43,13 @@ function App() {
 
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
+  
+  const handleDuplicate = (id: string) => {
+    const duplicated = duplicateAgent(id)
+    if (duplicated) {
+      addToast(`Agent "${duplicated.name}" created from duplicate`, 'success')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -116,6 +125,7 @@ function App() {
                   isSelected={selectedAgentId === agent.id}
                   onSelect={() => selectAgent(agent.id)}
                   onToggleEnabled={() => updateAgent(agent.id, { enabled: !agent.enabled })}
+                  onDuplicate={() => handleDuplicate(agent.id)}
                 />
               ))}
             </div>

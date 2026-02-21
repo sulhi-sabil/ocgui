@@ -10,6 +10,7 @@ interface AppState {
   addAgent: (agent: Agent) => void
   updateAgent: (id: string, updates: Partial<Agent>) => void
   deleteAgent: (id: string) => void
+  duplicateAgent: (id: string) => Agent | null
   selectAgent: (id: string | null) => void
   
   // Skill management
@@ -53,6 +54,19 @@ export const useAppStore = create<AppState>()(
           agents: state.agents.filter((a) => a.id !== id),
           selectedAgentId: state.selectedAgentId === id ? null : state.selectedAgentId,
         })),
+      duplicateAgent: (id) => {
+        const agent = useAppStore.getState().agents.find((a) => a.id === id)
+        if (!agent) return null
+        
+        const duplicated: Agent = {
+          ...agent,
+          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: `${agent.name} (Copy)`,
+        }
+        
+        set((state) => ({ agents: [...state.agents, duplicated] }))
+        return duplicated
+      },
       selectAgent: (id) => set({ selectedAgentId: id }),
       
       // Skills
