@@ -58,6 +58,8 @@ npm run dev
 |---------|-------------|
 | `npm run dev` | Start development server |
 | `npm run build` | Build for production |
+| `npm run tauri:dev` | Start Tauri in development mode |
+| `npm run tauri:build` | Build Tauri application for production |
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Run TypeScript check |
 | `npm test` | Run test suite |
