@@ -17,6 +17,8 @@ interface AppState {
   skills: Skill[]
   setSkills: (skills: Skill[]) => void
   addSkill: (skill: Skill) => void
+  updateSkill: (id: string, updates: Partial<Skill>) => void
+  deleteSkill: (id: string) => void
   
   // Configuration
   config: Config | null
@@ -25,6 +27,8 @@ interface AppState {
   // Execution
   runs: Run[]
   addRun: (run: Run) => void
+  deleteRun: (id: string) => void
+  clearRuns: () => void
   
   // UI State
   theme: 'light' | 'dark'
@@ -73,6 +77,16 @@ export const useAppStore = create<AppState>()(
       skills: [],
       setSkills: (skills) => set({ skills }),
       addSkill: (skill) => set((state) => ({ skills: [...state.skills, skill] })),
+      updateSkill: (id, updates) =>
+        set((state) => ({
+          skills: state.skills.map((s) =>
+            s.id === id ? { ...s, ...updates } : s
+          ),
+        })),
+      deleteSkill: (id) =>
+        set((state) => ({
+          skills: state.skills.filter((s) => s.id !== id),
+        })),
       
       // Config
       config: null,
@@ -81,6 +95,11 @@ export const useAppStore = create<AppState>()(
       // Runs
       runs: [],
       addRun: (run) => set((state) => ({ runs: [run, ...state.runs] })),
+      deleteRun: (id) =>
+        set((state) => ({
+          runs: state.runs.filter((r) => r.id !== id),
+        })),
+      clearRuns: () => set({ runs: [] }),
       
       // Theme
       theme: 'light',
