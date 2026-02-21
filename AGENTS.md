@@ -79,6 +79,7 @@ import { useAppStore } from '../../store/index'
 Available aliases:
 - `@/*` → `src/*`
 - `@components/*` → `src/components/*`
+- `@constants/*` → `src/constants/*`
 - `@hooks/*` → `src/hooks/*`
 - `@store/*` → `src/store/*`
 - `@styles/*` → `src/styles/*`
@@ -154,6 +155,7 @@ src/
 ├── components/       # React components
 │   ├── ui/          # Reusable UI components (Button, Input, etc.)
 │   └── index.ts     # Barrel exports
+├── constants/       # Application-wide constants
 ├── hooks/           # Custom React hooks
 ├── store/           # Zustand store
 ├── styles/          # Style tokens and theme
