@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Agent, Skill, Config, Run } from '../types'
+import { generateId } from '@utils/index'
 
 interface AppState {
   // Agent management
@@ -64,7 +65,7 @@ export const useAppStore = create<AppState>()(
         
         const duplicated: Agent = {
           ...agent,
-          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          id: generateId(),
           name: `${agent.name} (Copy)`,
         }
         
