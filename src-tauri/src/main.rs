@@ -57,16 +57,6 @@ fn set_db_version(conn: &Connection, version: i32) -> SqlResult<()> {
     Ok(())
 }
 
-fn migrate_v1_to_v2(conn: &Connection) -> SqlResult<()> {
-    conn.execute_batch(
-        "ALTER TABLE runs ADD COLUMN session_id TEXT DEFAULT '';
-         ALTER TABLE runs ADD COLUMN model TEXT DEFAULT '';
-         ALTER TABLE runs ADD COLUMN tools_used TEXT DEFAULT '[]';
-         ALTER TABLE runs ADD COLUMN exit_status INTEGER DEFAULT 0;"
-    )?;
-    Ok(())
-}
-
 fn init_database(app_handle: &AppHandle) -> SqlResult<Connection> {
     let app_dir = app_handle
         .path()
@@ -77,6 +67,9 @@ fn init_database(app_handle: &AppHandle) -> SqlResult<Connection> {
     
     let db_path = app_dir.join("ocgui.db");
     let conn = Connection::open(&db_path)?;
+    
+    conn.pragma_update(None, "journal_mode", &"WAL")?;
+    conn.pragma_update(None, "foreign_keys", &"ON")?;
     
     let current_version = get_db_version(&conn)?;
     
