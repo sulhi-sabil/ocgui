@@ -24,7 +24,7 @@ export default defineConfig(async () => ({
     },
   },
   build: {
-    sourcemap: true,
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks: {
