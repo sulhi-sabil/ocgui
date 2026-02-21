@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { useState, useCallback, createContext } from 'react'
+import { useState, useCallback, createContext, useRef, useEffect } from 'react'
 import { generateId } from '@utils/index'
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning'
@@ -24,17 +24,34 @@ interface ToastProviderProps {
 
 export function ToastProvider({ children }: ToastProviderProps) {
   const [toasts, setToasts] = useState<Toast[]>([])
+  const timeoutRefs = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
+
+  useEffect(() => {
+    const refs = timeoutRefs.current
+    return () => {
+      refs.forEach((timeoutId) => clearTimeout(timeoutId))
+      refs.clear()
+    }
+  }, [])
 
   const addToast = useCallback((message: string, type: ToastType = 'info') => {
     const id = generateId()
     setToasts((prev) => [...prev, { id, message, type }])
     
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id))
+      timeoutRefs.current.delete(id)
     }, 5000)
+    
+    timeoutRefs.current.set(id, timeoutId)
   }, [])
 
   const removeToast = useCallback((id: string) => {
+    const timeoutId = timeoutRefs.current.get(id)
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+      timeoutRefs.current.delete(id)
+    }
     setToasts((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
