@@ -43,3 +43,11 @@ export interface Run {
   toolsUsed: string[];
   exitStatus: number;
 }
+
+export interface RunLog {
+  id: number;
+  runId: string;
+  logLine: string;
+  logType: 'info' | 'error' | 'warning' | 'tool_call';
+  timestamp: number;
+}
