@@ -2,21 +2,25 @@ import { useEffect, useState, useRef, lazy, Suspense } from 'react'
 import { useAppStore } from '@store/index'
 import { AgentCard } from '@components/AgentCard'
 import { ThemeToggle } from '@components/ThemeToggle'
-import { Button, SearchInput, EmptyState } from '@components/ui'
+import { Button, SearchInput, EmptyState, ConfirmDialog } from '@components/ui'
 import { useAgentSearch } from '@hooks/useAgentSearch'
 import { usePlatformShortcut } from '@hooks/useKeyboardShortcut'
 import { useToast } from '@components/ui/Toast'
 import { cn } from '@utils/cn'
 import { iconSize, strokeWidth, grid, colors } from '@styles/tokens'
 
-// Lazy load modal for better initial load performance
 const CreateAgentModal = lazy(() => import('@components/CreateAgentModal'))
 
 function App() {
-  const { agents, selectedAgentId, selectAgent, theme, lastSearchQuery, setLastSearchQuery, updateAgent, duplicateAgent } = useAppStore()
+  const { agents, selectedAgentId, selectAgent, theme, lastSearchQuery, setLastSearchQuery, updateAgent, duplicateAgent, deleteAgent } = useAppStore()
   const { addToast } = useToast()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState(lastSearchQuery)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; agentId: string; agentName: string }>({
+    isOpen: false,
+    agentId: '',
+    agentName: '',
+  })
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   // Initialize theme on mount
@@ -49,6 +53,23 @@ function App() {
     if (duplicated) {
       addToast(`Agent "${duplicated.name}" created from duplicate`, 'success')
     }
+  }
+
+  const handleDeleteRequest = (id: string) => {
+    const agent = agents.find(a => a.id === id)
+    if (agent) {
+      setDeleteConfirm({ isOpen: true, agentId: id, agentName: agent.name })
+    }
+  }
+
+  const handleDeleteConfirm = () => {
+    deleteAgent(deleteConfirm.agentId)
+    addToast(`Agent "${deleteConfirm.agentName}" deleted`, 'success')
+    setDeleteConfirm({ isOpen: false, agentId: '', agentName: '' })
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirm({ isOpen: false, agentId: '', agentName: '' })
   }
 
   return (
@@ -126,6 +147,7 @@ function App() {
                   onSelect={() => selectAgent(agent.id)}
                   onToggleEnabled={() => updateAgent(agent.id, { enabled: !agent.enabled })}
                   onDuplicate={() => handleDuplicate(agent.id)}
+                  onDelete={() => handleDeleteRequest(agent.id)}
                 />
               ))}
             </div>
@@ -148,6 +170,17 @@ function App() {
       <Suspense fallback={null}>
         <CreateAgentModal isOpen={isModalOpen} onClose={closeModal} />
       </Suspense>
+
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        title="Delete Agent"
+        message={`Are you sure you want to delete "${deleteConfirm.agentName}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   )
 }
