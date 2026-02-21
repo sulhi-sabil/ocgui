@@ -1,0 +1,40 @@
+# CODEOWNERS - Repository ownership and review assignments
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything
+* @sulhi-sabil
+
+# Frontend (React/TypeScript)
+/src/ @sulhi-sabil
+/src/components/ @sulhi-sabil
+/src/hooks/ @sulhi-sabil
+/src/store/ @sulhi-sabil
+/src/types/ @sulhi-sabil
+/src/utils/ @sulhi-sabil
+/src/styles/ @sulhi-sabil
+
+# Backend (Tauri/Rust)
+/src-tauri/ @sulhi-sabil
+/src-tauri/src/ @sulhi-sabil
+
+# Configuration
+/package.json @sulhi-sabil
+/package-lock.json @sulhi-sabil
+/tsconfig.json @sulhi-sabil
+/vite.config.ts @sulhi-sabil
+/tailwind.config.ts @sulhi-sabil
+/.eslintrc.cjs @sulhi-sabil
+
+# GitHub workflows
+/.github/workflows/ @sulhi-sabil
+/.github/dependabot.yml @sulhi-sabil
+
+# Documentation
+/README.md @sulhi-sabil
+/blueprint.md @sulhi-sabil
+/docs/ @sulhi-sabil
+/AGENTS.md @sulhi-sabil
+
+# Tauri configuration
+/src-tauri/tauri.conf.json @sulhi-sabil
+/src-tauri/Cargo.toml @sulhi-sabil

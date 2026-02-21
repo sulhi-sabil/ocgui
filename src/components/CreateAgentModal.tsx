@@ -13,13 +13,14 @@ interface CreateAgentModalProps {
 }
 
 export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
-  const { addAgent } = useAppStore()
-  const { addToast } = useToast()
+  const addAgent = useAppStore((state) => state.addAgent)
+  const addToast = useToast().addToast
   const nameInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     model: '',
+    tags: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -44,9 +45,9 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     if (e.target === e.currentTarget) onClose()
   }, [onClose])
 
-  if (!isOpen) return null
-
-  const validateForm = () => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault()
+    
     const newErrors: Record<string, string> = {}
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required'
@@ -54,13 +55,11 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required'
     }
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validateForm()) return
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
 
     const newAgent: Agent = {
       id: generateId(),
@@ -70,15 +69,18 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
       tools: {},
       permissions: {},
       skills: [],
+      tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
       enabled: true,
     }
 
     addAgent(newAgent)
     addToast(`Agent "${newAgent.name}" created successfully`, 'success')
-    setFormData({ name: '', description: '', model: '' })
+    setFormData({ name: '', description: '', model: '', tags: '' })
     setErrors({})
     onClose()
-  }
+  }, [formData, addAgent, addToast, onClose])
+
+  if (!isOpen) return null
 
   return (
     <div 
@@ -152,6 +154,26 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
             />
             <p className={cn('mt-1', typography.small, colors.gray[500])}>
               Leave empty to use default model from config
+            </p>
+          </div>
+
+          <div>
+            <label 
+              htmlFor="tags" 
+              className={cn(label.base, label.default)}
+            >
+              Tags (optional)
+            </label>
+            <input
+              type="text"
+              id="tags"
+              value={formData.tags}
+              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+              className={cn(formInput.base, formInput.default, focus.ring)}
+              placeholder="e.g., code-review, testing, documentation"
+            />
+            <p className={cn('mt-1', typography.small, colors.gray[500])}>
+              Comma-separated tags for categorization
             </p>
           </div>
 

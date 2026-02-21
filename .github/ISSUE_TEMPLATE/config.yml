@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: OpenCode Documentation
+    url: https://opencode.ai/docs
+    about: Official OpenCode documentation and guides
+  - name: OpenCode Discord
+    url: https://discord.gg/opencode
+    about: Join the community for discussions and support
+  - name: Security Vulnerability
+    url: https://github.com/sulhi-sabil/ocgui/security/policy
+    about: Please report security vulnerabilities through our security policy

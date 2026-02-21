@@ -11,15 +11,7 @@ describe('useAppStore', () => {
       removeItem: vi.fn(),
       clear: vi.fn(),
     })
-    useAppStore.setState({
-      agents: [],
-      selectedAgentId: null,
-      skills: [],
-      config: null,
-      runs: [],
-      theme: 'light',
-      lastSearchQuery: '',
-    })
+    useAppStore.getState().reset()
   })
 
   afterEach(() => {
@@ -34,6 +26,7 @@ describe('useAppStore', () => {
     tools: { read: 'allow' },
     permissions: { file: 'ask' },
     skills: ['skill-1'],
+    tags: ['testing', 'automation'],
     enabled: true,
   }
 
@@ -237,6 +230,29 @@ describe('useAppStore', () => {
 
       expect(useAppStore.getState().skills).toHaveLength(0)
     })
+
+    it('should duplicate a skill', () => {
+      act(() => {
+        useAppStore.getState().addSkill(mockSkill)
+      })
+
+      act(() => {
+        useAppStore.getState().duplicateSkill('skill-1')
+      })
+
+      const skills = useAppStore.getState().skills
+      expect(skills).toHaveLength(2)
+      const duplicatedSkill = skills.find(s => s.id !== 'skill-1')
+      expect(duplicatedSkill).toBeDefined()
+      expect(duplicatedSkill?.name).toBe('Test Skill (Copy)')
+    })
+
+    it('should return null when duplicating non-existent skill', () => {
+      const result = useAppStore.getState().duplicateSkill('non-existent')
+
+      expect(result).toBeNull()
+      expect(useAppStore.getState().skills).toHaveLength(0)
+    })
   })
 
   describe('configuration', () => {
@@ -327,6 +343,40 @@ describe('useAppStore', () => {
       })
 
       expect(useAppStore.getState().lastSearchQuery).toBe('test query')
+    })
+  })
+
+  describe('reset', () => {
+    it('should reset all state to initial values', () => {
+      act(() => {
+        useAppStore.getState().addAgent(mockAgent)
+        useAppStore.getState().addSkill(mockSkill)
+        useAppStore.getState().setConfig(mockConfig)
+        useAppStore.getState().addRun(mockRun)
+        useAppStore.getState().setTheme('dark')
+        useAppStore.getState().setLastSearchQuery('test')
+        useAppStore.getState().selectAgent('agent-1')
+      })
+
+      expect(useAppStore.getState().agents).toHaveLength(1)
+      expect(useAppStore.getState().skills).toHaveLength(1)
+      expect(useAppStore.getState().config).toEqual(mockConfig)
+      expect(useAppStore.getState().runs).toHaveLength(1)
+      expect(useAppStore.getState().theme).toBe('dark')
+      expect(useAppStore.getState().lastSearchQuery).toBe('test')
+      expect(useAppStore.getState().selectedAgentId).toBe('agent-1')
+
+      act(() => {
+        useAppStore.getState().reset()
+      })
+
+      expect(useAppStore.getState().agents).toEqual([])
+      expect(useAppStore.getState().selectedAgentId).toBeNull()
+      expect(useAppStore.getState().skills).toEqual([])
+      expect(useAppStore.getState().config).toBeNull()
+      expect(useAppStore.getState().runs).toEqual([])
+      expect(useAppStore.getState().theme).toBe('light')
+      expect(useAppStore.getState().lastSearchQuery).toBe('')
     })
   })
 })

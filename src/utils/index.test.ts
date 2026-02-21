@@ -97,6 +97,45 @@ describe('deepClone', () => {
     
     expect(cloned).toEqual(original)
   })
+
+  it('should preserve Date objects', () => {
+    const date = new Date('2024-01-15T12:30:00')
+    const original = { date, name: 'test' }
+    const cloned = deepClone(original)
+    
+    expect(cloned.date).toBeInstanceOf(Date)
+    expect(cloned.date.getTime()).toBe(date.getTime())
+    expect(cloned.date).not.toBe(date)
+  })
+
+  it('should return primitives as-is', () => {
+    expect(deepClone('string')).toBe('string')
+    expect(deepClone(123)).toBe(123)
+    expect(deepClone(true)).toBe(true)
+    expect(deepClone(null)).toBe(null)
+    expect(deepClone(undefined)).toBe(undefined)
+  })
+
+  it('should handle circular references gracefully', () => {
+    const original: Record<string, unknown> = { name: 'test' }
+    original.self = original
+    
+    expect(() => deepClone(original)).not.toThrow()
+    
+    const cloned = deepClone(original)
+    expect(cloned.name).toBe('test')
+    expect(typeof cloned.self).toBe('object')
+  })
+
+  it('should handle empty objects', () => {
+    const cloned = deepClone({})
+    expect(cloned).toEqual({})
+  })
+
+  it('should handle empty arrays', () => {
+    const cloned = deepClone([])
+    expect(cloned).toEqual([])
+  })
 })
 
 describe('validateAgent', () => {

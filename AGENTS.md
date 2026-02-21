@@ -100,7 +100,14 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean
 }
 
-export function Button({ children, variant = 'primary', ... }: ButtonProps) {
+export function Button({
+  children,
+  variant = 'primary',
+  size = 'md',
+  isLoading,
+  className,
+  ...props
+}: ButtonProps) {
   // Implementation
 }
 ```

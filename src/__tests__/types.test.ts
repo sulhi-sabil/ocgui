@@ -11,12 +11,14 @@ describe('Type Definitions', () => {
       tools: {},
       permissions: {},
       skills: [],
+      tags: ['testing'],
       enabled: true,
     }
     
     expect(agent).toHaveProperty('id')
     expect(agent).toHaveProperty('name')
     expect(agent).toHaveProperty('enabled')
+    expect(agent).toHaveProperty('tags')
   })
 
   it('Skill type should have required properties', () => {

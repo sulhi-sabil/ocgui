@@ -13,6 +13,7 @@ describe('useAgentSearch', () => {
       tools: {},
       permissions: {},
       skills: [],
+      tags: ['code-quality', 'review'],
       enabled: true,
     },
     {
@@ -23,6 +24,7 @@ describe('useAgentSearch', () => {
       tools: {},
       permissions: {},
       skills: [],
+      tags: ['testing', 'automation'],
       enabled: true,
     },
     {
@@ -32,6 +34,7 @@ describe('useAgentSearch', () => {
       tools: {},
       permissions: {},
       skills: [],
+      tags: ['docs'],
       enabled: false,
     },
   ]
@@ -92,5 +95,26 @@ describe('useAgentSearch', () => {
     
     expect(result.current.filteredAgents).toHaveLength(1)
     expect(result.current.filteredAgents[0].name).toBe('Documentation Agent')
+  })
+
+  it('should filter agents by tags', () => {
+    const { result } = renderHook(() => useAgentSearch(mockAgents, 'automation'))
+    
+    expect(result.current.filteredAgents).toHaveLength(1)
+    expect(result.current.filteredAgents[0].name).toBe('Test Writer')
+  })
+
+  it('should filter agents by partial tag match', () => {
+    const { result } = renderHook(() => useAgentSearch(mockAgents, 'test'))
+    
+    expect(result.current.filteredAgents).toHaveLength(1)
+    expect(result.current.filteredAgents[0].name).toBe('Test Writer')
+  })
+
+  it('should handle agents without tags', () => {
+    const agentsWithoutTags = [{ ...mockAgents[0], tags: [] }]
+    const { result } = renderHook(() => useAgentSearch(agentsWithoutTags, 'review'))
+    
+    expect(result.current.filteredAgents).toHaveLength(1)
   })
 })

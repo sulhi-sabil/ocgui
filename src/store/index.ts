@@ -4,6 +4,7 @@ import type { Agent, Skill, Config, Run } from '../types'
 import { generateId } from '@utils/index'
 
 interface AppState {
+  version: number
   // Agent management
   agents: Agent[]
   selectedAgentId: string | null
@@ -20,6 +21,7 @@ interface AppState {
   addSkill: (skill: Skill) => void
   updateSkill: (id: string, updates: Partial<Skill>) => void
   deleteSkill: (id: string) => void
+  duplicateSkill: (id: string) => Skill | null
   
   // Configuration
   config: Config | null
@@ -38,11 +40,15 @@ interface AppState {
   // Search State
   lastSearchQuery: string
   setLastSearchQuery: (query: string) => void
+  
+  // Reset
+  reset: () => void
 }
 
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
+      version: 1,
       // Agents
       agents: [],
       selectedAgentId: null,
@@ -88,6 +94,19 @@ export const useAppStore = create<AppState>()(
         set((state) => ({
           skills: state.skills.filter((s) => s.id !== id),
         })),
+      duplicateSkill: (id) => {
+        const skill = useAppStore.getState().skills.find((s) => s.id === id)
+        if (!skill) return null
+        
+        const duplicated: Skill = {
+          ...skill,
+          id: generateId(),
+          name: `${skill.name} (Copy)`,
+        }
+        
+        set((state) => ({ skills: [...state.skills, duplicated] }))
+        return duplicated
+      },
       
       // Config
       config: null,
@@ -109,10 +128,23 @@ export const useAppStore = create<AppState>()(
       // Search
       lastSearchQuery: '',
       setLastSearchQuery: (query) => set({ lastSearchQuery: query }),
+      
+      // Reset
+      reset: () => set({
+        agents: [],
+        selectedAgentId: null,
+        skills: [],
+        config: null,
+        runs: [],
+        theme: 'light',
+        lastSearchQuery: '',
+      }),
     }),
     {
       name: 'ocgui-storage',
+      version: 1,
       partialize: (state) => ({ 
+        version: state.version,
         theme: state.theme,
         agents: state.agents,
         selectedAgentId: state.selectedAgentId,
