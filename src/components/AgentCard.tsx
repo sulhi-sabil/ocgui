@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import type { Agent } from '../types'
 import { cn } from '@utils/cn'
 import { colors, spacing, borders, transitions, shadows } from '@styles/tokens'
@@ -8,9 +9,10 @@ interface AgentCardProps {
   isSelected: boolean
   onSelect: () => void
   onToggleEnabled?: () => void
+  onDuplicate?: () => void
 }
 
-function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled }: AgentCardProps) {
+function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDuplicate }: AgentCardProps) {
   return (
     <div
       onClick={onSelect}
@@ -25,29 +27,67 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled }: Ag
       )}
     >
       <div className="flex items-start justify-between">
-        <div>
-          <h3 className={cn('font-medium', colors.gray[900])}>
+        <div className="flex-1 min-w-0">
+          <h3 className={cn('font-medium truncate', colors.gray[900])}>
             {agent.name}
           </h3>
           <p className={cn('text-sm mt-1 line-clamp-2', colors.gray[500])}>
             {agent.description}
           </p>
         </div>
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onToggleEnabled?.()
-          }}
-          className={cn(
-            'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium transition-colors',
-            agent.enabled ? colors.status.enabled : colors.status.disabled,
-            onToggleEnabled && 'hover:opacity-80 cursor-pointer'
+        <div className="flex items-center gap-2 ml-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggleEnabled?.()
+            }}
+            className={cn(
+              'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium transition-colors',
+              agent.enabled ? colors.status.enabled : colors.status.disabled,
+              onToggleEnabled && 'hover:opacity-80 cursor-pointer'
+            )}
+            disabled={!onToggleEnabled}
+            title={onToggleEnabled ? `Click to ${agent.enabled ? 'disable' : 'enable'} agent` : undefined}
+          >
+            {agent.enabled ? 'Enabled' : 'Disabled'}
+          </button>
+          
+          {onDuplicate && (
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button
+                  onClick={(e) => e.stopPropagation()}
+                  className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  aria-label="Agent actions"
+                >
+                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                  </svg>
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  className="min-w-[140px] bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-1 z-50"
+                  sideOffset={5}
+                  align="end"
+                >
+                  <DropdownMenu.Item
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded cursor-pointer outline-none hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700"
+                    onSelect={(e) => {
+                      e.preventDefault()
+                      onDuplicate()
+                    }}
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Duplicate
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
           )}
-          disabled={!onToggleEnabled}
-          title={onToggleEnabled ? `Click to ${agent.enabled ? 'disable' : 'enable'} agent` : undefined}
-        >
-          {agent.enabled ? 'Enabled' : 'Disabled'}
-        </button>
+        </div>
       </div>
       
       <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
