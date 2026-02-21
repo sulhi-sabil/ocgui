@@ -156,6 +156,29 @@ describe('useAppStore', () => {
 
       expect(useAppStore.getState().selectedAgentId).toBeNull()
     })
+
+    it('should duplicate an agent', () => {
+      act(() => {
+        useAppStore.getState().addAgent(mockAgent)
+      })
+
+      act(() => {
+        useAppStore.getState().duplicateAgent('agent-1')
+      })
+
+      const agents = useAppStore.getState().agents
+      expect(agents).toHaveLength(2)
+      const duplicatedAgent = agents.find(a => a.id !== 'agent-1')
+      expect(duplicatedAgent).toBeDefined()
+      expect(duplicatedAgent?.name).toBe('Test Agent (Copy)')
+    })
+
+    it('should return null when duplicating non-existent agent', () => {
+      const result = useAppStore.getState().duplicateAgent('non-existent')
+
+      expect(result).toBeNull()
+      expect(useAppStore.getState().agents).toHaveLength(0)
+    })
   })
 
   describe('skill management', () => {
@@ -179,6 +202,40 @@ describe('useAppStore', () => {
 
       expect(useAppStore.getState().skills).toHaveLength(1)
       expect(useAppStore.getState().skills[0]).toEqual(mockSkill)
+    })
+
+    it('should update a skill', () => {
+      act(() => {
+        useAppStore.getState().addSkill(mockSkill)
+      })
+
+      act(() => {
+        useAppStore.getState().updateSkill('skill-1', { name: 'Updated Skill' })
+      })
+
+      expect(useAppStore.getState().skills[0].name).toBe('Updated Skill')
+      expect(useAppStore.getState().skills[0].description).toBe(mockSkill.description)
+    })
+
+    it('should not update non-existent skill', () => {
+      act(() => {
+        useAppStore.getState().addSkill(mockSkill)
+        useAppStore.getState().updateSkill('non-existent', { name: 'Updated' })
+      })
+
+      expect(useAppStore.getState().skills[0].name).toBe(mockSkill.name)
+    })
+
+    it('should delete a skill', () => {
+      act(() => {
+        useAppStore.getState().addSkill(mockSkill)
+      })
+
+      act(() => {
+        useAppStore.getState().deleteSkill('skill-1')
+      })
+
+      expect(useAppStore.getState().skills).toHaveLength(0)
     })
   })
 
@@ -212,6 +269,36 @@ describe('useAppStore', () => {
 
       expect(useAppStore.getState().runs).toHaveLength(2)
       expect(useAppStore.getState().runs[0].id).toBe('run-2')
+    })
+
+    it('should delete a run', () => {
+      act(() => {
+        useAppStore.getState().addRun(mockRun)
+      })
+
+      act(() => {
+        useAppStore.getState().deleteRun('run-1')
+      })
+
+      expect(useAppStore.getState().runs).toHaveLength(0)
+    })
+
+    it('should clear all runs', () => {
+      const run1 = { ...mockRun, id: 'run-1' }
+      const run2 = { ...mockRun, id: 'run-2' }
+
+      act(() => {
+        useAppStore.getState().addRun(run1)
+        useAppStore.getState().addRun(run2)
+      })
+
+      expect(useAppStore.getState().runs).toHaveLength(2)
+
+      act(() => {
+        useAppStore.getState().clearRuns()
+      })
+
+      expect(useAppStore.getState().runs).toHaveLength(0)
     })
   })
 
