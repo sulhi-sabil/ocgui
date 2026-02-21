@@ -1,5 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from 'react'
 
+const isProduction = import.meta.env.PROD
+
 interface Props {
   children: ReactNode
 }
@@ -25,6 +27,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
+      const errorMessage = isProduction 
+        ? 'An unexpected error occurred. Please try refreshing the page.'
+        : this.state.error?.message || 'Unknown error'
+
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-md w-full">
@@ -34,9 +40,9 @@ export class ErrorBoundary extends Component<Props, State> {
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               The application encountered an unexpected error. Please try refreshing the page.
             </p>
-            {this.state.error && (
-              <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-sm text-gray-800 dark:text-gray-200 overflow-auto">
-                {this.state.error.message}
+            {!isProduction && this.state.error && (
+              <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-sm text-gray-800 dark:text-gray-200 overflow-auto max-h-40">
+                {errorMessage}
               </pre>
             )}
             <button
