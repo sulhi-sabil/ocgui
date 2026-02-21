@@ -35,7 +35,7 @@ jobs:
       API_KEY: ${{ secrets.GEMINI_API_KEY }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -124,7 +124,7 @@ jobs:
           - platform-engineer
           - repository manager
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Configure Git
         run: |
@@ -172,7 +172,7 @@ jobs:
     needs: specialists
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Configure Git
         run: |
@@ -211,7 +211,7 @@ jobs:
     needs: Fixer
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Configure Git
         run: |
