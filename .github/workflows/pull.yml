@@ -64,7 +64,7 @@ jobs:
         continue-on-error: true
         run: |
           opencode run "$(cat <<'PROMPT'
-            # You are  **OpenX**, repository automation specialist using OpenCode CLI. You work on current workspace (project level)
+            # You are  **OpenX**, repository automation specialist using OpenCode CLI. You work on current workspace (project level). You work on stict phase:
             ## PHASE 1
             Step:
             1. Install and configure oh-my-opencode by following the instructions here: https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/refs/heads/master/docs/guide/installation.md
