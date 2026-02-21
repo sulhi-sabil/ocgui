@@ -13,8 +13,8 @@ interface CreateAgentModalProps {
 }
 
 export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
-  const { addAgent } = useAppStore()
-  const { addToast } = useToast()
+  const addAgent = useAppStore((state) => state.addAgent)
+  const addToast = useToast().addToast
   const nameInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState({
     name: '',
@@ -44,9 +44,9 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     if (e.target === e.currentTarget) onClose()
   }, [onClose])
 
-  if (!isOpen) return null
-
-  const validateForm = () => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault()
+    
     const newErrors: Record<string, string> = {}
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required'
@@ -54,13 +54,11 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required'
     }
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validateForm()) return
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
 
     const newAgent: Agent = {
       id: generateId(),
@@ -78,7 +76,9 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     setFormData({ name: '', description: '', model: '' })
     setErrors({})
     onClose()
-  }
+  }, [formData, addAgent, addToast, onClose])
+
+  if (!isOpen) return null
 
   return (
     <div 

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { cn } from '@utils/cn'
 import { focus, transitions, colors, iconSize } from '@styles/tokens'
 
@@ -7,7 +8,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean
 }
 
-export function Button({
+function ButtonComponent({
   children,
   variant = 'primary',
   size = 'md',
@@ -57,3 +58,5 @@ export function Button({
     </button>
   )
 }
+
+export const Button = memo(ButtonComponent)
