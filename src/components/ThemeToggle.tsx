@@ -1,4 +1,6 @@
 import { useAppStore } from '../store'
+import { cn } from '@utils/cn'
+import { colors, transitions, iconSize } from '@styles/tokens'
 
 export function ThemeToggle() {
   const { theme, setTheme } = useAppStore()
@@ -7,7 +9,6 @@ export function ThemeToggle() {
     const newTheme = theme === 'light' ? 'dark' : 'light'
     setTheme(newTheme)
     
-    // Apply theme to document
     if (newTheme === 'dark') {
       document.documentElement.classList.add('dark')
     } else {
@@ -18,11 +19,16 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+      className={cn(
+        'p-2 rounded-lg',
+        colors.gray[100],
+        'hover:bg-gray-200 dark:hover:bg-gray-600',
+        transitions.colors
+      )}
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
       {theme === 'light' ? (
-        <svg className="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className={cn(iconSize.md, 'text-gray-700')} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -31,7 +37,7 @@ export function ThemeToggle() {
           />
         </svg>
       ) : (
-        <svg className="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className={cn(iconSize.md, 'text-yellow-400')} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
