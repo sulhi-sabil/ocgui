@@ -65,6 +65,7 @@ npm run dev
 ## Documentation
 
 - [Blueprint](./blueprint.md) - Complete project specification
+- [Changelog](./CHANGELOG.md) - Version history and changes
 - [Tasks](./docs/task.md) - Active development tasks
 - [Bugs](./docs/bug.md) - Known issues tracker
 
