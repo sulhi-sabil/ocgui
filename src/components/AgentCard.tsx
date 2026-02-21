@@ -11,14 +11,27 @@ interface AgentCardProps {
 }
 
 function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled }: AgentCardProps) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onSelect()
+    }
+  }
+
   return (
     <div
       onClick={onSelect}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-pressed={isSelected}
+      aria-label={`${agent.name}. ${agent.enabled ? 'Enabled' : 'Disabled'}. ${agent.skills.length} skills, ${Object.keys(agent.tools).length} tools.`}
       className={cn(
         'relative cursor-pointer',
         spacing.card,
         borders.card,
         transitions.default,
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-800',
         isSelected 
           ? `${colors.primary[500]} ${colors.primary[50]} scale-[1.02] ${shadows.md}` 
           : `${colors.gray[200]} ${colors.white} hover:border-gray-300 dark:hover:border-gray-600 hover:${shadows.md} hover:-translate-y-0.5`
