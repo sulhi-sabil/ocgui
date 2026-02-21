@@ -4,6 +4,7 @@ import type { Agent, Skill, Config, Run } from '../types'
 import { generateId } from '@utils/index'
 
 interface AppState {
+  version: number
   // Agent management
   agents: Agent[]
   selectedAgentId: string | null
@@ -43,6 +44,7 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
+      version: 1,
       // Agents
       agents: [],
       selectedAgentId: null,
@@ -112,7 +114,9 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'ocgui-storage',
+      version: 1,
       partialize: (state) => ({ 
+        version: state.version,
         theme: state.theme,
         agents: state.agents,
         selectedAgentId: state.selectedAgentId,
