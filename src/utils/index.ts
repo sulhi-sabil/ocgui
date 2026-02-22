@@ -16,10 +16,11 @@ export interface AgentTemplate {
  */
 
 /**
- * Generate a unique ID
+ * Generate a cryptographically secure unique ID
+ * Uses crypto.randomUUID() for security (RFC 4122 UUID)
  */
 export function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
+  return crypto.randomUUID()
 }
 
 /**
