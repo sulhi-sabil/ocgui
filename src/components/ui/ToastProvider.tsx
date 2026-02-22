@@ -37,7 +37,22 @@ export function ToastProvider({ children }: ToastProviderProps) {
 
   const addToast = useCallback((message: string, type: ToastType = 'info') => {
     const id = generateId()
-    setToasts((prev) => [...prev, { id, message, type }])
+    
+    setToasts((prev) => {
+      const updated = [...prev, { id, message, type }]
+      if (updated.length > TOAST.MAX_VISIBLE) {
+        const removed = updated.slice(0, updated.length - TOAST.MAX_VISIBLE)
+        removed.forEach((toast) => {
+          const timeoutId = timeoutRefs.current.get(toast.id)
+          if (timeoutId) {
+            clearTimeout(timeoutId)
+            timeoutRefs.current.delete(toast.id)
+          }
+        })
+        return updated.slice(-TOAST.MAX_VISIBLE)
+      }
+      return updated
+    })
     
     const timeoutId = setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id))
