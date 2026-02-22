@@ -86,6 +86,7 @@ describe('constants', () => {
       expect(UI_TEXT.BUTTONS.DELETE).toBe('Delete')
       expect(UI_TEXT.BUTTONS.DUPLICATE).toBe('Duplicate')
       expect(UI_TEXT.BUTTONS.EDIT).toBe('Edit')
+      expect(UI_TEXT.BUTTONS.SAVE_CHANGES).toBe('Save Changes')
     })
 
     it('should have placeholders', () => {
@@ -96,6 +97,11 @@ describe('constants', () => {
     it('should have error messages', () => {
       expect(UI_TEXT.ERRORS.NAME_REQUIRED).toBe('Name is required')
       expect(UI_TEXT.ERRORS.DESCRIPTION_REQUIRED).toBe('Description is required')
+    })
+
+    it('should have modal titles', () => {
+      expect(UI_TEXT.MODAL.CREATE_AGENT_TITLE).toBe('Create New Agent')
+      expect(UI_TEXT.MODAL.EDIT_AGENT_TITLE).toBe('Edit Agent')
     })
 
     it('should have dialog messages', () => {
