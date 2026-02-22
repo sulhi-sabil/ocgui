@@ -1,10 +1,10 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
-import type { Agent, Skill, Config, Run } from '../types'
-import { generateId, validateAgent, validateSkill } from '@utils/index'
-import { AGENT, SKILL, STORAGE } from '@constants/index'
+import type { Agent, Skill, Config, Run, Repository } from '../types'
+import { generateId, validateAgent, validateSkill, validateRepository } from '@utils/index'
+import { AGENT, SKILL, REPOSITORY, STORAGE } from '@constants/index'
 
-const CURRENT_STORE_VERSION = 2
+const CURRENT_STORE_VERSION = 3
 
 const safeStorage: StateStorage = {
   getItem: (name: string): string | null => {
@@ -39,6 +39,9 @@ interface PersistedState {
   skills: Skill[]
   config: Config | null
   lastSearchQuery: string
+  repositories: Repository[]
+  selectedRepositoryId: string | null
+  lastRepositorySearchQuery: string
 }
 
 type Migration = (state: Partial<PersistedState>) => Partial<PersistedState>
@@ -80,6 +83,18 @@ const migrations: Record<number, Migration> = {
     return {
       ...migrated,
       version: 2,
+    }
+  },
+  2: (state) => {
+    const migrated = { ...state }
+    
+    migrated.repositories = []
+    migrated.selectedRepositoryId = null
+    migrated.lastRepositorySearchQuery = ''
+    
+    return {
+      ...migrated,
+      version: 3,
     }
   },
 }
@@ -124,6 +139,11 @@ function validatePersistedState(state: Partial<PersistedState> | null): Persiste
       : [],
     config: state.config && typeof state.config === 'object' ? state.config : null,
     lastSearchQuery: typeof state.lastSearchQuery === 'string' ? state.lastSearchQuery : '',
+    repositories: Array.isArray(state.repositories)
+      ? state.repositories.filter((r: unknown) => validateRepository(r).valid)
+      : [],
+    selectedRepositoryId: typeof state.selectedRepositoryId === 'string' ? state.selectedRepositoryId : null,
+    lastRepositorySearchQuery: typeof state.lastRepositorySearchQuery === 'string' ? state.lastRepositorySearchQuery : '',
   }
 }
 
@@ -147,6 +167,16 @@ interface AppState {
   deleteSkill: (id: string) => void
   duplicateSkill: (id: string) => Skill | null
   
+  // Repository management
+  repositories: Repository[]
+  selectedRepositoryId: string | null
+  setRepositories: (repositories: Repository[]) => void
+  addRepository: (repository: Repository) => void
+  updateRepository: (id: string, updates: Partial<Repository>) => void
+  deleteRepository: (id: string) => void
+  duplicateRepository: (id: string) => Repository | null
+  selectRepository: (id: string | null) => void
+  
   // Configuration
   config: Config | null
   setConfig: (config: Config) => void
@@ -164,6 +194,8 @@ interface AppState {
   // Search State
   lastSearchQuery: string
   setLastSearchQuery: (query: string) => void
+  lastRepositorySearchQuery: string
+  setLastRepositorySearchQuery: (query: string) => void
   
   // Reset
   reset: () => void
@@ -230,6 +262,36 @@ export const useAppStore = create<AppState>()(
         return duplicated
       },
       
+      repositories: [],
+      selectedRepositoryId: null,
+      setRepositories: (repositories) => set({ repositories }),
+      addRepository: (repository) => set((state) => ({ repositories: [...state.repositories, repository] })),
+      updateRepository: (id, updates) =>
+        set((state) => ({
+          repositories: state.repositories.map((r) =>
+            r.id === id ? { ...r, ...updates } : r
+          ),
+        })),
+      deleteRepository: (id) =>
+        set((state) => ({
+          repositories: state.repositories.filter((r) => r.id !== id),
+          selectedRepositoryId: state.selectedRepositoryId === id ? null : state.selectedRepositoryId,
+        })),
+      duplicateRepository: (id) => {
+        const repository = useAppStore.getState().repositories.find((r) => r.id === id)
+        if (!repository) return null
+        
+        const duplicated: Repository = {
+          ...repository,
+          id: generateId(),
+          name: `${repository.name}${REPOSITORY.NAME_COPY_SUFFIX}`,
+        }
+        
+        set((state) => ({ repositories: [...state.repositories, duplicated] }))
+        return duplicated
+      },
+      selectRepository: (id) => set({ selectedRepositoryId: id }),
+      
       config: null,
       setConfig: (config) => set({ config }),
       
@@ -246,16 +308,21 @@ export const useAppStore = create<AppState>()(
       
       lastSearchQuery: '',
       setLastSearchQuery: (query) => set({ lastSearchQuery: query }),
+      lastRepositorySearchQuery: '',
+      setLastRepositorySearchQuery: (query) => set({ lastRepositorySearchQuery: query }),
       
       reset: () => set({
         version: CURRENT_STORE_VERSION,
         agents: [],
         selectedAgentId: null,
         skills: [],
+        repositories: [],
+        selectedRepositoryId: null,
         config: null,
         runs: [],
         theme: 'light',
         lastSearchQuery: '',
+        lastRepositorySearchQuery: '',
       }),
     }),
     {
@@ -270,6 +337,9 @@ export const useAppStore = create<AppState>()(
         skills: state.skills,
         config: state.config,
         lastSearchQuery: state.lastSearchQuery,
+        repositories: state.repositories,
+        selectedRepositoryId: state.selectedRepositoryId,
+        lastRepositorySearchQuery: state.lastRepositorySearchQuery,
       }),
       migrate: (persistedState, version) => {
         const migrated = migrateState(persistedState, version)
@@ -284,6 +354,9 @@ export const useAppStore = create<AppState>()(
           skills: [],
           config: null,
           lastSearchQuery: '',
+          repositories: [],
+          selectedRepositoryId: null,
+          lastRepositorySearchQuery: '',
         }
       },
     }

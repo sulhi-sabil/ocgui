@@ -33,6 +33,11 @@ export const SKILL = {
   NAME_COPY_SUFFIX: ' (Copy)',
 } as const
 
+export const REPOSITORY = {
+  NAME_COPY_SUFFIX: ' (Copy)',
+  DEFAULT_BRANCH: 'main',
+} as const
+
 export const STORAGE = {
   KEY: 'ocgui-storage',
 } as const
@@ -53,6 +58,8 @@ export const UI_TEXT = {
     DUPLICATE: 'Duplicate',
     EDIT: 'Edit',
     CLEAR_SEARCH: 'Clear Search',
+    ADD_REPOSITORY: 'Add Repository',
+    CREATE_FIRST_REPOSITORY: 'Add Your First Repository',
   },
   PLACEHOLDERS: {
     SEARCH_AGENTS: 'Search agents...',
@@ -60,6 +67,11 @@ export const UI_TEXT = {
     AGENT_DESCRIPTION: 'Describe what this agent does...',
     AGENT_MODEL: 'e.g., gpt-4, claude-3-opus',
     AGENT_TAGS: 'e.g., code-review, testing, documentation',
+    SEARCH_REPOSITORIES: 'Search repositories...',
+    REPOSITORY_NAME: 'e.g., My Project',
+    REPOSITORY_PATH: '/path/to/repository',
+    REPOSITORY_DESCRIPTION: 'Describe this repository...',
+    REPOSITORY_TAGS: 'e.g., frontend, backend, library',
   },
   LABELS: {
     AGENT_NAME: 'Name',
@@ -67,14 +79,21 @@ export const UI_TEXT = {
     AGENT_MODEL: 'Model Override (optional)',
     AGENT_TAGS: 'Tags (optional)',
     REQUIRED: '*',
+    REPOSITORY_NAME: 'Name',
+    REPOSITORY_PATH: 'Path',
+    REPOSITORY_DESCRIPTION: 'Description (optional)',
+    REPOSITORY_TAGS: 'Tags (optional)',
   },
   HINTS: {
     MODEL_DEFAULT: 'Leave empty to use default model from config',
     TAGS_FORMAT: 'Comma-separated tags for categorization',
+    REPOSITORY_PATH: 'Absolute path to the git repository',
+    REPOSITORY_TAGS: 'Comma-separated tags for categorization',
   },
   ERRORS: {
     NAME_REQUIRED: 'Name is required',
     DESCRIPTION_REQUIRED: 'Description is required',
+    PATH_REQUIRED: 'Path is required',
   },
   MODAL: {
     CREATE_AGENT_TITLE: 'Create New Agent',
@@ -82,12 +101,18 @@ export const UI_TEXT = {
   DIALOG: {
     DELETE_AGENT_TITLE: 'Delete Agent',
     DELETE_AGENT_MESSAGE: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
+    DELETE_REPOSITORY_TITLE: 'Delete Repository',
+    DELETE_REPOSITORY_MESSAGE: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
   },
   EMPTY_STATE: {
     NO_AGENTS_TITLE: 'No agents yet',
     NO_AGENTS_DESCRIPTION: 'Get started by creating your first agent. Agents help you automate tasks and orchestrate workflows.',
     NO_MATCHES_TITLE: 'No matching agents found',
     NO_MATCHES_DESCRIPTION: 'Try adjusting your search terms or clear the filter to see all agents.',
+    NO_REPOSITORIES_TITLE: 'No repositories yet',
+    NO_REPOSITORIES_DESCRIPTION: 'Add a git repository to start managing it with OpenCode.',
+    NO_REPOSITORY_MATCHES_TITLE: 'No matching repositories found',
+    NO_REPOSITORY_MATCHES_DESCRIPTION: 'Try adjusting your search terms or clear the filter to see all repositories.',
   },
   GETTING_STARTED: {
     TITLE: 'Getting Started',

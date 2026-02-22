@@ -382,7 +382,7 @@ describe('useAppStore', () => {
 
   describe('migrations', () => {
     it('should have current version in state', () => {
-      expect(useAppStore.getState().version).toBe(2)
+      expect(useAppStore.getState().version).toBe(3)
     })
 
     it('should reset with current version', () => {
@@ -391,7 +391,7 @@ describe('useAppStore', () => {
         useAppStore.getState().reset()
       })
 
-      expect(useAppStore.getState().version).toBe(2)
+      expect(useAppStore.getState().version).toBe(3)
     })
   })
 })

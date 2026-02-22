@@ -87,3 +87,15 @@ export interface RunLog {
   logType: 'info' | 'error' | 'warning' | 'tool_call';
   timestamp: number;
 }
+
+export interface Repository {
+  id: string
+  name: string
+  path: string
+  remoteUrl?: string
+  defaultBranch?: string
+  description?: string
+  tags: string[]
+  enabled: boolean
+  lastAccessed?: number
+}
