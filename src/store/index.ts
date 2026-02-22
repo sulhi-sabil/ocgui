@@ -62,6 +62,8 @@ interface AppState {
   // UI State
   theme: 'light' | 'dark'
   setTheme: (theme: 'light' | 'dark') => void
+  activeTab: string
+  setActiveTab: (tab: string) => void
   
   // Search State
   lastSearchQuery: string
@@ -151,6 +153,10 @@ export const useAppStore = create<AppState>()(
       theme: 'light',
       setTheme: (theme) => set({ theme }),
       
+      // Active Tab
+      activeTab: 'agents',
+      setActiveTab: (activeTab) => set({ activeTab }),
+      
       // Search
       lastSearchQuery: '',
       setLastSearchQuery: (query) => set({ lastSearchQuery: query }),
@@ -163,6 +169,7 @@ export const useAppStore = create<AppState>()(
         config: null,
         runs: [],
         theme: 'light',
+        activeTab: 'agents',
         lastSearchQuery: '',
       }),
     }),
@@ -173,6 +180,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({ 
         version: state.version,
         theme: state.theme,
+        activeTab: state.activeTab,
         agents: state.agents,
         selectedAgentId: state.selectedAgentId,
         skills: state.skills,

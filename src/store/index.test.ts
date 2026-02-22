@@ -332,6 +332,20 @@ describe('useAppStore', () => {
     })
   })
 
+  describe('activeTab', () => {
+    it('should have initial agents tab', () => {
+      expect(useAppStore.getState().activeTab).toBe('agents')
+    })
+
+    it('should set activeTab', () => {
+      act(() => {
+        useAppStore.getState().setActiveTab('skills')
+      })
+
+      expect(useAppStore.getState().activeTab).toBe('skills')
+    })
+  })
+
   describe('search', () => {
     it('should have initial empty lastSearchQuery', () => {
       expect(useAppStore.getState().lastSearchQuery).toBe('')
@@ -354,6 +368,7 @@ describe('useAppStore', () => {
         useAppStore.getState().setConfig(mockConfig)
         useAppStore.getState().addRun(mockRun)
         useAppStore.getState().setTheme('dark')
+        useAppStore.getState().setActiveTab('settings')
         useAppStore.getState().setLastSearchQuery('test')
         useAppStore.getState().selectAgent('agent-1')
       })
@@ -363,6 +378,7 @@ describe('useAppStore', () => {
       expect(useAppStore.getState().config).toEqual(mockConfig)
       expect(useAppStore.getState().runs).toHaveLength(1)
       expect(useAppStore.getState().theme).toBe('dark')
+      expect(useAppStore.getState().activeTab).toBe('settings')
       expect(useAppStore.getState().lastSearchQuery).toBe('test')
       expect(useAppStore.getState().selectedAgentId).toBe('agent-1')
 
@@ -376,6 +392,7 @@ describe('useAppStore', () => {
       expect(useAppStore.getState().config).toBeNull()
       expect(useAppStore.getState().runs).toEqual([])
       expect(useAppStore.getState().theme).toBe('light')
+      expect(useAppStore.getState().activeTab).toBe('agents')
       expect(useAppStore.getState().lastSearchQuery).toBe('')
     })
   })

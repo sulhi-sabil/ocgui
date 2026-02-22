@@ -3,6 +3,10 @@ import { useAppStore } from '@store/index'
 import { AgentCard } from '@components/AgentCard'
 import { ThemeToggle } from '@components/ThemeToggle'
 import { Button, SearchInput, EmptyState, ConfirmDialog } from '@components/ui'
+import { AppTabs, type AppTabValue } from '@components/AppTabs'
+import { tabIcons } from '@components/tabIcons'
+import { SkillsSection } from '@components/SkillsSection'
+import { SettingsSection } from '@components/SettingsSection'
 import { useAgentSearch, useTheme } from '@hooks/index'
 import { usePlatformShortcut } from '@hooks/useKeyboardShortcut'
 import { useToast } from '@components/ui/Toast'
@@ -22,6 +26,8 @@ function App() {
   const updateAgent = useAppStore((state) => state.updateAgent)
   const duplicateAgent = useAppStore((state) => state.duplicateAgent)
   const deleteAgent = useAppStore((state) => state.deleteAgent)
+  const activeTab = useAppStore((state) => state.activeTab)
+  const setActiveTab = useAppStore((state) => state.setActiveTab)
   useTheme()
   const { addToast } = useToast()
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -31,7 +37,6 @@ function App() {
   const [agentToDelete, setAgentToDelete] = useState<Agent | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  // Keyboard shortcut: Cmd/Ctrl + K to focus search
   usePlatformShortcut('k', () => {
     searchInputRef.current?.focus()
   })
@@ -106,74 +111,100 @@ function App() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6">
-        <div className="mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-              Agents ({resultCount})
-              {searchQuery && (
-                <span className="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">
-                  filtered from {agents.length}
-                </span>
-              )}
-            </h2>
-            
-            <SearchInput
-              ref={searchInputRef}
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="Search agents..."
-              className="w-full sm:w-72"
-              shortcutHint="⌘K"
-            />
+        <AppTabs value={activeTab as AppTabValue} onValueChange={setActiveTab}>
+          <div className="mb-6">
+            <AppTabs.List>
+              <AppTabs.Trigger value="agents" icon={tabIcons.agents}>
+                Agents
+              </AppTabs.Trigger>
+              <AppTabs.Trigger value="skills" icon={tabIcons.skills}>
+                Skills
+              </AppTabs.Trigger>
+              <AppTabs.Trigger value="settings" icon={tabIcons.settings}>
+                Settings
+              </AppTabs.Trigger>
+            </AppTabs.List>
           </div>
-          
-          {!hasResults ? (
-            <EmptyState
-              title={searchQuery ? 'No matching agents found' : 'No agents yet'}
-              description={
-                searchQuery
-                  ? 'Try adjusting your search terms or clear the filter to see all agents.'
-                  : 'Get started by creating your first agent. Agents help you automate tasks and orchestrate workflows.'
-              }
-              icon={
-                <svg className={cn(iconSize.xl, colors.primary.text)} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-              }
-              actionLabel={searchQuery ? undefined : 'Create Your First Agent'}
-              onAction={searchQuery ? undefined : openModal}
-              secondaryActionLabel={searchQuery ? 'Clear Search' : undefined}
-              onSecondaryAction={searchQuery ? () => setSearchQuery('') : undefined}
-            />
-          ) : (
-            <div className={grid.cards}>
-              {filteredAgents.map((agent) => (
-                <AgentCard
-                  key={agent.id}
-                  agent={agent}
-                  isSelected={selectedAgentId === agent.id}
-                  onSelect={() => selectAgent(agent.id)}
-                  onToggleEnabled={() => updateAgent(agent.id, { enabled: !agent.enabled })}
-                  onDuplicate={() => handleDuplicate(agent.id)}
-                  onEdit={() => handleEdit(agent.id)}
-                  onDelete={() => handleDeleteClick(agent)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
 
-        <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-            Getting Started
-          </h3>
-          <ul className="text-sm text-blue-800 dark:text-blue-200 list-disc list-inside space-y-1">
-            <li>Configure your OpenCode CLI workspace</li>
-            <li>Import existing agents from AGENTS.md</li>
-            <li>Set up skill compositions and tool permissions</li>
-            <li>Execute and monitor agent runs</li>
-          </ul>
-        </div>
+          <AppTabs.Content value="agents">
+            <div className="mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                  Agents ({resultCount})
+                  {searchQuery && (
+                    <span className="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">
+                      filtered from {agents.length}
+                    </span>
+                  )}
+                </h2>
+                
+                <SearchInput
+                  ref={searchInputRef}
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                  placeholder="Search agents..."
+                  className="w-full sm:w-72"
+                  shortcutHint="⌘K"
+                />
+              </div>
+              
+              {!hasResults ? (
+                <EmptyState
+                  title={searchQuery ? 'No matching agents found' : 'No agents yet'}
+                  description={
+                    searchQuery
+                      ? 'Try adjusting your search terms or clear the filter to see all agents.'
+                      : 'Get started by creating your first agent. Agents help you automate tasks and orchestrate workflows.'
+                  }
+                  icon={
+                    <svg className={cn(iconSize.xl, colors.primary.text)} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  }
+                  actionLabel={searchQuery ? undefined : 'Create Your First Agent'}
+                  onAction={searchQuery ? undefined : openModal}
+                  secondaryActionLabel={searchQuery ? 'Clear Search' : undefined}
+                  onSecondaryAction={searchQuery ? () => setSearchQuery('') : undefined}
+                />
+              ) : (
+                <div className={grid.cards}>
+                  {filteredAgents.map((agent) => (
+                    <AgentCard
+                      key={agent.id}
+                      agent={agent}
+                      isSelected={selectedAgentId === agent.id}
+                      onSelect={() => selectAgent(agent.id)}
+                      onToggleEnabled={() => updateAgent(agent.id, { enabled: !agent.enabled })}
+                      onDuplicate={() => handleDuplicate(agent.id)}
+                      onEdit={() => handleEdit(agent.id)}
+                      onDelete={() => handleDeleteClick(agent)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                Getting Started
+              </h3>
+              <ul className="text-sm text-blue-800 dark:text-blue-200 list-disc list-inside space-y-1">
+                <li>Configure your OpenCode CLI workspace</li>
+                <li>Import existing agents from AGENTS.md</li>
+                <li>Set up skill compositions and tool permissions</li>
+                <li>Execute and monitor agent runs</li>
+              </ul>
+            </div>
+          </AppTabs.Content>
+
+          <AppTabs.Content value="skills">
+            <SkillsSection />
+          </AppTabs.Content>
+
+          <AppTabs.Content value="settings">
+            <SettingsSection />
+          </AppTabs.Content>
+        </AppTabs>
       </main>
 
       <Suspense fallback={null}>
