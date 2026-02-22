@@ -4,10 +4,9 @@
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green)](./LICENSE)
+[![Status](https://img.shields.io/badge/Status-Early_Development-orange)](./docs/task.md)
 
 > A native desktop application that transforms OpenCode CLI into a visually orchestrated control plane.
-
-**Status:** 🚧 Early Development
 
 ## Prerequisites
 
@@ -70,6 +69,35 @@ npm run dev
 - [Changelog](./CHANGELOG.md) - Version history and changes
 - [Tasks](./docs/task.md) - Active development tasks
 - [Bugs](./docs/bug.md) - Known issues tracker
+- [Security Policy](./.github/SECURITY.md) - Security guidelines and reporting
+
+## Troubleshooting
+
+### Common Issues
+
+**OpenCode CLI not found**
+- Ensure OpenCode CLI is installed and in your PATH
+- Run `opencode --version` to verify installation
+- Download from [opencode.ai/download](https://opencode.ai/download)
+
+**Tauri build fails**
+- Verify Rust version: `rustc --version` (requires >= 1.70)
+- Run `rustup update` to update Rust toolchain
+- Check Tauri prerequisites for your platform: [tauri.app/start/prerequisites](https://tauri.app/start/prerequisites/)
+
+**Development server won't start**
+- Delete `node_modules` and run `npm install` fresh
+- Check Node.js version: `node --version` (requires >= 18)
+
+**Tests fail unexpectedly**
+- Run `npm run lint && npm run typecheck` first
+- Check for TypeScript errors that may cause test failures
+
+### Getting Help
+
+- Check [Issues](https://github.com/sulhi-sabil/ocgui/issues) for known problems
+- Review [AGENTS.md](./AGENTS.md) for development guidelines
+- Report bugs via [GitHub Issues](https://github.com/sulhi-sabil/ocgui/issues/new)
 
 ## Contributing
 
