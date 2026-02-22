@@ -2,6 +2,7 @@ import { useEffect, useCallback, useRef } from 'react'
 import { Button } from './Button'
 import { cn } from '@utils/cn'
 import { zIndex, modal, focus } from '@styles/tokens'
+import { MODAL } from '@constants/index'
 
 interface ConfirmDialogProps {
   isOpen: boolean
@@ -34,7 +35,7 @@ export function ConfirmDialog({
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
-      setTimeout(() => confirmButtonRef.current?.focus(), 50)
+      setTimeout(() => confirmButtonRef.current?.focus(), MODAL.FOCUS_DELAY_MS)
     }
 
     return () => {
