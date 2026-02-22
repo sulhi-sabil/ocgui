@@ -29,6 +29,14 @@ export const AGENT = {
   NAME_COPY_SUFFIX: ' (Copy)',
 } as const
 
+export const SKILL = {
+  NAME_COPY_SUFFIX: ' (Copy)',
+} as const
+
+export const STORAGE = {
+  KEY: 'ocgui-storage',
+} as const
+
 export const APP = {
   NAME: 'OpenCode GUI',
   DESCRIPTION: 'Desktop Control Center for OpenCode CLI',

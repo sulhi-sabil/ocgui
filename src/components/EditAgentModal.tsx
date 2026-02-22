@@ -4,6 +4,7 @@ import { Button } from './ui/Button'
 import { useToast } from './ui/Toast'
 import { cn } from '@utils/cn'
 import { colors, zIndex, modal, formInput, focus, label, typography } from '@styles/tokens'
+import { MODAL } from '@constants/index'
 import type { Agent } from '../types'
 
 interface EditAgentModalProps {
@@ -43,7 +44,7 @@ export function EditAgentModal({ isOpen, onClose, agent }: EditAgentModalProps) 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
-      setTimeout(() => nameInputRef.current?.focus(), 50)
+      setTimeout(() => nameInputRef.current?.focus(), MODAL.FOCUS_DELAY_MS)
     }
 
     return () => {

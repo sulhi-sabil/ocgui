@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
 import type { Agent, Skill, Config, Run } from '../types'
 import { generateId, validateAgent, validateSkill } from '@utils/index'
-import { AGENT } from '@constants/index'
+import { AGENT, SKILL, STORAGE } from '@constants/index'
 
 const CURRENT_STORE_VERSION = 2
 
@@ -223,7 +223,7 @@ export const useAppStore = create<AppState>()(
         const duplicated: Skill = {
           ...skill,
           id: generateId(),
-          name: `${skill.name} (Copy)`,
+          name: `${skill.name}${SKILL.NAME_COPY_SUFFIX}`,
         }
         
         set((state) => ({ skills: [...state.skills, duplicated] }))
@@ -259,7 +259,7 @@ export const useAppStore = create<AppState>()(
       }),
     }),
     {
-      name: 'ocgui-storage',
+      name: STORAGE.KEY,
       version: CURRENT_STORE_VERSION,
       storage: createJSONStorage(() => safeStorage),
       partialize: (state) => ({ 
