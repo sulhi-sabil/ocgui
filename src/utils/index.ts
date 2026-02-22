@@ -439,3 +439,57 @@ export function validateRun(run: unknown): { valid: boolean; errors: string[] } 
   
   return { valid: errors.length === 0, errors }
 }
+
+export function validateRepository(repository: unknown): { valid: boolean; errors: string[] } {
+  const errors: string[] = []
+  
+  if (!repository || typeof repository !== 'object') {
+    errors.push('Repository must be an object')
+    return { valid: false, errors }
+  }
+  
+  const r = repository as Record<string, unknown>
+  
+  if (!r.id || typeof r.id !== 'string') {
+    errors.push('Repository must have a string id')
+  }
+  
+  if (!r.name || typeof r.name !== 'string') {
+    errors.push('Repository must have a string name')
+  }
+  
+  if (!r.path || typeof r.path !== 'string') {
+    errors.push('Repository must have a string path')
+  }
+  
+  if (r.remoteUrl !== undefined && typeof r.remoteUrl !== 'string') {
+    errors.push('Repository remoteUrl must be a string')
+  }
+  
+  if (r.defaultBranch !== undefined && typeof r.defaultBranch !== 'string') {
+    errors.push('Repository defaultBranch must be a string')
+  }
+  
+  if (r.description !== undefined && typeof r.description !== 'string') {
+    errors.push('Repository description must be a string')
+  }
+  
+  if (!Array.isArray(r.tags)) {
+    errors.push('Repository must have a tags array')
+  } else {
+    const invalidTags = r.tags.filter((t: unknown) => typeof t !== 'string')
+    if (invalidTags.length > 0) {
+      errors.push('Repository tags must be strings')
+    }
+  }
+  
+  if (typeof r.enabled !== 'boolean') {
+    errors.push('Repository must have an enabled boolean')
+  }
+  
+  if (r.lastAccessed !== undefined && typeof r.lastAccessed !== 'number') {
+    errors.push('Repository lastAccessed must be a number')
+  }
+  
+  return { valid: errors.length === 0, errors }
+}

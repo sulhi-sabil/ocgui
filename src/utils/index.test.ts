@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateId, formatDate, deepClone, validateAgent, validateSkill, validateTool, validateRun, mergeConfig, AGENT_TEMPLATES, createAgentFromTemplate, getTemplateKeys } from './index'
+import { generateId, formatDate, deepClone, validateAgent, validateSkill, validateTool, validateRun, validateRepository, mergeConfig, AGENT_TEMPLATES, createAgentFromTemplate, getTemplateKeys } from './index'
 
 describe('generateId', () => {
   it('should generate a unique ID string', () => {
@@ -1646,6 +1646,366 @@ describe('validateRun', () => {
     }
     
     const result = validateRun(run)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors.length).toBeGreaterThan(1)
+  })
+})
+
+describe('validateRepository', () => {
+  it('should return valid for a proper repository', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test Repository',
+      path: '/path/to/repo',
+      tags: ['frontend', 'react'],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(true)
+    expect(result.errors).toHaveLength(0)
+  })
+
+  it('should fail for null input', () => {
+    const result = validateRepository(null)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository must be an object')
+  })
+
+  it('should fail for non-object input', () => {
+    const result = validateRepository('not an object')
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository must be an object')
+  })
+
+  it('should fail for missing id', () => {
+    const repository = {
+      name: 'Test',
+      path: '/path',
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository must have a string id')
+  })
+
+  it('should fail for non-string id', () => {
+    const repository = {
+      id: 123,
+      name: 'Test',
+      path: '/path',
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository must have a string id')
+  })
+
+  it('should fail for missing name', () => {
+    const repository = {
+      id: 'repo-id',
+      path: '/path',
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository must have a string name')
+  })
+
+  it('should fail for non-string name', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 123,
+      path: '/path',
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository must have a string name')
+  })
+
+  it('should fail for missing path', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository must have a string path')
+  })
+
+  it('should fail for non-string path', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: 123,
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository must have a string path')
+  })
+
+  it('should accept optional remoteUrl', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      remoteUrl: 'https://github.com/example/repo',
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for non-string remoteUrl', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      remoteUrl: 123,
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository remoteUrl must be a string')
+  })
+
+  it('should accept optional defaultBranch', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      defaultBranch: 'main',
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for non-string defaultBranch', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      defaultBranch: 123,
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository defaultBranch must be a string')
+  })
+
+  it('should accept optional description', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      description: 'A test repository',
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for non-string description', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      description: 123,
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository description must be a string')
+  })
+
+  it('should fail for missing tags array', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository must have a tags array')
+  })
+
+  it('should fail for non-array tags', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      tags: 'not-an-array',
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository must have a tags array')
+  })
+
+  it('should fail for non-string tag items', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      tags: ['valid', 123],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository tags must be strings')
+  })
+
+  it('should accept empty tags array', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for missing enabled', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      tags: [],
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository must have an enabled boolean')
+  })
+
+  it('should fail for non-boolean enabled', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      tags: [],
+      enabled: 'true',
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository must have an enabled boolean')
+  })
+
+  it('should accept optional lastAccessed', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      tags: [],
+      enabled: true,
+      lastAccessed: Date.now(),
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for non-number lastAccessed', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Test',
+      path: '/path',
+      tags: [],
+      enabled: true,
+      lastAccessed: 'not-a-number',
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Repository lastAccessed must be a number')
+  })
+
+  it('should validate a complete repository with all fields', () => {
+    const repository = {
+      id: 'repo-id',
+      name: 'Full Repository',
+      path: '/path/to/repo',
+      remoteUrl: 'https://github.com/example/repo',
+      defaultBranch: 'main',
+      description: 'A complete repository',
+      tags: ['frontend', 'react', 'typescript'],
+      enabled: true,
+      lastAccessed: Date.now(),
+    }
+    
+    const result = validateRepository(repository)
+    
+    expect(result.valid).toBe(true)
+    expect(result.errors).toHaveLength(0)
+  })
+
+  it('should collect multiple errors', () => {
+    const repository = {
+      tags: 'invalid',
+      enabled: 'invalid',
+    }
+    
+    const result = validateRepository(repository)
     
     expect(result.valid).toBe(false)
     expect(result.errors.length).toBeGreaterThan(1)
