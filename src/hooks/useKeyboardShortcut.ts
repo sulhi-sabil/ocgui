@@ -4,6 +4,7 @@ interface UseKeyboardShortcutOptions {
   preventDefault?: boolean
   requireMeta?: boolean
   requireCtrl?: boolean
+  requireShift?: boolean
 }
 
 /**
@@ -17,22 +18,23 @@ export function useKeyboardShortcut(
   callback: () => void,
   options: UseKeyboardShortcutOptions = {}
 ) {
-  const { preventDefault = true, requireMeta = false, requireCtrl = false } = options
+  const { preventDefault = true, requireMeta = false, requireCtrl = false, requireShift = false } = options
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       const keyMatch = event.key.toLowerCase() === key.toLowerCase()
       const metaMatch = requireMeta ? event.metaKey : true
       const ctrlMatch = requireCtrl ? event.ctrlKey : true
+      const shiftMatch = requireShift ? event.shiftKey : true
 
-      if (keyMatch && metaMatch && ctrlMatch) {
+      if (keyMatch && metaMatch && ctrlMatch && shiftMatch) {
         if (preventDefault) {
           event.preventDefault()
         }
         callback()
       }
     },
-    [key, callback, preventDefault, requireMeta, requireCtrl]
+    [key, callback, preventDefault, requireMeta, requireCtrl, requireShift]
   )
 
   useEffect(() => {

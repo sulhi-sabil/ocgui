@@ -80,6 +80,29 @@ describe('useKeyboardShortcut', () => {
     expect(callback).toHaveBeenCalledTimes(1)
   })
 
+  it('should require shift key when requireShift is true', () => {
+    renderHook(() => useKeyboardShortcut('k', callback, { requireShift: true }))
+    
+    fireKeyEvent('k', { shiftKey: false })
+    expect(callback).not.toHaveBeenCalled()
+    
+    fireKeyEvent('k', { shiftKey: true })
+    expect(callback).toHaveBeenCalledTimes(1)
+  })
+
+  it('should work with multiple modifiers combined', () => {
+    renderHook(() => useKeyboardShortcut('k', callback, { requireCtrl: true, requireShift: true }))
+    
+    fireKeyEvent('k', { ctrlKey: true, shiftKey: false })
+    expect(callback).not.toHaveBeenCalled()
+    
+    fireKeyEvent('k', { ctrlKey: false, shiftKey: true })
+    expect(callback).not.toHaveBeenCalled()
+    
+    fireKeyEvent('k', { ctrlKey: true, shiftKey: true })
+    expect(callback).toHaveBeenCalledTimes(1)
+  })
+
   it('should not trigger for different keys', () => {
     renderHook(() => useKeyboardShortcut('k', callback))
     
