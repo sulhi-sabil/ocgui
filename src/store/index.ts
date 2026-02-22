@@ -1,7 +1,32 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
 import type { Agent, Skill, Config, Run } from '../types'
 import { generateId } from '@utils/index'
+
+const safeStorage: StateStorage = {
+  getItem: (name: string): string | null => {
+    try {
+      const value = localStorage.getItem(name)
+      return value
+    } catch {
+      return null
+    }
+  },
+  setItem: (name: string, value: string): void => {
+    try {
+      localStorage.setItem(name, value)
+    } catch {
+      // Storage quota exceeded or unavailable - silently fail
+    }
+  },
+  removeItem: (name: string): void => {
+    try {
+      localStorage.removeItem(name)
+    } catch {
+      // Storage unavailable - silently fail
+    }
+  },
+}
 
 interface AppState {
   version: number
@@ -143,6 +168,7 @@ export const useAppStore = create<AppState>()(
     {
       name: 'ocgui-storage',
       version: 1,
+      storage: createJSONStorage(() => safeStorage),
       partialize: (state) => ({ 
         version: state.version,
         theme: state.theme,
