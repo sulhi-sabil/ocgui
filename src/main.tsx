@@ -5,7 +5,13 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { ToastProvider, ToastContainer } from './components/ui/Toast'
 import './index.css'
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root')
+
+if (!rootElement) {
+  throw new Error('Root element not found. Ensure there is a <div id="root"></div> in your HTML.')
+}
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <ErrorBoundary>
       <ToastProvider>
