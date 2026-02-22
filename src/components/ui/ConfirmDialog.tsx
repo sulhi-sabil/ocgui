@@ -2,7 +2,7 @@ import { useEffect, useCallback, useRef } from 'react'
 import { Button } from './Button'
 import { cn } from '@utils/cn'
 import { zIndex, modal, focus } from '@styles/tokens'
-import { MODAL } from '@constants/index'
+import { MODAL, UI_TEXT } from '@constants/index'
 
 interface ConfirmDialogProps {
   isOpen: boolean
@@ -22,7 +22,7 @@ export function ConfirmDialog({
   title,
   message,
   confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  cancelLabel = UI_TEXT.BUTTONS.CANCEL,
   variant = 'danger',
 }: ConfirmDialogProps) {
   const confirmButtonRef = useRef<HTMLButtonElement>(null)

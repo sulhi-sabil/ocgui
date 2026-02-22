@@ -53,6 +53,7 @@ export const UI_TEXT = {
     DUPLICATE: 'Duplicate',
     EDIT: 'Edit',
     CLEAR_SEARCH: 'Clear Search',
+    SAVE_CHANGES: 'Save Changes',
   },
   PLACEHOLDERS: {
     SEARCH_AGENTS: 'Search agents...',
@@ -78,6 +79,7 @@ export const UI_TEXT = {
   },
   MODAL: {
     CREATE_AGENT_TITLE: 'Create New Agent',
+    EDIT_AGENT_TITLE: 'Edit Agent',
   },
   DIALOG: {
     DELETE_AGENT_TITLE: 'Delete Agent',
