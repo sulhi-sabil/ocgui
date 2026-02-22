@@ -316,6 +316,85 @@ describe('useAppStore', () => {
 
       expect(useAppStore.getState().runs).toHaveLength(0)
     })
+
+    it('should not add invalid run (missing id)', () => {
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const invalidRun = { ...mockRun, id: '' }
+
+      act(() => {
+        useAppStore.getState().addRun(invalidRun as unknown as Run)
+      })
+
+      expect(useAppStore.getState().runs).toHaveLength(0)
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Attempted to add invalid run:',
+        expect.arrayContaining(['Run must have a string id'])
+      )
+      consoleSpy.mockRestore()
+    })
+
+    it('should not add invalid run (missing sessionId)', () => {
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const invalidRun = { ...mockRun, sessionId: undefined } as unknown as Run
+
+      act(() => {
+        useAppStore.getState().addRun(invalidRun)
+      })
+
+      expect(useAppStore.getState().runs).toHaveLength(0)
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Attempted to add invalid run:',
+        expect.arrayContaining(['Run must have a string sessionId'])
+      )
+      consoleSpy.mockRestore()
+    })
+
+    it('should not add invalid run (missing timestamp)', () => {
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const invalidRun = { ...mockRun, timestamp: 'invalid' as unknown as number }
+
+      act(() => {
+        useAppStore.getState().addRun(invalidRun)
+      })
+
+      expect(useAppStore.getState().runs).toHaveLength(0)
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Attempted to add invalid run:',
+        expect.arrayContaining(['Run must have a number timestamp'])
+      )
+      consoleSpy.mockRestore()
+    })
+
+    it('should not add invalid run (null input)', () => {
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+      act(() => {
+        useAppStore.getState().addRun(null as unknown as Run)
+      })
+
+      expect(useAppStore.getState().runs).toHaveLength(0)
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Attempted to add invalid run:',
+        expect.arrayContaining(['Run must be an object'])
+      )
+      consoleSpy.mockRestore()
+    })
+
+    it('should not add invalid run (non-array toolsUsed)', () => {
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const invalidRun = { ...mockRun, toolsUsed: 'not-an-array' as unknown as string[] }
+
+      act(() => {
+        useAppStore.getState().addRun(invalidRun)
+      })
+
+      expect(useAppStore.getState().runs).toHaveLength(0)
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Attempted to add invalid run:',
+        expect.arrayContaining(['Run must have a toolsUsed array'])
+      )
+      consoleSpy.mockRestore()
+    })
   })
 
   describe('theme', () => {

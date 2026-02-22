@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
 import type { Agent, Skill, Config, Run } from '../types'
-import { generateId, validateAgent, validateSkill } from '@utils/index'
+import { generateId, validateAgent, validateSkill, validateRun } from '@utils/index'
 import { AGENT, SKILL, STORAGE } from '@constants/index'
 
 const CURRENT_STORE_VERSION = 2
@@ -234,7 +234,14 @@ export const useAppStore = create<AppState>()(
       setConfig: (config) => set({ config }),
       
       runs: [],
-      addRun: (run) => set((state) => ({ runs: [run, ...state.runs] })),
+      addRun: (run) => {
+        const result = validateRun(run)
+        if (!result.valid) {
+          console.warn('Attempted to add invalid run:', result.errors)
+          return
+        }
+        set((state) => ({ runs: [run, ...state.runs] }))
+      },
       deleteRun: (id) =>
         set((state) => ({
           runs: state.runs.filter((r) => r.id !== id),
