@@ -185,4 +185,80 @@ describe('CreateAgentModal', () => {
     expect(dialog).toHaveAttribute('aria-modal', 'true')
     expect(dialog).toHaveAttribute('aria-labelledby', 'modal-title')
   })
+
+  describe('template selection', () => {
+    it('renders template buttons', () => {
+      renderWithProviders(<CreateAgentModal isOpen={true} onClose={mockOnClose} />)
+      expect(screen.getByText('Code Reviewer')).toBeInTheDocument()
+      expect(screen.getByText('Test Writer')).toBeInTheDocument()
+      expect(screen.getByText('Documentation Agent')).toBeInTheDocument()
+      expect(screen.getByText('DevOps Agent')).toBeInTheDocument()
+    })
+
+    it('pre-fills form when template is selected', () => {
+      renderWithProviders(<CreateAgentModal isOpen={true} onClose={mockOnClose} />)
+      fireEvent.click(screen.getByText('Code Reviewer'))
+      
+      expect(screen.getByLabelText('Name *')).toHaveValue('Code Reviewer')
+      expect(screen.getByLabelText('Description *')).toHaveValue('Reviews code for quality, security, and best practices')
+      expect(screen.getByLabelText('Tags (optional)')).toHaveValue('code-quality, review')
+    })
+
+    it('creates agent with template tools and permissions', async () => {
+      renderWithProviders(<CreateAgentModal isOpen={true} onClose={mockOnClose} />)
+      fireEvent.click(screen.getByText('Code Reviewer'))
+      fireEvent.click(screen.getByText('Create Agent'))
+
+      await waitFor(() => {
+        expect(mockOnClose).toHaveBeenCalled()
+      })
+
+      const agents = useAppStore.getState().agents
+      expect(agents).toHaveLength(1)
+      expect(agents[0].name).toBe('Code Reviewer')
+      expect(agents[0].tools).toHaveProperty('read')
+      expect(agents[0].tools.read).toBe('allow')
+      expect(agents[0].permissions).toHaveProperty('file')
+      expect(agents[0].skills).toContain('code-review')
+    })
+
+    it('allows editing template values before submission', async () => {
+      renderWithProviders(<CreateAgentModal isOpen={true} onClose={mockOnClose} />)
+      fireEvent.click(screen.getByText('Test Writer'))
+      
+      fireEvent.change(screen.getByLabelText('Name *'), { target: { value: 'Custom Test Agent' } })
+      fireEvent.change(screen.getByLabelText('Model Override (optional)'), { target: { value: 'gpt-4' } })
+      fireEvent.click(screen.getByText('Create Agent'))
+
+      await waitFor(() => {
+        expect(mockOnClose).toHaveBeenCalled()
+      })
+
+      const agents = useAppStore.getState().agents
+      expect(agents[0].name).toBe('Custom Test Agent')
+      expect(agents[0].model).toBe('gpt-4')
+      expect(agents[0].tools).toHaveProperty('bash')
+    })
+
+    it('resets template selection after submission', async () => {
+      renderWithProviders(<CreateAgentModal isOpen={true} onClose={mockOnClose} />)
+      fireEvent.click(screen.getByText('Code Reviewer'))
+      fireEvent.click(screen.getByText('Create Agent'))
+
+      await waitFor(() => {
+        expect(mockOnClose).toHaveBeenCalled()
+      })
+    })
+
+    it('switches between templates', () => {
+      renderWithProviders(<CreateAgentModal isOpen={true} onClose={mockOnClose} />)
+      
+      fireEvent.click(screen.getByText('Code Reviewer'))
+      expect(screen.getByLabelText('Name *')).toHaveValue('Code Reviewer')
+      
+      fireEvent.click(screen.getByText('Test Writer'))
+      expect(screen.getByLabelText('Name *')).toHaveValue('Test Writer')
+      expect(screen.getByLabelText('Description *')).toHaveValue('Generates unit tests and integration tests for code')
+    })
+  })
 })
