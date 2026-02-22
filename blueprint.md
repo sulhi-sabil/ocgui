@@ -1,5 +1,40 @@
 # Project Blueprint: OpenCode Desktop Control Center
 
+## Table of Contents
+
+- [1. Executive Summary](#1-executive-summary)
+- [2. Market & User Intelligence](#2-market--user-intelligence)
+  - [Target Personas](#target-personas)
+  - [Pain Points Validated by OpenCode Ecosystem](#pain-points-validated-by-opencode-ecosystem)
+  - [Competitive Landscape](#competitive-landscape)
+- [3. Product Specifications](#3-product-specifications)
+  - [Core Features (V1 MVP)](#core-features-v1-mvp)
+  - [Secondary Features (Post-V1)](#secondary-features-post-v1)
+- [4. Technical Architecture](#4-technical-architecture)
+  - [Frontend/UI Framework](#frontendui-framework)
+  - [Backend/CLI Integration Layer (Rust in Tauri)](#backendcli-integration-layer-rust-in-tauri)
+  - [Infrastructure & Deployment](#infrastructure--deployment)
+  - [Data Strategy](#data-strategy)
+- [5. Strategic Growth](#5-strategic-growth)
+  - [Key Performance Indicators (KPIs)](#key-performance-indicators-kpis)
+  - [Go-to-Market Strategy](#go-to-market-strategy)
+  - [Revenue Model (Future Consideration—NOT V1)](#revenue-model-future-considerationnot-v1)
+- [6. User Experience Design Principles](#6-user-experience-design-principles)
+  - [Design Philosophy: "CLI-Native, GUI-Augmented"](#design-philosophy-cli-native-gui-augmented)
+  - [Interaction Patterns](#interaction-patterns)
+- [7. Success Criteria & MVP Boundary](#7-success-criteria--mvp-boundary)
+  - [V1 Scope (Included)](#v1-scope-included)
+  - [V1 Exclusions (Future Roadmap)](#v1-exclusions-future-roadmap)
+  - [Launch Criteria (Definition of "Ready")](#launch-criteria-definition-of-ready)
+- [8. Risk Mitigation](#8-risk-mitigation)
+  - [Technical Risks](#technical-risks)
+  - [Product Risks](#product-risks)
+- [9. Long-Term Vision (12-24 Months)](#9-long-term-vision-12-24-months)
+- [10. Non-Negotiables (Direction Lock)](#10-non-negotiables-direction-lock)
+- [Appendix: Technical References](#appendix-technical-references)
+
+---
+
 ## 1. Executive Summary
 
 **Concept Definition**: A native desktop application that transforms OpenCode CLI from a terminal-only tool into a visually orchestrated control plane—exposing agents, skills, tools, commands, configs, and plugins through a high-performance GUI while preserving CLI as the single execution authority [web:1][web:2].
