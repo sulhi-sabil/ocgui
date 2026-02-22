@@ -12,7 +12,7 @@ describe('useAgentSearch', () => {
       model: 'gpt-4',
       tools: {},
       permissions: {},
-      skills: [],
+      skills: ['code-review', 'security-analysis'],
       tags: ['code-quality', 'review'],
       enabled: true,
     },
@@ -23,7 +23,7 @@ describe('useAgentSearch', () => {
       model: 'claude-3',
       tools: {},
       permissions: {},
-      skills: [],
+      skills: ['testing', 'test-coverage'],
       tags: ['testing', 'automation'],
       enabled: true,
     },
@@ -33,7 +33,7 @@ describe('useAgentSearch', () => {
       description: 'Creates documentation',
       tools: {},
       permissions: {},
-      skills: [],
+      skills: ['markdown', 'documentation'],
       tags: ['docs'],
       enabled: false,
     },
@@ -114,6 +114,27 @@ describe('useAgentSearch', () => {
   it('should handle agents without tags', () => {
     const agentsWithoutTags = [{ ...mockAgents[0], tags: [] }]
     const { result } = renderHook(() => useAgentSearch(agentsWithoutTags, 'review'))
+    
+    expect(result.current.filteredAgents).toHaveLength(1)
+  })
+
+  it('should filter agents by skills', () => {
+    const { result } = renderHook(() => useAgentSearch(mockAgents, 'security-analysis'))
+    
+    expect(result.current.filteredAgents).toHaveLength(1)
+    expect(result.current.filteredAgents[0].name).toBe('Code Reviewer')
+  })
+
+  it('should filter agents by partial skill match', () => {
+    const { result } = renderHook(() => useAgentSearch(mockAgents, 'test-coverage'))
+    
+    expect(result.current.filteredAgents).toHaveLength(1)
+    expect(result.current.filteredAgents[0].name).toBe('Test Writer')
+  })
+
+  it('should handle agents without skills', () => {
+    const agentsWithoutSkills = [{ ...mockAgents[0], skills: [] }]
+    const { result } = renderHook(() => useAgentSearch(agentsWithoutSkills, 'reviewer'))
     
     expect(result.current.filteredAgents).toHaveLength(1)
   })
