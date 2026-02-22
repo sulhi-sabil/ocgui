@@ -147,6 +147,7 @@ describe('validateAgent', () => {
       tools: {},
       permissions: {},
       skills: ['skill-1'],
+      tags: ['testing'],
       enabled: true,
     }
     
@@ -247,6 +248,7 @@ describe('validateAgent', () => {
       id: 'test-id',
       name: 'Test',
       skills: [],
+      tags: [],
       enabled: true,
     }
     
@@ -262,6 +264,7 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 123,
       skills: [],
+      tags: [],
       enabled: true,
     }
     
@@ -276,6 +279,7 @@ describe('validateAgent', () => {
       id: 'test-id',
       name: 'Test',
       description: 'A test',
+      tags: [],
       enabled: true,
     }
     
@@ -291,6 +295,7 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 'A test',
       skills: 'not-an-array',
+      tags: [],
       enabled: true,
     }
     
@@ -306,6 +311,7 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 'A test',
       skills: ['valid', 123, 'also-valid'],
+      tags: [],
       enabled: true,
     }
     
@@ -321,6 +327,7 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 'A test',
       skills: [],
+      tags: [],
       enabled: true,
     }
     
@@ -335,6 +342,7 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 'A test',
       skills: [],
+      tags: [],
     }
     
     const result = validateAgent(agent)
@@ -349,6 +357,7 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 'A test',
       skills: [],
+      tags: [],
       enabled: 'true',
     }
     
@@ -364,7 +373,70 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 'A test',
       skills: [],
+      tags: [],
       enabled: false,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for missing tags array', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent must have a tags array')
+  })
+
+  it('should fail for non-array tags', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      tags: 'not-an-array',
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent must have a tags array')
+  })
+
+  it('should fail for non-string tag items', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      tags: ['valid', 123, 'also-valid'],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent tags must be strings')
+  })
+
+  it('should accept empty tags array', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
     }
     
     const result = validateAgent(agent)
