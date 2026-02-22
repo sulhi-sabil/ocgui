@@ -35,7 +35,13 @@ export function ConfirmDialog({
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
-      setTimeout(() => confirmButtonRef.current?.focus(), MODAL.FOCUS_DELAY_MS)
+      const focusTimeout = setTimeout(() => confirmButtonRef.current?.focus(), MODAL.FOCUS_DELAY_MS)
+      
+      return () => {
+        document.removeEventListener('keydown', handleEscape)
+        document.body.style.overflow = ''
+        clearTimeout(focusTimeout)
+      }
     }
 
     return () => {
