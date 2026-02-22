@@ -129,7 +129,7 @@ export const label = {
 export const modal = {
   backdrop: 'fixed inset-0 flex items-center justify-center p-4 bg-black/50',
   container: 'bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6',
-  title: 'text-xl font-semibold text-gray-900 dark:text-white mb-4',
+  title: 'text-xl font-semibold text-gray-900 dark:text-white',
 }
 
 export const overlay = {
