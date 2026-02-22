@@ -25,15 +25,16 @@ export function EditAgentModal({ isOpen, onClose, agent }: EditAgentModalProps) 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    if (agent) {
+    if (isOpen && agent) {
       setFormData({
         name: agent.name,
         description: agent.description,
         model: agent.model || '',
         tags: agent.tags.join(', '),
       })
+      setErrors({})
     }
-  }, [agent])
+  }, [isOpen, agent])
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

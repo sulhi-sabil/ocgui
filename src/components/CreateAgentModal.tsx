@@ -31,6 +31,8 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     }
 
     if (isOpen) {
+      setFormData({ name: '', description: '', model: '', tags: '' })
+      setErrors({})
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
       setTimeout(() => nameInputRef.current?.focus(), MODAL.FOCUS_DELAY_MS)

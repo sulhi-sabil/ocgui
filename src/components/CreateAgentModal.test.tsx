@@ -185,4 +185,54 @@ describe('CreateAgentModal', () => {
     expect(dialog).toHaveAttribute('aria-modal', 'true')
     expect(dialog).toHaveAttribute('aria-labelledby', 'modal-title')
   })
+
+  it('resets form when modal is reopened after cancel', () => {
+    const { rerender } = renderWithProviders(<CreateAgentModal isOpen={true} onClose={mockOnClose} />)
+    
+    fireEvent.change(screen.getByLabelText('Name *'), { target: { value: 'Cancelled Agent' } })
+    fireEvent.change(screen.getByLabelText('Description *'), { target: { value: 'This will be cancelled' } })
+    
+    expect(screen.getByLabelText('Name *')).toHaveValue('Cancelled Agent')
+    
+    fireEvent.click(screen.getByText('Cancel'))
+    expect(mockOnClose).toHaveBeenCalled()
+    
+    rerender(
+      <ToastProvider>
+        <CreateAgentModal isOpen={false} onClose={mockOnClose} />
+      </ToastProvider>
+    )
+    
+    rerender(
+      <ToastProvider>
+        <CreateAgentModal isOpen={true} onClose={mockOnClose} />
+      </ToastProvider>
+    )
+    
+    expect(screen.getByLabelText('Name *')).toHaveValue('')
+    expect(screen.getByLabelText('Description *')).toHaveValue('')
+  })
+
+  it('clears validation errors when modal is reopened', () => {
+    const { rerender } = renderWithProviders(<CreateAgentModal isOpen={true} onClose={mockOnClose} />)
+    
+    fireEvent.click(screen.getByText('Create Agent'))
+    expect(screen.getByText('Name is required')).toBeInTheDocument()
+    
+    fireEvent.click(screen.getByText('Cancel'))
+    
+    rerender(
+      <ToastProvider>
+        <CreateAgentModal isOpen={false} onClose={mockOnClose} />
+      </ToastProvider>
+    )
+    
+    rerender(
+      <ToastProvider>
+        <CreateAgentModal isOpen={true} onClose={mockOnClose} />
+      </ToastProvider>
+    )
+    
+    expect(screen.queryByText('Name is required')).not.toBeInTheDocument()
+  })
 })
