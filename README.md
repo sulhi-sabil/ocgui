@@ -73,15 +73,14 @@ npm run dev
 
 ## Contributing
 
-Contributions welcome! 
+Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) for detailed guidelines on:
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit changes (`git commit -m 'Add your feature'`)
-4. Push to branch (`git push origin feature/your-feature`)
-5. Open a Pull Request
+- Development setup
+- Coding standards
+- Commit guidelines
+- Pull request process
 
-Please read the [Blueprint](./blueprint.md) to understand project direction before submitting PRs.
+Quick start: Fork → Branch → Commit → Push → PR
 
 ## License
 
