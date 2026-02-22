@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager, State};
 use std::process::Command;
 
-const DB_VERSION: i32 = 2;
+const DB_VERSION: i32 = 3;
 
 pub struct DbState {
     conn: Arc<Mutex<Connection>>,
@@ -25,6 +25,22 @@ pub struct Run {
     pub output: String,
     pub tools_used: String,
     pub exit_status: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Session {
+    pub id: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+    pub status: String,
+    pub run_count: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SessionUpdate {
+    pub updated_at: i64,
+    pub status: Option<String>,
+    pub run_count: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -155,6 +171,31 @@ fn init_database(app_handle: &AppHandle) -> SqlResult<Connection> {
         )?;
         
         set_db_version(&conn, 2)?;
+    }
+    
+    if current_version < 3 {
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS sessions (
+                id TEXT PRIMARY KEY,
+                created_at INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL,
+                status TEXT NOT NULL DEFAULT 'active',
+                run_count INTEGER NOT NULL DEFAULT 0
+            )",
+            [],
+        )?;
+        
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_sessions_created_at ON sessions(created_at DESC)",
+            [],
+        )?;
+        
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_sessions_status ON sessions(status)",
+            [],
+        )?;
+        
+        set_db_version(&conn, 3)?;
     }
     
     Ok(conn)
@@ -328,6 +369,100 @@ fn get_run_logs(state: State<DbState>, run_id: String) -> Result<Vec<RunLog>, St
     Ok(logs)
 }
 
+#[tauri::command]
+fn create_session(state: State<DbState>, session: Session) -> Result<(), String> {
+    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    
+    conn.execute(
+        "INSERT INTO sessions (id, created_at, updated_at, status, run_count)
+         VALUES (?1, ?2, ?3, ?4, ?5)",
+        params![
+            &session.id,
+            &session.created_at,
+            &session.updated_at,
+            &session.status,
+            &session.run_count
+        ],
+    ).map_err(|e| e.to_string())?;
+    
+    Ok(())
+}
+
+#[tauri::command]
+fn get_sessions(state: State<DbState>, limit: i64) -> Result<Vec<Session>, String> {
+    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    
+    let mut stmt = conn
+        .prepare("SELECT id, created_at, updated_at, status, run_count 
+                  FROM sessions ORDER BY created_at DESC LIMIT ?1")
+        .map_err(|e| e.to_string())?;
+    
+    let sessions = stmt
+        .query_map([limit], |row| {
+            Ok(Session {
+                id: row.get(0)?,
+                created_at: row.get(1)?,
+                updated_at: row.get(2)?,
+                status: row.get(3)?,
+                run_count: row.get(4)?,
+            })
+        })
+        .map_err(|e| e.to_string())?
+        .collect::<SqlResult<Vec<Session>>>()
+        .map_err(|e| e.to_string())?;
+    
+    Ok(sessions)
+}
+
+#[tauri::command]
+fn get_session_by_id(state: State<DbState>, session_id: String) -> Result<Option<Session>, String> {
+    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    
+    let mut stmt = conn
+        .prepare("SELECT id, created_at, updated_at, status, run_count 
+                  FROM sessions WHERE id = ?1")
+        .map_err(|e| e.to_string())?;
+    
+    let session = stmt
+        .query_row([&session_id], |row| {
+            Ok(Session {
+                id: row.get(0)?,
+                created_at: row.get(1)?,
+                updated_at: row.get(2)?,
+                status: row.get(3)?,
+                run_count: row.get(4)?,
+            })
+        })
+        .optional()
+        .map_err(|e| e.to_string())?;
+    
+    Ok(session)
+}
+
+#[tauri::command]
+fn update_session(state: State<DbState>, session_id: String, updates: SessionUpdate) -> Result<(), String> {
+    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    
+    conn.execute(
+        "UPDATE sessions SET updated_at = ?1, status = COALESCE(?2, status), run_count = COALESCE(?3, run_count) WHERE id = ?4",
+        params![&updates.updated_at, &updates.status, &updates.run_count, &session_id],
+    ).map_err(|e| e.to_string())?;
+    
+    Ok(())
+}
+
+#[tauri::command]
+fn delete_session(state: State<DbState>, session_id: String) -> Result<(), String> {
+    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    
+    conn.execute(
+        "DELETE FROM sessions WHERE id = ?1",
+        [&session_id],
+    ).map_err(|e| e.to_string())?;
+    
+    Ok(())
+}
+
 fn setup_file_watcher(app_handle: AppHandle) -> Result<RecommendedWatcher, String> {
     let app_handle_clone = app_handle.clone();
     
@@ -416,6 +551,11 @@ fn main() {
             add_run_log,
             get_run_logs,
             watch_agents_file,
+            create_session,
+            get_sessions,
+            get_session_by_id,
+            update_session,
+            delete_session,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

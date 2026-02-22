@@ -52,3 +52,11 @@ export interface RunLog {
   logType: 'info' | 'error' | 'warning' | 'tool_call';
   timestamp: number;
 }
+
+export interface Session {
+  id: string;
+  createdAt: number;
+  updatedAt: number;
+  status: 'active' | 'completed' | 'archived';
+  runCount: number;
+}
