@@ -83,6 +83,7 @@ Available aliases:
 - `@hooks/*` → `src/hooks/*`
 - `@store/*` → `src/store/*`
 - `@styles/*` → `src/styles/*`
+- `@test/*` → `src/test/*`
 - `@types/*` → `src/types/*`
 - `@utils/*` → `src/utils/*`
 
@@ -133,19 +134,32 @@ export function Button({
 - Use `describe`/`it` blocks for organization
 - Test user interactions, not implementation details
 - Use `@testing-library/react` for component testing
+- Use centralized test utilities from `@test/utils` and `@test/fixtures`
 
 ```typescript
-// Test pattern
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { Button } from './Button'
+import { renderWithProviders } from '@test/utils'
+import { createMockAgent } from '@test/fixtures'
 
 describe('Button', () => {
   it('renders with children', () => {
-    render(<Button>Click me</Button>)
+    renderWithProviders(<Button>Click me</Button>)
     expect(screen.getByRole('button')).toHaveTextContent('Click me')
   })
 })
+```
+
+#### Test Utilities
+
+- `renderWithProviders(ui, options)` - Render components with required providers (ToastProvider, etc.)
+- `createMockAgent(overrides)` - Create mock agent data with defaults
+- `createMockSkill(overrides)` - Create mock skill data with defaults
+- `createMockRun(overrides)` - Create mock run data with defaults
+- `createMockConfig(overrides)` - Create mock config data with defaults
+
+See `src/test/utils.tsx` and `src/test/fixtures/index.ts` for all available utilities.
 ```
 
 ## File Structure
@@ -162,6 +176,9 @@ src/
 ├── types/           # TypeScript type definitions
 ├── utils/           # Utility functions
 ├── test/            # Test setup and utilities
+│   ├── setup.ts     # Test configuration and matchers
+│   ├── utils.tsx    # renderWithProviders and test helpers
+│   └── fixtures/    # Mock data factories
 ├── App.tsx          # Main application component
 └── main.tsx         # Application entry point
 ```
