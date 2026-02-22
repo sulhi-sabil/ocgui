@@ -3,7 +3,7 @@ import { useAppStore } from '@store/index'
 import { AgentCard } from '@components/AgentCard'
 import { ThemeToggle } from '@components/ThemeToggle'
 import { Button, SearchInput, EmptyState, ConfirmDialog } from '@components/ui'
-import { useAgentSearch } from '@hooks/useAgentSearch'
+import { useAgentSearch, useTheme } from '@hooks/index'
 import { usePlatformShortcut } from '@hooks/useKeyboardShortcut'
 import { useToast } from '@components/ui/Toast'
 import { cn } from '@utils/cn'
@@ -16,26 +16,17 @@ function App() {
   const agents = useAppStore((state) => state.agents)
   const selectedAgentId = useAppStore((state) => state.selectedAgentId)
   const selectAgent = useAppStore((state) => state.selectAgent)
-  const theme = useAppStore((state) => state.theme)
   const lastSearchQuery = useAppStore((state) => state.lastSearchQuery)
   const setLastSearchQuery = useAppStore((state) => state.setLastSearchQuery)
   const updateAgent = useAppStore((state) => state.updateAgent)
   const duplicateAgent = useAppStore((state) => state.duplicateAgent)
   const deleteAgent = useAppStore((state) => state.deleteAgent)
+  useTheme()
   const { addToast } = useToast()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState(lastSearchQuery)
   const [agentToDelete, setAgentToDelete] = useState<Agent | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
-
-  // Initialize theme on mount
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [theme])
 
   // Keyboard shortcut: Cmd/Ctrl + K to focus search
   usePlatformShortcut('k', () => {

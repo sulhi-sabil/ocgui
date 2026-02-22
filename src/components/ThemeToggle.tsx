@@ -1,22 +1,10 @@
-import { memo, useCallback } from 'react'
-import { useAppStore } from '../store'
+import { memo } from 'react'
+import { useTheme } from '@hooks/index'
 import { cn } from '@utils/cn'
 import { colors, transitions, iconSize } from '@styles/tokens'
 
 function ThemeToggleComponent() {
-  const theme = useAppStore((state) => state.theme)
-  const setTheme = useAppStore((state) => state.setTheme)
-
-  const toggleTheme = useCallback(() => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newTheme)
-    
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [theme, setTheme])
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <button
