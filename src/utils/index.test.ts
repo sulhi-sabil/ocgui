@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateId, formatDate, deepClone, validateAgent, validateSkill, validateTool, validateRun, mergeConfig, AGENT_TEMPLATES, createAgentFromTemplate, getTemplateKeys } from './index'
+import { generateId, formatDate, formatRelativeTime, deepClone, validateAgent, validateSkill, validateTool, validateRun, mergeConfig, AGENT_TEMPLATES, createAgentFromTemplate, getTemplateKeys } from './index'
 
 describe('generateId', () => {
   it('should generate a unique ID string', () => {
@@ -51,6 +51,67 @@ describe('formatDate', () => {
   it('should handle current timestamp', () => {
     const result = formatDate(Date.now())
     expect(result).toBeDefined()
+  })
+})
+
+describe('formatRelativeTime', () => {
+  it('should return "just now" for recent timestamps', () => {
+    const result = formatRelativeTime(Date.now())
+    expect(result).toBe('just now')
+  })
+
+  it('should return minutes ago', () => {
+    const fiveMinutesAgo = Date.now() - 5 * 60 * 1000
+    const result = formatRelativeTime(fiveMinutesAgo)
+    expect(result).toBe('5 minutes ago')
+  })
+
+  it('should return singular minute ago', () => {
+    const oneMinuteAgo = Date.now() - 60 * 1000
+    const result = formatRelativeTime(oneMinuteAgo)
+    expect(result).toBe('1 minute ago')
+  })
+
+  it('should return hours ago', () => {
+    const threeHoursAgo = Date.now() - 3 * 60 * 60 * 1000
+    const result = formatRelativeTime(threeHoursAgo)
+    expect(result).toBe('3 hours ago')
+  })
+
+  it('should return singular hour ago', () => {
+    const oneHourAgo = Date.now() - 60 * 60 * 1000
+    const result = formatRelativeTime(oneHourAgo)
+    expect(result).toBe('1 hour ago')
+  })
+
+  it('should return days ago', () => {
+    const twoDaysAgo = Date.now() - 2 * 24 * 60 * 60 * 1000
+    const result = formatRelativeTime(twoDaysAgo)
+    expect(result).toBe('2 days ago')
+  })
+
+  it('should return singular day ago', () => {
+    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000
+    const result = formatRelativeTime(oneDayAgo)
+    expect(result).toBe('1 day ago')
+  })
+
+  it('should return weeks ago', () => {
+    const twoWeeksAgo = Date.now() - 14 * 24 * 60 * 60 * 1000
+    const result = formatRelativeTime(twoWeeksAgo)
+    expect(result).toBe('2 weeks ago')
+  })
+
+  it('should return months ago', () => {
+    const twoMonthsAgo = Date.now() - 60 * 24 * 60 * 60 * 1000
+    const result = formatRelativeTime(twoMonthsAgo)
+    expect(result).toBe('2 months ago')
+  })
+
+  it('should return years ago', () => {
+    const twoYearsAgo = Date.now() - 730 * 24 * 60 * 60 * 1000
+    const result = formatRelativeTime(twoYearsAgo)
+    expect(result).toBe('2 years ago')
   })
 })
 
@@ -149,6 +210,7 @@ describe('validateAgent', () => {
       skills: ['skill-1'],
       tags: ['testing'],
       enabled: true,
+      createdAt: Date.now(),
     }
     
     const result = validateAgent(agent)
@@ -329,6 +391,7 @@ describe('validateAgent', () => {
       skills: [],
       tags: [],
       enabled: true,
+      createdAt: Date.now(),
     }
     
     const result = validateAgent(agent)
@@ -375,6 +438,7 @@ describe('validateAgent', () => {
       skills: [],
       tags: [],
       enabled: false,
+      createdAt: Date.now(),
     }
     
     const result = validateAgent(agent)
@@ -437,11 +501,45 @@ describe('validateAgent', () => {
       skills: [],
       tags: [],
       enabled: true,
+      createdAt: Date.now(),
     }
     
     const result = validateAgent(agent)
     
     expect(result.valid).toBe(true)
+  })
+  
+  it('should fail for missing createdAt', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent must have a number createdAt timestamp')
+  })
+  
+  it('should fail for non-number createdAt', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+      createdAt: 'not-a-number',
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent must have a number createdAt timestamp')
   })
 })
 
@@ -531,6 +629,8 @@ describe('createAgentFromTemplate', () => {
     expect(agent.tools).toHaveProperty('read')
     expect(agent.skills).toContain('code-review')
     expect(agent.tags).toContain('code-quality')
+    expect(agent.createdAt).toBeDefined()
+    expect(typeof agent.createdAt).toBe('number')
   })
 
   it('should create an agent from testWriter template', () => {

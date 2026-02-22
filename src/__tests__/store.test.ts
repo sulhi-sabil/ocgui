@@ -21,6 +21,7 @@ describe('Store - Agent Management', () => {
       skills: ['skill-1', 'skill-2'],
       tags: ['testing', 'automation'],
       enabled: true,
+      createdAt: Date.now(),
     }
 
     it('should duplicate an existing agent', () => {

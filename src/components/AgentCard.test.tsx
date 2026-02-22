@@ -13,6 +13,7 @@ const mockAgent: Agent = {
   skills: ['skill1', 'skill2', 'skill3'],
   tags: ['test', 'demo'],
   enabled: true,
+  createdAt: Date.now() - 3600000,
 }
 
 describe('AgentCard', () => {
@@ -208,5 +209,27 @@ describe('AgentCard', () => {
     )
     fireEvent.click(screen.getByLabelText('Agent actions'))
     expect(handleSelect).not.toHaveBeenCalled()
+  })
+
+  it('displays creation date when createdAt is provided', () => {
+    render(
+      <AgentCard
+        agent={mockAgent}
+        isSelected={false}
+        onSelect={() => {}}
+      />
+    )
+    expect(screen.getByText(/Created /)).toBeInTheDocument()
+  })
+
+  it('does not display creation date when createdAt is not provided', () => {
+    render(
+      <AgentCard
+        agent={{ ...mockAgent, createdAt: undefined as unknown as number }}
+        isSelected={false}
+        onSelect={() => {}}
+      />
+    )
+    expect(screen.queryByText(/Created /)).not.toBeInTheDocument()
   })
 })

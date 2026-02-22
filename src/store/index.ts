@@ -99,6 +99,7 @@ export const useAppStore = create<AppState>()(
           ...agent,
           id: generateId(),
           name: `${agent.name}${AGENT.NAME_COPY_SUFFIX}`,
+          createdAt: Date.now(),
         }
         
         set((state) => ({ agents: [...state.agents, duplicated] }))

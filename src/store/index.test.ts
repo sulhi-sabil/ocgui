@@ -28,6 +28,7 @@ describe('useAppStore', () => {
     skills: ['skill-1'],
     tags: ['testing', 'automation'],
     enabled: true,
+    createdAt: Date.now(),
   }
 
   const mockSkill: Skill = {

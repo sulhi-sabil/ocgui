@@ -72,6 +72,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
       skills: [],
       tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
       enabled: true,
+      createdAt: Date.now(),
     }
 
     addAgent(newAgent)

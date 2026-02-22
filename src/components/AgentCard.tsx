@@ -2,6 +2,7 @@ import { memo } from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import type { Agent } from '../types'
 import { cn } from '@utils/cn'
+import { formatRelativeTime } from '@utils/index'
 import { colors, spacing, borders, transitions, shadows, iconSize, strokeWidth } from '@styles/tokens'
 
 interface AgentCardProps {
@@ -156,6 +157,14 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
             <>
               <span>•</span>
               <span className="truncate max-w-[100px]">{agent.model}</span>
+            </>
+          )}
+          {agent.createdAt && (
+            <>
+              <span>•</span>
+              <span title={new Date(agent.createdAt).toLocaleString()}>
+                Created {formatRelativeTime(agent.createdAt)}
+              </span>
             </>
           )}
         </div>

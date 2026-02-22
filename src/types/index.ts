@@ -8,6 +8,7 @@ export interface Agent {
   skills: string[];
   tags: string[];
   enabled: boolean;
+  createdAt: number;
 }
 
 export interface Skill {

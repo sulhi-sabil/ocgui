@@ -15,6 +15,7 @@ describe('useAgentSearch', () => {
       skills: [],
       tags: ['code-quality', 'review'],
       enabled: true,
+      createdAt: Date.now(),
     },
     {
       id: '2',
@@ -26,6 +27,7 @@ describe('useAgentSearch', () => {
       skills: [],
       tags: ['testing', 'automation'],
       enabled: true,
+      createdAt: Date.now(),
     },
     {
       id: '3',
@@ -36,6 +38,7 @@ describe('useAgentSearch', () => {
       skills: [],
       tags: ['docs'],
       enabled: false,
+      createdAt: Date.now(),
     },
   ]
 
