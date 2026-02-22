@@ -8,6 +8,7 @@ import { usePlatformShortcut } from '@hooks/useKeyboardShortcut'
 import { useToast } from '@components/ui/Toast'
 import { cn } from '@utils/cn'
 import { iconSize, strokeWidth, grid, colors } from '@styles/tokens'
+import type { AgentId } from '@/types'
 
 const CreateAgentModal = lazy(() => import('@components/CreateAgentModal'))
 
@@ -50,7 +51,7 @@ function App() {
   const openModal = useCallback(() => setIsModalOpen(true), [])
   const closeModal = useCallback(() => setIsModalOpen(false), [])
   
-  const handleDuplicate = useCallback((id: string) => {
+  const handleDuplicate = useCallback((id: AgentId) => {
     const duplicated = duplicateAgent(id)
     if (duplicated) {
       addToast(`Agent "${duplicated.name}" created from duplicate`, 'success')

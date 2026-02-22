@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAppStore } from '@store/index'
 import { Button } from './ui/Button'
 import { useToast } from './ui/Toast'
-import { generateId } from '@utils/index'
+import { generateAgentId } from '@utils/index'
 import { cn } from '@utils/cn'
 import { colors, zIndex, modal, formInput, focus, label, typography } from '@styles/tokens'
 import type { Agent } from '../types'
@@ -62,7 +62,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     }
 
     const newAgent: Agent = {
-      id: generateId(),
+      id: generateAgentId(),
       name: formData.name.trim(),
       description: formData.description.trim(),
       model: formData.model.trim() || undefined,

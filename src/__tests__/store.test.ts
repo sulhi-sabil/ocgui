@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useAppStore } from '../store/index'
-import type { Agent } from '../types'
+import type { Agent, AgentId } from '../types'
 
 describe('Store - Agent Management', () => {
   beforeEach(() => {
@@ -12,7 +12,7 @@ describe('Store - Agent Management', () => {
 
   describe('duplicateAgent', () => {
     const mockAgent: Agent = {
-      id: 'test-agent-1',
+      id: 'test-agent-1' as AgentId,
       name: 'Test Agent',
       description: 'A test agent for duplication',
       model: 'gpt-4',
@@ -26,7 +26,7 @@ describe('Store - Agent Management', () => {
     it('should duplicate an existing agent', () => {
       useAppStore.getState().setAgents([mockAgent])
       
-      const duplicated = useAppStore.getState().duplicateAgent('test-agent-1')
+      const duplicated = useAppStore.getState().duplicateAgent('test-agent-1' as AgentId)
       
       expect(duplicated).not.toBeNull()
       expect(duplicated?.name).toBe('Test Agent (Copy)')
@@ -42,7 +42,7 @@ describe('Store - Agent Management', () => {
     it('should add duplicated agent to the agents array', () => {
       useAppStore.getState().setAgents([mockAgent])
       
-      useAppStore.getState().duplicateAgent('test-agent-1')
+      useAppStore.getState().duplicateAgent('test-agent-1' as AgentId)
       
       const agents = useAppStore.getState().agents
       expect(agents).toHaveLength(2)
@@ -51,7 +51,7 @@ describe('Store - Agent Management', () => {
     })
 
     it('should return null when duplicating non-existent agent', () => {
-      const duplicated = useAppStore.getState().duplicateAgent('non-existent-id')
+      const duplicated = useAppStore.getState().duplicateAgent('non-existent-id' as AgentId)
       
       expect(duplicated).toBeNull()
     })
@@ -59,7 +59,7 @@ describe('Store - Agent Management', () => {
     it('should not modify agents array when duplicating non-existent agent', () => {
       useAppStore.getState().setAgents([mockAgent])
       
-      useAppStore.getState().duplicateAgent('non-existent-id')
+      useAppStore.getState().duplicateAgent('non-existent-id' as AgentId)
       
       expect(useAppStore.getState().agents).toHaveLength(1)
     })
@@ -67,9 +67,9 @@ describe('Store - Agent Management', () => {
     it('should generate unique id for duplicated agent', () => {
       useAppStore.getState().setAgents([mockAgent])
       
-      const first = useAppStore.getState().duplicateAgent('test-agent-1')
+      const first = useAppStore.getState().duplicateAgent('test-agent-1' as AgentId)
       useAppStore.getState().setAgents([mockAgent, first!])
-      const second = useAppStore.getState().duplicateAgent('test-agent-1')
+      const second = useAppStore.getState().duplicateAgent('test-agent-1' as AgentId)
       
       expect(first?.id).not.toBe(second?.id)
     })
@@ -78,7 +78,7 @@ describe('Store - Agent Management', () => {
       const disabledAgent: Agent = { ...mockAgent, enabled: false }
       useAppStore.getState().setAgents([disabledAgent])
       
-      const duplicated = useAppStore.getState().duplicateAgent('test-agent-1')
+      const duplicated = useAppStore.getState().duplicateAgent('test-agent-1' as AgentId)
       
       expect(duplicated?.enabled).toBe(false)
     })

@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { Agent, Skill, Tool } from '../types'
+import { Agent, Skill, Tool, AgentId, SkillId } from '../types'
 
 describe('Type Definitions', () => {
   it('Agent type should have required properties', () => {
     const agent: Agent = {
-      id: 'test-agent',
+      id: 'test-agent' as AgentId,
       name: 'Test Agent',
       description: 'A test agent',
       model: 'gpt-4',
@@ -23,7 +23,7 @@ describe('Type Definitions', () => {
 
   it('Skill type should have required properties', () => {
     const skill: Skill = {
-      id: 'test-skill',
+      id: 'test-skill' as SkillId,
       name: 'Test Skill',
       description: 'A test skill',
       content: 'Skill content',

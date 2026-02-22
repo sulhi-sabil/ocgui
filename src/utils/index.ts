@@ -1,14 +1,28 @@
 export { cn } from './cn'
 
-/**
- * Utility functions for common operations
- */
+import type { AgentId, SkillId, RunId } from '../types'
+
+function generateIdBase(): string {
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
+}
+
+export function generateAgentId(): AgentId {
+  return generateIdBase() as AgentId
+}
+
+export function generateSkillId(): SkillId {
+  return generateIdBase() as SkillId
+}
+
+export function generateRunId(): RunId {
+  return generateIdBase() as RunId
+}
 
 /**
- * Generate a unique ID
+ * @deprecated Use generateAgentId, generateSkillId, or generateRunId instead
  */
 export function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
+  return generateIdBase()
 }
 
 /**

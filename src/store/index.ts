@@ -1,27 +1,27 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Agent, Skill, Config, Run } from '../types'
-import { generateId } from '@utils/index'
+import type { Agent, Skill, Config, Run, AgentId, SkillId, RunId } from '../types'
+import { generateAgentId, generateSkillId } from '@utils/index'
 
 interface AppState {
   version: number
   // Agent management
   agents: Agent[]
-  selectedAgentId: string | null
+  selectedAgentId: AgentId | null
   setAgents: (agents: Agent[]) => void
   addAgent: (agent: Agent) => void
-  updateAgent: (id: string, updates: Partial<Agent>) => void
-  deleteAgent: (id: string) => void
-  duplicateAgent: (id: string) => Agent | null
-  selectAgent: (id: string | null) => void
+  updateAgent: (id: AgentId, updates: Partial<Agent>) => void
+  deleteAgent: (id: AgentId) => void
+  duplicateAgent: (id: AgentId) => Agent | null
+  selectAgent: (id: AgentId | null) => void
   
   // Skill management
   skills: Skill[]
   setSkills: (skills: Skill[]) => void
   addSkill: (skill: Skill) => void
-  updateSkill: (id: string, updates: Partial<Skill>) => void
-  deleteSkill: (id: string) => void
-  duplicateSkill: (id: string) => Skill | null
+  updateSkill: (id: SkillId, updates: Partial<Skill>) => void
+  deleteSkill: (id: SkillId) => void
+  duplicateSkill: (id: SkillId) => Skill | null
   
   // Configuration
   config: Config | null
@@ -30,7 +30,7 @@ interface AppState {
   // Execution
   runs: Run[]
   addRun: (run: Run) => void
-  deleteRun: (id: string) => void
+  deleteRun: (id: RunId) => void
   clearRuns: () => void
   
   // UI State
@@ -71,7 +71,7 @@ export const useAppStore = create<AppState>()(
         
         const duplicated: Agent = {
           ...agent,
-          id: generateId(),
+          id: generateAgentId(),
           name: `${agent.name} (Copy)`,
         }
         
@@ -100,7 +100,7 @@ export const useAppStore = create<AppState>()(
         
         const duplicated: Skill = {
           ...skill,
-          id: generateId(),
+          id: generateSkillId(),
           name: `${skill.name} (Copy)`,
         }
         

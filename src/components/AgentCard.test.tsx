@@ -1,16 +1,17 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { AgentCard } from './AgentCard'
-import type { Agent } from '../types'
+import type { Agent, AgentId } from '../types'
 
 const mockAgent: Agent = {
-  id: 'test-agent-1',
+  id: 'test-agent-1' as AgentId,
   name: 'Test Agent',
   description: 'A test agent for testing',
   model: 'gpt-4',
   tools: { tool1: 'read', tool2: 'write' },
   permissions: { file: 'read' },
   skills: ['skill1', 'skill2', 'skill3'],
+  tags: ['test'],
   enabled: true,
 }
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { act } from '@testing-library/react'
 import { useAppStore } from './index'
-import type { Agent, Skill, Config, Run } from '../types'
+import type { Agent, Skill, Config, Run, AgentId, SkillId, RunId } from '../types'
 
 describe('useAppStore', () => {
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('useAppStore', () => {
   })
 
   const mockAgent: Agent = {
-    id: 'agent-1',
+    id: 'agent-1' as AgentId,
     name: 'Test Agent',
     description: 'A test agent',
     model: 'gpt-4',
@@ -31,7 +31,7 @@ describe('useAppStore', () => {
   }
 
   const mockSkill: Skill = {
-    id: 'skill-1',
+    id: 'skill-1' as SkillId,
     name: 'Test Skill',
     description: 'A test skill',
     content: 'skill content',
@@ -47,7 +47,7 @@ describe('useAppStore', () => {
   }
 
   const mockRun: Run = {
-    id: 'run-1',
+    id: 'run-1' as RunId,
     sessionId: 'session-1',
     timestamp: Date.now(),
     agent: 'agent-1',
@@ -87,7 +87,7 @@ describe('useAppStore', () => {
       })
 
       act(() => {
-        useAppStore.getState().updateAgent('agent-1', { name: 'Updated Agent' })
+        useAppStore.getState().updateAgent('agent-1' as AgentId, { name: 'Updated Agent' })
       })
 
       expect(useAppStore.getState().agents[0].name).toBe('Updated Agent')
@@ -97,7 +97,7 @@ describe('useAppStore', () => {
     it('should not update non-existent agent', () => {
       act(() => {
         useAppStore.getState().addAgent(mockAgent)
-        useAppStore.getState().updateAgent('non-existent', { name: 'Updated' })
+        useAppStore.getState().updateAgent('non-existent' as AgentId, { name: 'Updated' })
       })
 
       expect(useAppStore.getState().agents[0].name).toBe(mockAgent.name)
@@ -109,7 +109,7 @@ describe('useAppStore', () => {
       })
 
       act(() => {
-        useAppStore.getState().deleteAgent('agent-1')
+        useAppStore.getState().deleteAgent('agent-1' as AgentId)
       })
 
       expect(useAppStore.getState().agents).toHaveLength(0)
@@ -118,13 +118,13 @@ describe('useAppStore', () => {
     it('should clear selectedAgentId when deleting selected agent', () => {
       act(() => {
         useAppStore.getState().addAgent(mockAgent)
-        useAppStore.getState().selectAgent('agent-1')
+        useAppStore.getState().selectAgent('agent-1' as AgentId)
       })
 
-      expect(useAppStore.getState().selectedAgentId).toBe('agent-1')
+      expect(useAppStore.getState().selectedAgentId).toBe('agent-1' as AgentId)
 
       act(() => {
-        useAppStore.getState().deleteAgent('agent-1')
+        useAppStore.getState().deleteAgent('agent-1' as AgentId)
       })
 
       expect(useAppStore.getState().selectedAgentId).toBeNull()
@@ -132,15 +132,15 @@ describe('useAppStore', () => {
 
     it('should select an agent', () => {
       act(() => {
-        useAppStore.getState().selectAgent('agent-1')
+        useAppStore.getState().selectAgent('agent-1' as AgentId)
       })
 
-      expect(useAppStore.getState().selectedAgentId).toBe('agent-1')
+      expect(useAppStore.getState().selectedAgentId).toBe('agent-1' as AgentId)
     })
 
     it('should deselect an agent', () => {
       act(() => {
-        useAppStore.getState().selectAgent('agent-1')
+        useAppStore.getState().selectAgent('agent-1' as AgentId)
       })
 
       act(() => {
@@ -156,18 +156,18 @@ describe('useAppStore', () => {
       })
 
       act(() => {
-        useAppStore.getState().duplicateAgent('agent-1')
+        useAppStore.getState().duplicateAgent('agent-1' as AgentId)
       })
 
       const agents = useAppStore.getState().agents
       expect(agents).toHaveLength(2)
-      const duplicatedAgent = agents.find(a => a.id !== 'agent-1')
+      const duplicatedAgent = agents.find(a => a.id !== 'agent-1' as AgentId)
       expect(duplicatedAgent).toBeDefined()
       expect(duplicatedAgent?.name).toBe('Test Agent (Copy)')
     })
 
     it('should return null when duplicating non-existent agent', () => {
-      const result = useAppStore.getState().duplicateAgent('non-existent')
+      const result = useAppStore.getState().duplicateAgent('non-existent' as AgentId)
 
       expect(result).toBeNull()
       expect(useAppStore.getState().agents).toHaveLength(0)
@@ -203,7 +203,7 @@ describe('useAppStore', () => {
       })
 
       act(() => {
-        useAppStore.getState().updateSkill('skill-1', { name: 'Updated Skill' })
+        useAppStore.getState().updateSkill('skill-1' as SkillId, { name: 'Updated Skill' })
       })
 
       expect(useAppStore.getState().skills[0].name).toBe('Updated Skill')
@@ -213,7 +213,7 @@ describe('useAppStore', () => {
     it('should not update non-existent skill', () => {
       act(() => {
         useAppStore.getState().addSkill(mockSkill)
-        useAppStore.getState().updateSkill('non-existent', { name: 'Updated' })
+        useAppStore.getState().updateSkill('non-existent' as SkillId, { name: 'Updated' })
       })
 
       expect(useAppStore.getState().skills[0].name).toBe(mockSkill.name)
@@ -225,7 +225,7 @@ describe('useAppStore', () => {
       })
 
       act(() => {
-        useAppStore.getState().deleteSkill('skill-1')
+        useAppStore.getState().deleteSkill('skill-1' as SkillId)
       })
 
       expect(useAppStore.getState().skills).toHaveLength(0)
@@ -237,18 +237,18 @@ describe('useAppStore', () => {
       })
 
       act(() => {
-        useAppStore.getState().duplicateSkill('skill-1')
+        useAppStore.getState().duplicateSkill('skill-1' as SkillId)
       })
 
       const skills = useAppStore.getState().skills
       expect(skills).toHaveLength(2)
-      const duplicatedSkill = skills.find(s => s.id !== 'skill-1')
+      const duplicatedSkill = skills.find(s => s.id !== 'skill-1' as SkillId)
       expect(duplicatedSkill).toBeDefined()
       expect(duplicatedSkill?.name).toBe('Test Skill (Copy)')
     })
 
     it('should return null when duplicating non-existent skill', () => {
-      const result = useAppStore.getState().duplicateSkill('non-existent')
+      const result = useAppStore.getState().duplicateSkill('non-existent' as SkillId)
 
       expect(result).toBeNull()
       expect(useAppStore.getState().skills).toHaveLength(0)
@@ -275,8 +275,8 @@ describe('useAppStore', () => {
     })
 
     it('should add a run to the beginning', () => {
-      const run1 = { ...mockRun, id: 'run-1', timestamp: 1000 }
-      const run2 = { ...mockRun, id: 'run-2', timestamp: 2000 }
+      const run1 = { ...mockRun, id: 'run-1' as RunId, timestamp: 1000 }
+      const run2 = { ...mockRun, id: 'run-2' as RunId, timestamp: 2000 }
 
       act(() => {
         useAppStore.getState().addRun(run1)
@@ -284,7 +284,7 @@ describe('useAppStore', () => {
       })
 
       expect(useAppStore.getState().runs).toHaveLength(2)
-      expect(useAppStore.getState().runs[0].id).toBe('run-2')
+      expect(useAppStore.getState().runs[0].id).toBe('run-2' as RunId)
     })
 
     it('should delete a run', () => {
@@ -293,15 +293,15 @@ describe('useAppStore', () => {
       })
 
       act(() => {
-        useAppStore.getState().deleteRun('run-1')
+        useAppStore.getState().deleteRun('run-1' as RunId)
       })
 
       expect(useAppStore.getState().runs).toHaveLength(0)
     })
 
     it('should clear all runs', () => {
-      const run1 = { ...mockRun, id: 'run-1' }
-      const run2 = { ...mockRun, id: 'run-2' }
+      const run1 = { ...mockRun, id: 'run-1' as RunId }
+      const run2 = { ...mockRun, id: 'run-2' as RunId }
 
       act(() => {
         useAppStore.getState().addRun(run1)
@@ -355,7 +355,7 @@ describe('useAppStore', () => {
         useAppStore.getState().addRun(mockRun)
         useAppStore.getState().setTheme('dark')
         useAppStore.getState().setLastSearchQuery('test')
-        useAppStore.getState().selectAgent('agent-1')
+        useAppStore.getState().selectAgent('agent-1' as AgentId)
       })
 
       expect(useAppStore.getState().agents).toHaveLength(1)
@@ -364,7 +364,7 @@ describe('useAppStore', () => {
       expect(useAppStore.getState().runs).toHaveLength(1)
       expect(useAppStore.getState().theme).toBe('dark')
       expect(useAppStore.getState().lastSearchQuery).toBe('test')
-      expect(useAppStore.getState().selectedAgentId).toBe('agent-1')
+      expect(useAppStore.getState().selectedAgentId).toBe('agent-1' as AgentId)
 
       act(() => {
         useAppStore.getState().reset()

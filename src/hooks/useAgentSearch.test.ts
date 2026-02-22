@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { useAgentSearch } from './useAgentSearch'
-import type { Agent } from '../types'
+import type { Agent, AgentId } from '../types'
 
 describe('useAgentSearch', () => {
   const mockAgents: Agent[] = [
     {
-      id: '1',
+      id: '1' as AgentId,
       name: 'Code Reviewer',
       description: 'Reviews code for quality',
       model: 'gpt-4',
@@ -17,7 +17,7 @@ describe('useAgentSearch', () => {
       enabled: true,
     },
     {
-      id: '2',
+      id: '2' as AgentId,
       name: 'Test Writer',
       description: 'Writes unit tests',
       model: 'claude-3',
@@ -28,7 +28,7 @@ describe('useAgentSearch', () => {
       enabled: true,
     },
     {
-      id: '3',
+      id: '3' as AgentId,
       name: 'Documentation Agent',
       description: 'Creates documentation',
       tools: {},
