@@ -265,3 +265,92 @@ export function validateSkill(skill: unknown): { valid: boolean; errors: string[
   
   return { valid: errors.length === 0, errors }
 }
+
+/**
+ * Validate tool configuration
+ */
+export function validateTool(tool: unknown): { valid: boolean; errors: string[] } {
+  const errors: string[] = []
+  
+  if (!tool || typeof tool !== 'object') {
+    errors.push('Tool must be an object')
+    return { valid: false, errors }
+  }
+  
+  const t = tool as Record<string, unknown>
+  
+  if (!t.name || typeof t.name !== 'string') {
+    errors.push('Tool must have a string name')
+  }
+  
+  if (t.description === undefined || typeof t.description !== 'string') {
+    errors.push('Tool must have a string description')
+  }
+  
+  if (t.parameters && typeof t.parameters !== 'object') {
+    errors.push('Tool parameters must be an object')
+  }
+  
+  if (!['allow', 'deny', 'ask'].includes(t.permission as string)) {
+    errors.push('Tool permission must be "allow", "deny", or "ask"')
+  }
+  
+  return { valid: errors.length === 0, errors }
+}
+
+/**
+ * Validate run configuration
+ */
+export function validateRun(run: unknown): { valid: boolean; errors: string[] } {
+  const errors: string[] = []
+  
+  if (!run || typeof run !== 'object') {
+    errors.push('Run must be an object')
+    return { valid: false, errors }
+  }
+  
+  const r = run as Record<string, unknown>
+  
+  if (!r.id || typeof r.id !== 'string') {
+    errors.push('Run must have a string id')
+  }
+  
+  if (!r.sessionId || typeof r.sessionId !== 'string') {
+    errors.push('Run must have a string sessionId')
+  }
+  
+  if (typeof r.timestamp !== 'number') {
+    errors.push('Run must have a number timestamp')
+  }
+  
+  if (!r.agent || typeof r.agent !== 'string') {
+    errors.push('Run must have a string agent')
+  }
+  
+  if (!r.model || typeof r.model !== 'string') {
+    errors.push('Run must have a string model')
+  }
+  
+  if (r.input === undefined || typeof r.input !== 'string') {
+    errors.push('Run must have a string input')
+  }
+  
+  if (r.output === undefined || typeof r.output !== 'string') {
+    errors.push('Run must have a string output')
+  }
+  
+  if (!Array.isArray(r.toolsUsed)) {
+    errors.push('Run must have a toolsUsed array')
+  } else {
+    const invalidTools = r.toolsUsed.filter(t => typeof t !== 'string')
+    if (invalidTools.length > 0) {
+      errors.push('Run toolsUsed must be strings')
+    }
+  }
+  
+  if (typeof r.exitStatus !== 'number') {
+    errors.push('Run must have a number exitStatus')
+  }
+  
+  return { valid: errors.length === 0, errors }
+}
