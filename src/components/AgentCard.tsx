@@ -10,10 +10,11 @@ interface AgentCardProps {
   onSelect: () => void
   onToggleEnabled?: () => void
   onDuplicate?: () => void
+  onEdit?: () => void
   onDelete?: () => void
 }
 
-function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDuplicate, onDelete }: AgentCardProps) {
+function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDuplicate, onEdit, onDelete }: AgentCardProps) {
   return (
     <div
       onClick={onSelect}
@@ -57,7 +58,7 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
             {agent.enabled ? 'Enabled' : 'Disabled'}
           </button>
           
-          {(onDuplicate || onDelete) && (
+          {(onDuplicate || onEdit || onDelete) && (
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button
@@ -76,6 +77,20 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
                   sideOffset={5}
                   align="end"
                 >
+                  {onEdit && (
+                    <DropdownMenu.Item
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded cursor-pointer outline-none hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700"
+                      onSelect={(e) => {
+                        e.preventDefault()
+                        onEdit()
+                      }}
+                    >
+                      <svg className={iconSize.sm} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Edit
+                    </DropdownMenu.Item>
+                  )}
                   {onDuplicate && (
                     <DropdownMenu.Item
                       className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded cursor-pointer outline-none hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700"
@@ -91,18 +106,21 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
                     </DropdownMenu.Item>
                   )}
                   {onDelete && (
-                    <DropdownMenu.Item
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded cursor-pointer outline-none hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20"
-                      onSelect={(e) => {
-                        e.preventDefault()
-                        onDelete()
-                      }}
-                    >
-                      <svg className={iconSize.sm} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                      Delete
-                    </DropdownMenu.Item>
+                    <>
+                      <DropdownMenu.Separator className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
+                      <DropdownMenu.Item
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded cursor-pointer outline-none hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20"
+                        onSelect={(e) => {
+                          e.preventDefault()
+                          onDelete()
+                        }}
+                      >
+                        <svg className={iconSize.sm} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete
+                      </DropdownMenu.Item>
+                    </>
                   )}
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
