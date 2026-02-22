@@ -1,8 +1,10 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
 import type { Agent, Skill, Config, Run } from '../types'
-import { generateId } from '@utils/index'
+import { generateId, validateAgent, validateSkill } from '@utils/index'
 import { AGENT } from '@constants/index'
+
+const CURRENT_STORE_VERSION = 2
 
 const safeStorage: StateStorage = {
   getItem: (name: string): string | null => {
@@ -27,6 +29,102 @@ const safeStorage: StateStorage = {
       // Storage unavailable - silently fail
     }
   },
+}
+
+interface PersistedState {
+  version: number
+  theme: 'light' | 'dark'
+  agents: Agent[]
+  selectedAgentId: string | null
+  skills: Skill[]
+  config: Config | null
+  lastSearchQuery: string
+}
+
+type Migration = (state: Partial<PersistedState>) => Partial<PersistedState>
+
+const migrations: Record<number, Migration> = {
+  1: (state) => {
+    const migrated = { ...state }
+    
+    if (Array.isArray(migrated.agents)) {
+      migrated.agents = migrated.agents.filter((agent: unknown) => {
+        const result = validateAgent(agent)
+        return result.valid
+      })
+    } else {
+      migrated.agents = []
+    }
+    
+    if (Array.isArray(migrated.skills)) {
+      migrated.skills = migrated.skills.filter((skill: unknown) => {
+        const result = validateSkill(skill)
+        return result.valid
+      })
+    } else {
+      migrated.skills = []
+    }
+    
+    if (migrated.theme !== 'light' && migrated.theme !== 'dark') {
+      migrated.theme = 'light'
+    }
+    
+    if (typeof migrated.selectedAgentId !== 'string' && migrated.selectedAgentId !== null) {
+      migrated.selectedAgentId = null
+    }
+    
+    if (typeof migrated.lastSearchQuery !== 'string') {
+      migrated.lastSearchQuery = ''
+    }
+    
+    return {
+      ...migrated,
+      version: 2,
+    }
+  },
+}
+
+function migrateState(state: unknown, fromVersion: number): PersistedState | null {
+  if (!state || typeof state !== 'object') {
+    return null
+  }
+  
+  let migrated = state as Partial<PersistedState>
+  
+  for (let v = fromVersion; v < CURRENT_STORE_VERSION; v++) {
+    const migration = migrations[v]
+    if (migration) {
+      try {
+        migrated = migration(migrated)
+      } catch {
+        return null
+      }
+    }
+  }
+  
+  return validatePersistedState(migrated)
+}
+
+function validatePersistedState(state: Partial<PersistedState> | null): PersistedState | null {
+  if (!state) return null
+  
+  if (state.version !== CURRENT_STORE_VERSION) {
+    return null
+  }
+  
+  return {
+    version: CURRENT_STORE_VERSION,
+    theme: state.theme === 'dark' ? 'dark' : 'light',
+    agents: Array.isArray(state.agents) 
+      ? state.agents.filter((a: unknown) => validateAgent(a).valid) 
+      : [],
+    selectedAgentId: typeof state.selectedAgentId === 'string' ? state.selectedAgentId : null,
+    skills: Array.isArray(state.skills) 
+      ? state.skills.filter((s: unknown) => validateSkill(s).valid) 
+      : [],
+    config: state.config && typeof state.config === 'object' ? state.config : null,
+    lastSearchQuery: typeof state.lastSearchQuery === 'string' ? state.lastSearchQuery : '',
+  }
 }
 
 interface AppState {
@@ -74,8 +172,7 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      version: 1,
-      // Agents
+      version: CURRENT_STORE_VERSION,
       agents: [],
       selectedAgentId: null,
       setAgents: (agents) => set({ agents }),
@@ -106,7 +203,6 @@ export const useAppStore = create<AppState>()(
       },
       selectAgent: (id) => set({ selectedAgentId: id }),
       
-      // Skills
       skills: [],
       setSkills: (skills) => set({ skills }),
       addSkill: (skill) => set((state) => ({ skills: [...state.skills, skill] })),
@@ -134,11 +230,9 @@ export const useAppStore = create<AppState>()(
         return duplicated
       },
       
-      // Config
       config: null,
       setConfig: (config) => set({ config }),
       
-      // Runs
       runs: [],
       addRun: (run) => set((state) => ({ runs: [run, ...state.runs] })),
       deleteRun: (id) =>
@@ -147,16 +241,14 @@ export const useAppStore = create<AppState>()(
         })),
       clearRuns: () => set({ runs: [] }),
       
-      // Theme
       theme: 'light',
       setTheme: (theme) => set({ theme }),
       
-      // Search
       lastSearchQuery: '',
       setLastSearchQuery: (query) => set({ lastSearchQuery: query }),
       
-      // Reset
       reset: () => set({
+        version: CURRENT_STORE_VERSION,
         agents: [],
         selectedAgentId: null,
         skills: [],
@@ -168,7 +260,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'ocgui-storage',
-      version: 1,
+      version: CURRENT_STORE_VERSION,
       storage: createJSONStorage(() => safeStorage),
       partialize: (state) => ({ 
         version: state.version,
@@ -179,6 +271,21 @@ export const useAppStore = create<AppState>()(
         config: state.config,
         lastSearchQuery: state.lastSearchQuery,
       }),
+      migrate: (persistedState, version) => {
+        const migrated = migrateState(persistedState, version)
+        if (migrated) {
+          return migrated
+        }
+        return {
+          version: CURRENT_STORE_VERSION,
+          theme: 'light' as const,
+          agents: [],
+          selectedAgentId: null,
+          skills: [],
+          config: null,
+          lastSearchQuery: '',
+        }
+      },
     }
   )
 )
