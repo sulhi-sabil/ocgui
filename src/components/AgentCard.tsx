@@ -1,23 +1,52 @@
-import { memo } from 'react'
+import { memo, useCallback } from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import type { Agent } from '../types'
 import { cn } from '@utils/cn'
 import { colors, spacing, borders, transitions, shadows, iconSize, strokeWidth } from '@styles/tokens'
 
+export type AgentAction = 'select' | 'toggle' | 'duplicate' | 'edit' | 'delete'
+
 interface AgentCardProps {
   agent: Agent
   isSelected: boolean
-  onSelect: () => void
-  onToggleEnabled?: () => void
-  onDuplicate?: () => void
-  onEdit?: () => void
-  onDelete?: () => void
+  onAction: (action: AgentAction, agentId: string) => void
+  showDuplicate?: boolean
+  showEdit?: boolean
+  showDelete?: boolean
 }
 
-function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDuplicate, onEdit, onDelete }: AgentCardProps) {
+function AgentCardComponent({ 
+  agent, 
+  isSelected, 
+  onAction, 
+  showDuplicate = true, 
+  showEdit = true,
+  showDelete = true 
+}: AgentCardProps) {
+  const handleSelect = useCallback(() => {
+    onAction('select', agent.id)
+  }, [onAction, agent.id])
+
+  const handleToggle = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    onAction('toggle', agent.id)
+  }, [onAction, agent.id])
+
+  const handleDuplicate = useCallback(() => {
+    onAction('duplicate', agent.id)
+  }, [onAction, agent.id])
+
+  const handleEdit = useCallback(() => {
+    onAction('edit', agent.id)
+  }, [onAction, agent.id])
+
+  const handleDelete = useCallback(() => {
+    onAction('delete', agent.id)
+  }, [onAction, agent.id])
+
   return (
     <div
-      onClick={onSelect}
+      onClick={handleSelect}
       className={cn(
         'relative cursor-pointer',
         spacing.card,
@@ -39,17 +68,13 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
         </div>
         <div className="flex items-center gap-2 ml-2">
           <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onToggleEnabled?.()
-            }}
+            onClick={handleToggle}
             className={cn(
               'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium transition-colors',
               agent.enabled ? colors.status.enabled : colors.status.disabled,
-              onToggleEnabled && 'hover:opacity-80 cursor-pointer'
+              'hover:opacity-80 cursor-pointer'
             )}
-            disabled={!onToggleEnabled}
-            title={onToggleEnabled ? `Click to ${agent.enabled ? 'disable' : 'enable'} agent` : undefined}
+            title={`Click to ${agent.enabled ? 'disable' : 'enable'} agent`}
           >
             <span className={cn(
               'w-1.5 h-1.5 rounded-full mr-1.5 flex-shrink-0',
@@ -58,7 +83,7 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
             {agent.enabled ? 'Enabled' : 'Disabled'}
           </button>
           
-          {(onDuplicate || onEdit || onDelete) && (
+          {(showDuplicate || showEdit || showDelete) && (
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button
@@ -77,13 +102,10 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
                   sideOffset={5}
                   align="end"
                 >
-                  {onEdit && (
+                  {showEdit && (
                     <DropdownMenu.Item
                       className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded cursor-pointer outline-none hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700"
-                      onSelect={(e) => {
-                        e.preventDefault()
-                        onEdit()
-                      }}
+                      onSelect={handleEdit}
                     >
                       <svg className={iconSize.sm} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -91,13 +113,10 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
                       Edit
                     </DropdownMenu.Item>
                   )}
-                  {onDuplicate && (
+                  {showDuplicate && (
                     <DropdownMenu.Item
                       className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded cursor-pointer outline-none hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700"
-                      onSelect={(e) => {
-                        e.preventDefault()
-                        onDuplicate()
-                      }}
+                      onSelect={handleDuplicate}
                     >
                       <svg className={iconSize.sm} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -105,15 +124,12 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
                       Duplicate
                     </DropdownMenu.Item>
                   )}
-                  {onDelete && (
+                  {showDelete && (
                     <>
                       <DropdownMenu.Separator className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
                       <DropdownMenu.Item
                         className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded cursor-pointer outline-none hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20"
-                        onSelect={(e) => {
-                          e.preventDefault()
-                          onDelete()
-                        }}
+                        onSelect={handleDelete}
                       >
                         <svg className={iconSize.sm} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

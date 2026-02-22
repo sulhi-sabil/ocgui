@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, lazy, Suspense, useCallback } from 'react'
 import { useAppStore } from '@store/index'
-import { AgentCard } from '@components/AgentCard'
+import { AgentCard, type AgentAction } from '@components/AgentCard'
 import { ThemeToggle } from '@components/ThemeToggle'
 import { Button, SearchInput, EmptyState, ConfirmDialog } from '@components/ui'
 import { useAgentSearch, useTheme } from '@hooks/index'
@@ -31,7 +31,6 @@ function App() {
   const [agentToDelete, setAgentToDelete] = useState<Agent | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  // Keyboard shortcut: Cmd/Ctrl + K to focus search
   usePlatformShortcut('k', () => {
     searchInputRef.current?.focus()
   })
@@ -44,29 +43,47 @@ function App() {
 
   const openModal = useCallback(() => setIsModalOpen(true), [])
   const closeModal = useCallback(() => setIsModalOpen(false), [])
-  
-  const handleDuplicate = useCallback((id: string) => {
-    const duplicated = duplicateAgent(id)
-    if (duplicated) {
-      addToast(`Agent "${duplicated.name}" created from duplicate`, 'success')
-    }
-  }, [duplicateAgent, addToast])
 
-  const handleEdit = useCallback((id: string) => {
-    const agent = agents.find(a => a.id === id)
-    if (agent) {
-      setEditingAgent(agent)
-      setIsEditModalOpen(true)
+  const handleAgentAction = useCallback((action: AgentAction, agentId: string) => {
+    switch (action) {
+      case 'select':
+        selectAgent(agentId)
+        break
+      case 'toggle': {
+        const agent = agents.find(a => a.id === agentId)
+        if (agent) {
+          updateAgent(agentId, { enabled: !agent.enabled })
+        }
+        break
+      }
+      case 'duplicate': {
+        const duplicated = duplicateAgent(agentId)
+        if (duplicated) {
+          addToast(`Agent "${duplicated.name}" created from duplicate`, 'success')
+        }
+        break
+      }
+      case 'edit': {
+        const agent = agents.find(a => a.id === agentId)
+        if (agent) {
+          setEditingAgent(agent)
+          setIsEditModalOpen(true)
+        }
+        break
+      }
+      case 'delete': {
+        const agent = agents.find(a => a.id === agentId)
+        if (agent) {
+          setAgentToDelete(agent)
+        }
+        break
+      }
     }
-  }, [agents])
+  }, [selectAgent, agents, updateAgent, duplicateAgent, addToast])
 
   const closeEditModal = useCallback(() => {
     setIsEditModalOpen(false)
     setEditingAgent(null)
-  }, [])
-
-  const handleDeleteClick = useCallback((agent: Agent) => {
-    setAgentToDelete(agent)
   }, [])
 
   const handleDeleteConfirm = useCallback(() => {
@@ -152,11 +169,7 @@ function App() {
                   key={agent.id}
                   agent={agent}
                   isSelected={selectedAgentId === agent.id}
-                  onSelect={() => selectAgent(agent.id)}
-                  onToggleEnabled={() => updateAgent(agent.id, { enabled: !agent.enabled })}
-                  onDuplicate={() => handleDuplicate(agent.id)}
-                  onEdit={() => handleEdit(agent.id)}
-                  onDelete={() => handleDeleteClick(agent)}
+                  onAction={handleAgentAction}
                 />
               ))}
             </div>
