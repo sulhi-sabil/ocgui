@@ -93,12 +93,76 @@ export function validateAgent(agent: unknown): { valid: boolean; errors: string[
     errors.push('Agent must have a string description')
   }
   
+  if (a.version !== undefined && typeof a.version !== 'string') {
+    errors.push('Agent version must be a string')
+  }
+  
+  if (a.model !== undefined && typeof a.model !== 'string') {
+    errors.push('Agent model must be a string')
+  }
+  
+  if (a.capabilities !== undefined) {
+    if (!Array.isArray(a.capabilities)) {
+      errors.push('Agent capabilities must be an array')
+    } else {
+      const invalidCapabilities = a.capabilities.filter(c => typeof c !== 'string')
+      if (invalidCapabilities.length > 0) {
+        errors.push('Agent capabilities must be strings')
+      }
+    }
+  }
+  
+  if (a.behavior !== undefined) {
+    if (typeof a.behavior !== 'object' || Array.isArray(a.behavior)) {
+      errors.push('Agent behavior must be an object')
+    } else {
+      const behavior = a.behavior as Record<string, unknown>
+      const validKeys = ['selfHeal', 'selfLearn', 'selfEvolve', 'maximizePotential']
+      for (const key of Object.keys(behavior)) {
+        if (!validKeys.includes(key)) {
+          errors.push(`Agent behavior has invalid key: ${key}`)
+        } else if (typeof behavior[key] !== 'boolean') {
+          errors.push(`Agent behavior.${key} must be a boolean`)
+        }
+      }
+    }
+  }
+  
   if (a.tools && typeof a.tools !== 'object') {
     errors.push('Agent tools must be an object')
   }
   
-  if (a.permissions && typeof a.permissions !== 'object') {
-    errors.push('Agent permissions must be an object')
+  if (a.permissions !== undefined) {
+    if (typeof a.permissions !== 'object' || Array.isArray(a.permissions)) {
+      errors.push('Agent permissions must be an object')
+    }
+  }
+  
+  if (a.hooks !== undefined) {
+    if (typeof a.hooks !== 'object' || Array.isArray(a.hooks)) {
+      errors.push('Agent hooks must be an object')
+    } else {
+      const hooks = a.hooks as Record<string, unknown>
+      const validHookKeys = ['preToolUse', 'postToolUse', 'userPromptSubmit', 'stop']
+      for (const key of Object.keys(hooks)) {
+        if (!validHookKeys.includes(key)) {
+          errors.push(`Agent hooks has invalid key: ${key}`)
+        } else if (!Array.isArray(hooks[key])) {
+          errors.push(`Agent hooks.${key} must be an array`)
+        }
+      }
+    }
+  }
+  
+  if (a.mcpServers !== undefined) {
+    if (!Array.isArray(a.mcpServers)) {
+      errors.push('Agent mcpServers must be an array')
+    } else {
+      const invalidServers = a.mcpServers.filter(s => typeof s !== 'string')
+      if (invalidServers.length > 0) {
+        errors.push('Agent mcpServers must be strings')
+      }
+    }
   }
   
   if (!Array.isArray(a.skills)) {
@@ -121,6 +185,26 @@ export function validateAgent(agent: unknown): { valid: boolean; errors: string[
   
   if (typeof a.enabled !== 'boolean') {
     errors.push('Agent must have an enabled boolean')
+  }
+  
+  if (a.config !== undefined) {
+    if (typeof a.config !== 'object' || Array.isArray(a.config)) {
+      errors.push('Agent config must be an object')
+    } else {
+      const config = a.config as Record<string, unknown>
+      if (config.temperature !== undefined && typeof config.temperature !== 'number') {
+        errors.push('Agent config.temperature must be a number')
+      }
+      if (config.maxTokens !== undefined && typeof config.maxTokens !== 'number') {
+        errors.push('Agent config.maxTokens must be a number')
+      }
+      if (config.contextWindow !== undefined && typeof config.contextWindow !== 'number') {
+        errors.push('Agent config.contextWindow must be a number')
+      }
+      if (config.responseFormat !== undefined && !['text', 'json'].includes(config.responseFormat as string)) {
+        errors.push('Agent config.responseFormat must be "text" or "json"')
+      }
+    }
   }
   
   return { valid: errors.length === 0, errors }

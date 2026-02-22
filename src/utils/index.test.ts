@@ -443,6 +443,412 @@ describe('validateAgent', () => {
     
     expect(result.valid).toBe(true)
   })
+
+  it('should accept optional version field', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      version: '1.0.0',
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for non-string version', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      version: 123,
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent version must be a string')
+  })
+
+  it('should accept optional capabilities array', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      capabilities: ['code-generation', 'testing'],
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for non-array capabilities', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      capabilities: 'not-an-array',
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent capabilities must be an array')
+  })
+
+  it('should fail for non-string capabilities items', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      capabilities: ['valid', 123],
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent capabilities must be strings')
+  })
+
+  it('should accept valid behavior configuration', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      behavior: {
+        selfHeal: true,
+        selfLearn: false,
+        selfEvolve: true,
+        maximizePotential: true,
+      },
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for non-object behavior', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      behavior: 'not-an-object',
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent behavior must be an object')
+  })
+
+  it('should fail for invalid behavior key', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      behavior: { invalidKey: true },
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent behavior has invalid key: invalidKey')
+  })
+
+  it('should fail for non-boolean behavior value', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      behavior: { selfHeal: 'yes' },
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent behavior.selfHeal must be a boolean')
+  })
+
+  it('should accept valid hooks configuration', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      hooks: {
+        preToolUse: ['hook1'],
+        postToolUse: ['hook2'],
+        userPromptSubmit: [],
+        stop: ['cleanup'],
+      },
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for non-object hooks', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      hooks: 'not-an-object',
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent hooks must be an object')
+  })
+
+  it('should fail for invalid hooks key', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      hooks: { invalidHook: [] },
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent hooks has invalid key: invalidHook')
+  })
+
+  it('should fail for non-array hooks value', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      hooks: { preToolUse: 'not-an-array' },
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent hooks.preToolUse must be an array')
+  })
+
+  it('should accept valid config with runtime settings', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      config: {
+        temperature: 0.7,
+        maxTokens: 8000,
+        contextWindow: 128000,
+        responseFormat: 'json',
+      },
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for non-object config', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      config: 'not-an-object',
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent config must be an object')
+  })
+
+  it('should fail for non-number temperature', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      config: { temperature: 'hot' },
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent config.temperature must be a number')
+  })
+
+  it('should fail for non-number maxTokens', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      config: { maxTokens: '8000' },
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent config.maxTokens must be a number')
+  })
+
+  it('should fail for invalid responseFormat', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      config: { responseFormat: 'xml' },
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent config.responseFormat must be "text" or "json"')
+  })
+
+  it('should accept valid mcpServers array', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      mcpServers: ['server1', 'server2'],
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for non-array mcpServers', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      mcpServers: 'not-an-array',
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent mcpServers must be an array')
+  })
+
+  it('should fail for non-string mcpServers items', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      mcpServers: ['valid', 123],
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent mcpServers must be strings')
+  })
+
+  it('should validate a complete CMZ-style agent', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'CMZ',
+      version: '1.0.0',
+      description: 'Self-healing, self-learning agent',
+      behavior: {
+        selfHeal: true,
+        selfLearn: true,
+        selfEvolve: true,
+        maximizePotential: true,
+      },
+      model: 'gpt-4',
+      capabilities: ['code-generation', 'debugging'],
+      tools: { read: 'allow', write: 'ask' },
+      permissions: { read: true, write: true, execute: true, git: true, network: true },
+      hooks: {
+        preToolUse: [],
+        postToolUse: [],
+        userPromptSubmit: [],
+        stop: [],
+      },
+      mcpServers: [],
+      skills: ['self-healing', 'continuous-improvement'],
+      tags: ['autonomous', 'experimental'],
+      enabled: true,
+      config: {
+        temperature: 0.7,
+        maxTokens: 8000,
+        contextWindow: 128000,
+        responseFormat: 'text',
+      },
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(true)
+    expect(result.errors).toHaveLength(0)
+  })
 })
 
 describe('mergeConfig', () => {

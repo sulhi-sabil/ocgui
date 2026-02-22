@@ -1,13 +1,48 @@
+export interface AgentBehavior {
+  selfHeal?: boolean
+  selfLearn?: boolean
+  selfEvolve?: boolean
+  maximizePotential?: boolean
+}
+
+export interface AgentHooks {
+  preToolUse?: string[]
+  postToolUse?: string[]
+  userPromptSubmit?: string[]
+  stop?: string[]
+}
+
+export interface AgentRuntimeConfig {
+  temperature?: number
+  maxTokens?: number
+  contextWindow?: number
+  responseFormat?: 'text' | 'json'
+}
+
+export interface AgentPermissions {
+  read?: boolean
+  write?: boolean
+  execute?: boolean
+  git?: boolean
+  network?: boolean
+}
+
 export interface Agent {
-  id: string;
-  name: string;
-  description: string;
-  model?: string;
-  tools: Record<string, string>;
-  permissions: Record<string, string>;
-  skills: string[];
-  tags: string[];
-  enabled: boolean;
+  id: string
+  name: string
+  description: string
+  version?: string
+  model?: string
+  capabilities?: string[]
+  behavior?: AgentBehavior
+  tools: Record<string, string>
+  permissions: Record<string, string> | AgentPermissions
+  hooks?: AgentHooks
+  mcpServers?: string[]
+  skills: string[]
+  tags: string[]
+  enabled: boolean
+  config?: AgentRuntimeConfig
 }
 
 export interface Skill {
