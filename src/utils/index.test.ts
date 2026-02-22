@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateId, formatDate, deepClone, validateAgent, validateSkill, mergeConfig } from './index'
+import { generateId, formatDate, deepClone, validateAgent, validateSkill, mergeConfig, AGENT_TEMPLATES, createAgentFromTemplate, getTemplateKeys } from './index'
 
 describe('generateId', () => {
   it('should generate a unique ID string', () => {
@@ -147,6 +147,7 @@ describe('validateAgent', () => {
       tools: {},
       permissions: {},
       skills: ['skill-1'],
+      tags: ['testing'],
       enabled: true,
     }
     
@@ -247,6 +248,7 @@ describe('validateAgent', () => {
       id: 'test-id',
       name: 'Test',
       skills: [],
+      tags: [],
       enabled: true,
     }
     
@@ -262,6 +264,7 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 123,
       skills: [],
+      tags: [],
       enabled: true,
     }
     
@@ -276,6 +279,7 @@ describe('validateAgent', () => {
       id: 'test-id',
       name: 'Test',
       description: 'A test',
+      tags: [],
       enabled: true,
     }
     
@@ -291,6 +295,7 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 'A test',
       skills: 'not-an-array',
+      tags: [],
       enabled: true,
     }
     
@@ -306,6 +311,7 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 'A test',
       skills: ['valid', 123, 'also-valid'],
+      tags: [],
       enabled: true,
     }
     
@@ -321,6 +327,7 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 'A test',
       skills: [],
+      tags: [],
       enabled: true,
     }
     
@@ -335,6 +342,7 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 'A test',
       skills: [],
+      tags: [],
     }
     
     const result = validateAgent(agent)
@@ -349,6 +357,7 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 'A test',
       skills: [],
+      tags: [],
       enabled: 'true',
     }
     
@@ -364,7 +373,70 @@ describe('validateAgent', () => {
       name: 'Test',
       description: 'A test',
       skills: [],
+      tags: [],
       enabled: false,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for missing tags array', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent must have a tags array')
+  })
+
+  it('should fail for non-array tags', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      tags: 'not-an-array',
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent must have a tags array')
+  })
+
+  it('should fail for non-string tag items', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      tags: ['valid', 123, 'also-valid'],
+      enabled: true,
+    }
+    
+    const result = validateAgent(agent)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Agent tags must be strings')
+  })
+
+  it('should accept empty tags array', () => {
+    const agent = {
+      id: 'test-id',
+      name: 'Test',
+      description: 'A test',
+      skills: [],
+      tags: [],
+      enabled: true,
     }
     
     const result = validateAgent(agent)
@@ -641,5 +713,143 @@ describe('mergeConfig', () => {
     const result = mergeConfig(base, override)
     
     expect(result).toEqual({ a: 1, b: undefined })
+  })
+})
+
+describe('AGENT_TEMPLATES', () => {
+  it('should have codeReviewer template', () => {
+    expect(AGENT_TEMPLATES.codeReviewer).toBeDefined()
+    expect(AGENT_TEMPLATES.codeReviewer.name).toBe('Code Reviewer')
+    expect(AGENT_TEMPLATES.codeReviewer.defaultTools).toHaveProperty('read')
+  })
+
+  it('should have testWriter template', () => {
+    expect(AGENT_TEMPLATES.testWriter).toBeDefined()
+    expect(AGENT_TEMPLATES.testWriter.name).toBe('Test Writer')
+    expect(AGENT_TEMPLATES.testWriter.defaultTools).toHaveProperty('bash')
+  })
+
+  it('should have documentationAgent template', () => {
+    expect(AGENT_TEMPLATES.documentationAgent).toBeDefined()
+    expect(AGENT_TEMPLATES.documentationAgent.name).toBe('Documentation Agent')
+  })
+
+  it('should have devopsAgent template', () => {
+    expect(AGENT_TEMPLATES.devopsAgent).toBeDefined()
+    expect(AGENT_TEMPLATES.devopsAgent.name).toBe('DevOps Agent')
+  })
+
+  it('should have suggestedSkills as arrays', () => {
+    Object.values(AGENT_TEMPLATES).forEach(template => {
+      expect(Array.isArray(template.suggestedSkills)).toBe(true)
+    })
+  })
+
+  it('should have defaultTags as arrays', () => {
+    Object.values(AGENT_TEMPLATES).forEach(template => {
+      expect(Array.isArray(template.defaultTags)).toBe(true)
+      expect(template.defaultTags.length).toBeGreaterThan(0)
+    })
+  })
+})
+
+describe('createAgentFromTemplate', () => {
+  it('should create an agent from codeReviewer template', () => {
+    const agent = createAgentFromTemplate('codeReviewer')
+    
+    expect(agent.id).toBeDefined()
+    expect(agent.name).toBe('Code Reviewer')
+    expect(agent.description).toContain('code')
+    expect(agent.enabled).toBe(true)
+    expect(agent.tools).toHaveProperty('read')
+    expect(agent.skills).toContain('code-review')
+    expect(agent.tags).toContain('code-quality')
+  })
+
+  it('should create an agent from testWriter template', () => {
+    const agent = createAgentFromTemplate('testWriter')
+    
+    expect(agent.name).toBe('Test Writer')
+    expect(agent.tools).toHaveProperty('bash')
+    expect(agent.permissions).toHaveProperty('execute')
+  })
+
+  it('should allow overriding name', () => {
+    const agent = createAgentFromTemplate('codeReviewer', { name: 'Custom Reviewer' })
+    
+    expect(agent.name).toBe('Custom Reviewer')
+    expect(agent.description).toBe(AGENT_TEMPLATES.codeReviewer.description)
+  })
+
+  it('should allow overriding description', () => {
+    const agent = createAgentFromTemplate('documentationAgent', { 
+      description: 'Custom docs agent' 
+    })
+    
+    expect(agent.description).toBe('Custom docs agent')
+  })
+
+  it('should allow overriding model', () => {
+    const agent = createAgentFromTemplate('devopsAgent', { model: 'gpt-4' })
+    
+    expect(agent.model).toBe('gpt-4')
+  })
+
+  it('should allow overriding enabled', () => {
+    const agent = createAgentFromTemplate('codeReviewer', { enabled: false })
+    
+    expect(agent.enabled).toBe(false)
+  })
+
+  it('should allow overriding tags', () => {
+    const agent = createAgentFromTemplate('codeReviewer', { tags: ['custom-tag'] })
+    
+    expect(agent.tags).toEqual(['custom-tag'])
+  })
+
+  it('should generate unique IDs', () => {
+    const agent1 = createAgentFromTemplate('codeReviewer')
+    const agent2 = createAgentFromTemplate('codeReviewer')
+    
+    expect(agent1.id).not.toBe(agent2.id)
+  })
+
+  it('should copy tools deeply', () => {
+    const agent = createAgentFromTemplate('codeReviewer')
+    agent.tools.read = 'deny'
+    
+    expect(AGENT_TEMPLATES.codeReviewer.defaultTools.read).toBe('allow')
+  })
+
+  it('should copy skills array', () => {
+    const agent = createAgentFromTemplate('codeReviewer')
+    agent.skills.push('new-skill')
+    
+    expect(AGENT_TEMPLATES.codeReviewer.suggestedSkills).not.toContain('new-skill')
+  })
+
+  it('should copy tags array', () => {
+    const agent = createAgentFromTemplate('codeReviewer')
+    agent.tags.push('new-tag')
+    
+    expect(AGENT_TEMPLATES.codeReviewer.defaultTags).not.toContain('new-tag')
+  })
+})
+
+describe('getTemplateKeys', () => {
+  it('should return all template keys', () => {
+    const keys = getTemplateKeys()
+    
+    expect(keys).toContain('codeReviewer')
+    expect(keys).toContain('testWriter')
+    expect(keys).toContain('documentationAgent')
+    expect(keys).toContain('devopsAgent')
+  })
+
+  it('should return an array', () => {
+    const keys = getTemplateKeys()
+    
+    expect(Array.isArray(keys)).toBe(true)
+    expect(keys.length).toBe(4)
   })
 })
