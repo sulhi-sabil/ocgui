@@ -1,5 +1,7 @@
 import type { Run, RunLog } from '@/types'
-import { invoke, DatabaseError } from './index'
+import { invoke } from './index'
+
+export { DatabaseError } from './index'
 
 interface BackendRun {
   id: string
@@ -107,7 +109,5 @@ export const runsApi = {
 
   async addLog(log: Omit<RunLog, 'id'>): Promise<number> {
     return invoke<number>('add_run_log', { log: toBackendRunLog(log) })
-  },
+  }
 }
-
-export { DatabaseError }

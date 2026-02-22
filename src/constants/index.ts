@@ -102,3 +102,12 @@ export const UI_TEXT = {
     MORE: '+{count} more',
   },
 } as const
+
+export const ERROR_MESSAGES: Record<string, string> = {
+  INVOKE_ERROR: 'Failed to communicate with the backend',
+  DATABASE_ERROR: 'A database operation failed',
+  VALIDATION_ERROR: 'Invalid data provided',
+  STORAGE_ERROR: 'Failed to access local storage',
+  NETWORK_ERROR: 'Network request failed',
+  UNKNOWN_ERROR: 'An unexpected error occurred',
+} as const

@@ -87,3 +87,18 @@ export interface RunLog {
   logType: 'info' | 'error' | 'warning' | 'tool_call';
   timestamp: number;
 }
+
+export type ErrorCode =
+  | 'INVOKE_ERROR'
+  | 'DATABASE_ERROR'
+  | 'VALIDATION_ERROR'
+  | 'STORAGE_ERROR'
+  | 'NETWORK_ERROR'
+  | 'UNKNOWN_ERROR'
+
+export interface AppErrorData {
+  code: ErrorCode
+  message: string
+  cause?: unknown
+  recoverable?: boolean
+}

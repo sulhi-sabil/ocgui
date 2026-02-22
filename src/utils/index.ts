@@ -1,6 +1,8 @@
 import type { Agent } from '../types'
 
 export { cn } from './cn'
+export { AppError, isAppError, isRecoverable, getErrorMessage } from './errors'
+export type { ErrorCode, AppErrorData } from '../types'
 
 export interface AgentTemplate {
   name: string
