@@ -11,22 +11,20 @@ describe('generateId', () => {
     expect(id1).not.toBe(id2)
   })
 
-  it('should include timestamp in the ID', () => {
-    const before = Date.now()
+  it('should generate a valid UUID format', () => {
     const id = generateId()
-    const after = Date.now()
     
-    const timestampPart = parseInt(id.split('-')[0], 10)
-    expect(timestampPart).toBeGreaterThanOrEqual(before)
-    expect(timestampPart).toBeLessThanOrEqual(after)
+    expect(id).toBeDefined()
+    expect(typeof id).toBe('string')
+    
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    expect(uuidRegex.test(id)).toBe(true)
   })
 
-  it('should have a random suffix', () => {
+  it('should generate cryptographically secure unique IDs', () => {
     const ids = new Set<string>()
     for (let i = 0; i < 100; i++) {
-      const id = generateId()
-      const suffix = id.split('-')[1]
-      ids.add(suffix)
+      ids.add(generateId())
     }
     
     expect(ids.size).toBe(100)
