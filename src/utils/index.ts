@@ -1,6 +1,7 @@
 import type { Agent } from '../types'
 
 export { cn } from './cn'
+export { safeStorage } from './storage'
 
 export interface AgentTemplate {
   name: string
