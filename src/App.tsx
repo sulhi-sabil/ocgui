@@ -11,6 +11,7 @@ import { iconSize, strokeWidth, grid, colors } from '@styles/tokens'
 import type { Agent } from './types'
 
 const CreateAgentModal = lazy(() => import('@components/CreateAgentModal'))
+const EditAgentModal = lazy(() => import('@components/EditAgentModal'))
 
 function App() {
   const agents = useAppStore((state) => state.agents)
@@ -24,11 +25,12 @@ function App() {
   const deleteAgent = useAppStore((state) => state.deleteAgent)
   const { addToast } = useToast()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingAgent, setEditingAgent] = useState<Agent | null>(null)
   const [searchQuery, setSearchQuery] = useState(lastSearchQuery)
   const [agentToDelete, setAgentToDelete] = useState<Agent | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  // Initialize theme on mount
   useEffect(() => {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark')
@@ -37,15 +39,12 @@ function App() {
     }
   }, [theme])
 
-  // Keyboard shortcut: Cmd/Ctrl + K to focus search
   usePlatformShortcut('k', () => {
     searchInputRef.current?.focus()
   })
 
-  // Filter agents based on search query
   const { filteredAgents, hasResults, resultCount } = useAgentSearch(agents, searchQuery)
 
-  // Persist search query when it changes
   useEffect(() => {
     setLastSearchQuery(searchQuery)
   }, [searchQuery, setLastSearchQuery])
@@ -60,21 +59,34 @@ function App() {
     }
   }, [duplicateAgent, addToast])
 
-  const handleDeleteClick = (agent: Agent) => {
-    setAgentToDelete(agent)
-  }
+  const handleEdit = useCallback((id: string) => {
+    const agent = agents.find(a => a.id === id)
+    if (agent) {
+      setEditingAgent(agent)
+      setIsEditModalOpen(true)
+    }
+  }, [agents])
 
-  const handleDeleteConfirm = () => {
+  const closeEditModal = useCallback(() => {
+    setIsEditModalOpen(false)
+    setEditingAgent(null)
+  }, [])
+
+  const handleDeleteClick = useCallback((agent: Agent) => {
+    setAgentToDelete(agent)
+  }, [])
+
+  const handleDeleteConfirm = useCallback(() => {
     if (agentToDelete) {
       deleteAgent(agentToDelete.id)
       addToast(`Agent "${agentToDelete.name}" deleted`, 'success')
       setAgentToDelete(null)
     }
-  }
+  }, [agentToDelete, deleteAgent, addToast])
 
-  const handleDeleteCancel = () => {
+  const handleDeleteCancel = useCallback(() => {
     setAgentToDelete(null)
-  }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -112,7 +124,6 @@ function App() {
               )}
             </h2>
             
-            {/* Search Bar */}
             <SearchInput
               ref={searchInputRef}
               value={searchQuery}
@@ -151,6 +162,7 @@ function App() {
                   onSelect={() => selectAgent(agent.id)}
                   onToggleEnabled={() => updateAgent(agent.id, { enabled: !agent.enabled })}
                   onDuplicate={() => handleDuplicate(agent.id)}
+                  onEdit={() => handleEdit(agent.id)}
                   onDelete={() => handleDeleteClick(agent)}
                 />
               ))}
@@ -173,6 +185,7 @@ function App() {
 
       <Suspense fallback={null}>
         <CreateAgentModal isOpen={isModalOpen} onClose={closeModal} />
+        <EditAgentModal isOpen={isEditModalOpen} onClose={closeEditModal} agent={editingAgent} />
       </Suspense>
 
       <ConfirmDialog

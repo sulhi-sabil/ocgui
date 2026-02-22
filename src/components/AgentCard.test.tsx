@@ -123,7 +123,7 @@ describe('AgentCard', () => {
     expect(badge).toBeDisabled()
   })
 
-  it('shows duplicate button when onDuplicate is provided', () => {
+  it('shows action menu when onDuplicate is provided', () => {
     render(
       <AgentCard
         agent={mockAgent}
@@ -135,7 +135,31 @@ describe('AgentCard', () => {
     expect(screen.getByLabelText('Agent actions')).toBeInTheDocument()
   })
 
-  it('does not show duplicate button when onDuplicate is not provided', () => {
+  it('shows action menu when onEdit is provided', () => {
+    render(
+      <AgentCard
+        agent={mockAgent}
+        isSelected={false}
+        onSelect={() => {}}
+        onEdit={() => {}}
+      />
+    )
+    expect(screen.getByLabelText('Agent actions')).toBeInTheDocument()
+  })
+
+  it('shows action menu when onDelete is provided', () => {
+    render(
+      <AgentCard
+        agent={mockAgent}
+        isSelected={false}
+        onSelect={() => {}}
+        onDelete={() => {}}
+      />
+    )
+    expect(screen.getByLabelText('Agent actions')).toBeInTheDocument()
+  })
+
+  it('does not show action menu when no handlers are provided', () => {
     render(
       <AgentCard
         agent={mockAgent}
