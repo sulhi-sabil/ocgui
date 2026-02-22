@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Agent, Skill, Config, Run } from '../types'
 import { generateId } from '@utils/index'
+import { STORAGE_KEY, STORE_VERSION } from '@config/index'
 
 interface AppState {
   version: number
@@ -141,8 +142,8 @@ export const useAppStore = create<AppState>()(
       }),
     }),
     {
-      name: 'ocgui-storage',
-      version: 1,
+      name: STORAGE_KEY,
+      version: STORE_VERSION,
       partialize: (state) => ({ 
         version: state.version,
         theme: state.theme,

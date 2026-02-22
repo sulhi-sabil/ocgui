@@ -11,6 +11,7 @@ const mockAgent: Agent = {
   tools: { tool1: 'read', tool2: 'write' },
   permissions: { file: 'read' },
   skills: ['skill1', 'skill2', 'skill3'],
+  tags: ['testing', 'demo'],
   enabled: true,
 }
 

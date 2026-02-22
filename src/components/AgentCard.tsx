@@ -3,6 +3,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import type { Agent } from '../types'
 import { cn } from '@utils/cn'
 import { colors, spacing, borders, transitions, shadows, iconSize, strokeWidth } from '@styles/tokens'
+import { AGENT_CARD_MAX_TAGS, DROPDOWN_SIDE_OFFSET } from '@config/index'
 
 interface AgentCardProps {
   agent: Agent
@@ -72,7 +73,7 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
               <DropdownMenu.Portal>
                 <DropdownMenu.Content
                   className="min-w-[140px] bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-1 z-50"
-                  sideOffset={5}
+                  sideOffset={DROPDOWN_SIDE_OFFSET}
                   align="end"
                 >
                   <DropdownMenu.Item
@@ -96,7 +97,7 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
       
       {agent.tags && agent.tags.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1">
-          {agent.tags.slice(0, 3).map((tag) => (
+          {agent.tags.slice(0, AGENT_CARD_MAX_TAGS).map((tag) => (
             <span
               key={tag}
               className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
@@ -104,9 +105,9 @@ function AgentCardComponent({ agent, isSelected, onSelect, onToggleEnabled, onDu
               {tag}
             </span>
           ))}
-          {agent.tags.length > 3 && (
+          {agent.tags.length > AGENT_CARD_MAX_TAGS && (
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              +{agent.tags.length - 3} more
+              +{agent.tags.length - AGENT_CARD_MAX_TAGS} more
             </span>
           )}
         </div>
