@@ -4,6 +4,49 @@ import type { Agent, Skill, Config, Run } from '../types'
 import { generateId } from '@utils/index'
 import { AGENT } from '@constants/index'
 
+const CURRENT_STORE_VERSION = 1
+
+export { CURRENT_STORE_VERSION }
+
+interface PersistedState {
+  version: number
+  agents: Agent[]
+  selectedAgentId: string | null
+  skills: Skill[]
+  config: Config | null
+  theme: 'light' | 'dark'
+  lastSearchQuery: string
+}
+
+type Migration = (state: Partial<PersistedState>) => Partial<PersistedState>
+
+const migrations: Record<number, Migration> = {
+  0: (state) => ({
+    version: 1,
+    agents: Array.isArray(state.agents) ? state.agents : [],
+    selectedAgentId: typeof state.selectedAgentId === 'string' ? state.selectedAgentId : null,
+    skills: Array.isArray(state.skills) ? state.skills : [],
+    config: state.config ?? null,
+    theme: state.theme === 'dark' ? 'dark' : 'light',
+    lastSearchQuery: typeof state.lastSearchQuery === 'string' ? state.lastSearchQuery : '',
+  }),
+}
+
+function migrate(state: unknown, fromVersion: number): Partial<PersistedState> {
+  let migratedState = (state ?? {}) as Partial<PersistedState>
+  
+  for (let v = fromVersion; v < CURRENT_STORE_VERSION; v++) {
+    const migration = migrations[v]
+    if (migration) {
+      migratedState = migration(migratedState)
+    }
+  }
+  
+  return { ...migratedState, version: CURRENT_STORE_VERSION }
+}
+
+export { migrate }
+
 const safeStorage: StateStorage = {
   getItem: (name: string): string | null => {
     try {
@@ -74,7 +117,7 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      version: 1,
+      version: CURRENT_STORE_VERSION,
       // Agents
       agents: [],
       selectedAgentId: null,
@@ -168,7 +211,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'ocgui-storage',
-      version: 1,
+      version: CURRENT_STORE_VERSION,
       storage: createJSONStorage(() => safeStorage),
       partialize: (state) => ({ 
         version: state.version,
@@ -179,6 +222,7 @@ export const useAppStore = create<AppState>()(
         config: state.config,
         lastSearchQuery: state.lastSearchQuery,
       }),
+      migrate,
     }
   )
 )

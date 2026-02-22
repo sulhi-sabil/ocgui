@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { act } from '@testing-library/react'
-import { useAppStore } from './index'
+import { useAppStore, migrate, CURRENT_STORE_VERSION } from './index'
 import type { Agent, Skill, Config, Run } from '../types'
 
 describe('useAppStore', () => {
@@ -377,6 +377,106 @@ describe('useAppStore', () => {
       expect(useAppStore.getState().runs).toEqual([])
       expect(useAppStore.getState().theme).toBe('light')
       expect(useAppStore.getState().lastSearchQuery).toBe('')
+    })
+  })
+
+  describe('migrations', () => {
+    it('should migrate from version 0 to current version', () => {
+      const oldState = {
+        agents: [mockAgent],
+        selectedAgentId: 'agent-1',
+        skills: [mockSkill],
+        theme: 'dark' as const,
+        lastSearchQuery: 'test query',
+      }
+
+      const migrated = migrate(oldState, 0)
+
+      expect(migrated.version).toBe(CURRENT_STORE_VERSION)
+      expect(migrated.agents).toEqual([mockAgent])
+      expect(migrated.selectedAgentId).toBe('agent-1')
+      expect(migrated.skills).toEqual([mockSkill])
+      expect(migrated.theme).toBe('dark')
+      expect(migrated.lastSearchQuery).toBe('test query')
+    })
+
+    it('should handle null state during migration', () => {
+      const migrated = migrate(null, 0)
+
+      expect(migrated.version).toBe(CURRENT_STORE_VERSION)
+      expect(migrated.agents).toEqual([])
+      expect(migrated.selectedAgentId).toBeNull()
+      expect(migrated.skills).toEqual([])
+      expect(migrated.config).toBeNull()
+      expect(migrated.theme).toBe('light')
+      expect(migrated.lastSearchQuery).toBe('')
+    })
+
+    it('should handle undefined state during migration', () => {
+      const migrated = migrate(undefined, 0)
+
+      expect(migrated.version).toBe(CURRENT_STORE_VERSION)
+      expect(migrated.agents).toEqual([])
+    })
+
+    it('should handle malformed data during migration', () => {
+      const malformedState = {
+        agents: 'not an array',
+        selectedAgentId: 123,
+        skills: null,
+        theme: 'invalid',
+        lastSearchQuery: { nested: 'object' },
+      }
+
+      const migrated = migrate(malformedState, 0)
+
+      expect(migrated.version).toBe(CURRENT_STORE_VERSION)
+      expect(migrated.agents).toEqual([])
+      expect(migrated.selectedAgentId).toBeNull()
+      expect(migrated.skills).toEqual([])
+      expect(migrated.theme).toBe('light')
+      expect(migrated.lastSearchQuery).toBe('')
+    })
+
+    it('should preserve valid data during migration', () => {
+      const validState = {
+        version: 0,
+        agents: [
+          { id: 'a1', name: 'Agent 1', description: 'Test', tools: {}, permissions: {}, skills: [], tags: [], enabled: true },
+          { id: 'a2', name: 'Agent 2', description: 'Test', tools: {}, permissions: {}, skills: [], tags: [], enabled: false },
+        ],
+        selectedAgentId: 'a2',
+        skills: [
+          { id: 's1', name: 'Skill 1', description: 'Test', content: 'content', commands: [], path: '/path' },
+        ],
+        theme: 'dark' as const,
+        lastSearchQuery: 'preserved query',
+        config: { providers: {}, agents: [], tools: {}, experimental: {} },
+      }
+
+      const migrated = migrate(validState, 0)
+
+      expect(migrated.version).toBe(CURRENT_STORE_VERSION)
+      expect(migrated.agents).toHaveLength(2)
+      expect(migrated.agents?.[0]?.id).toBe('a1')
+      expect(migrated.agents?.[1]?.id).toBe('a2')
+      expect(migrated.selectedAgentId).toBe('a2')
+      expect(migrated.skills).toHaveLength(1)
+      expect(migrated.skills?.[0]?.id).toBe('s1')
+      expect(migrated.theme).toBe('dark')
+      expect(migrated.lastSearchQuery).toBe('preserved query')
+    })
+
+    it('should return current version state when already at current version', () => {
+      const currentState = {
+        version: CURRENT_STORE_VERSION,
+        agents: [mockAgent],
+        theme: 'dark' as const,
+      }
+
+      const result = migrate(currentState, CURRENT_STORE_VERSION)
+
+      expect(result.version).toBe(CURRENT_STORE_VERSION)
     })
   })
 })
