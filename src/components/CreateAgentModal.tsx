@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAppStore } from '@store/index'
 import { Button } from './ui/Button'
 import { useToast } from './ui/Toast'
-import { generateId } from '@utils/index'
+import { generateId, AGENT_TEMPLATES, createAgentFromTemplate } from '@utils/index'
 import { cn } from '@utils/cn'
 import { colors, zIndex, modal, formInput, focus, label, typography, iconSize, transitions } from '@styles/tokens'
 import { MODAL } from '@constants/index'
@@ -17,6 +17,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
   const addAgent = useAppStore((state) => state.addAgent)
   const addToast = useToast().addToast
   const nameInputRef = useRef<HTMLInputElement>(null)
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -42,6 +43,20 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     }
   }, [isOpen, onClose])
 
+  const handleTemplateSelect = useCallback((templateKey: string) => {
+    const template = AGENT_TEMPLATES[templateKey]
+    if (!template) return
+    
+    setSelectedTemplate(templateKey)
+    setFormData({
+      name: template.name,
+      description: template.description,
+      model: '',
+      tags: template.defaultTags.join(', '),
+    })
+    setErrors({})
+  }, [])
+
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose()
   }, [onClose])
@@ -62,24 +77,35 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
       return
     }
 
-    const newAgent: Agent = {
-      id: generateId(),
-      name: formData.name.trim(),
-      description: formData.description.trim(),
-      model: formData.model.trim() || undefined,
-      tools: {},
-      permissions: {},
-      skills: [],
-      tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
-      enabled: true,
+    let newAgent: Agent
+    if (selectedTemplate && AGENT_TEMPLATES[selectedTemplate]) {
+      newAgent = createAgentFromTemplate(selectedTemplate as keyof typeof AGENT_TEMPLATES, {
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        model: formData.model.trim() || undefined,
+        tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+      })
+    } else {
+      newAgent = {
+        id: generateId(),
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        model: formData.model.trim() || undefined,
+        tools: {},
+        permissions: {},
+        skills: [],
+        tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+        enabled: true,
+      }
     }
 
     addAgent(newAgent)
     addToast(`Agent "${newAgent.name}" created successfully`, 'success')
     setFormData({ name: '', description: '', model: '', tags: '' })
+    setSelectedTemplate(null)
     setErrors({})
     onClose()
-  }, [formData, addAgent, addToast, onClose])
+  }, [formData, selectedTemplate, addAgent, addToast, onClose])
 
   if (!isOpen) return null
 
@@ -112,6 +138,29 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
+        </div>
+        
+        <div className="mb-4">
+          <p className={cn(typography.body, colors.gray[600], 'mb-2')}>Start from a template (optional)</p>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(AGENT_TEMPLATES).map(([key, template]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => handleTemplateSelect(key)}
+                className={cn(
+                  'px-3 py-1.5 text-sm rounded-full border',
+                  transitions.colors,
+                  focus.ring,
+                  selectedTemplate === key
+                    ? cn(colors.primary[600], 'text-white border-transparent')
+                    : cn(colors.gray[100], colors.gray[200], 'hover:border-gray-300 dark:hover:border-gray-500')
+                )}
+              >
+                {template.name}
+              </button>
+            ))}
+          </div>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
