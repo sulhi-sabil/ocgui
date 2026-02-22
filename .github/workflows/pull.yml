@@ -1,13 +1,13 @@
 name: on pull
 on:
   pull_request:
+    types: opened
   workflow_dispatch:
-  workflow_run:
-    workflows: ["iterate"]
-    types: [completed]
+
 permissions:
   contents: write
   pull-requests: write
+  issues: write
   actions: write
   id-token: write
 concurrency:
