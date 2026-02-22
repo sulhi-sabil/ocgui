@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { cn } from '@utils/cn'
 import { Toast, ToastType } from './ToastProvider'
 import { useToast } from './useToast'
@@ -8,7 +9,7 @@ interface ToastItemProps {
   onClose: () => void
 }
 
-function ToastItem({ toast, onClose }: ToastItemProps) {
+function ToastItemComponent({ toast, onClose }: ToastItemProps) {
   const styles: Record<ToastType, string> = {
     success: colors.success.bg,
     error: colors.error.bg,
@@ -64,6 +65,8 @@ function ToastItem({ toast, onClose }: ToastItemProps) {
     </div>
   )
 }
+
+const ToastItem = memo(ToastItemComponent)
 
 export function ToastContainer() {
   const { toasts, removeToast } = useToast()
