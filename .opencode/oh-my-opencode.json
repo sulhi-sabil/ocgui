@@ -56,7 +56,9 @@
       "git-commit-message",
       "tauri-react-patterns",
       "agentic-workflows",
-      "cli-development"
+      "cli-development",
+      "react-testing-vitest",
+      "opencode-primitives"
     ]
   },
   "mcp": {
