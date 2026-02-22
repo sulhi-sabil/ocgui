@@ -4,7 +4,7 @@ import { Button } from './ui/Button'
 import { useToast } from './ui/Toast'
 import { generateId } from '@utils/index'
 import { cn } from '@utils/cn'
-import { colors, zIndex, modal, formInput, focus, label, typography } from '@styles/tokens'
+import { colors, zIndex, modal, formInput, focus, label, typography, iconSize, transitions } from '@styles/tokens'
 import { MODAL } from '@constants/index'
 import type { Agent } from '../types'
 
@@ -92,9 +92,27 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
       aria-labelledby="modal-title"
     >
       <div className={modal.container}>
-        <h2 id="modal-title" className={modal.title}>
-          Create New Agent
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 id="modal-title" className={modal.title}>
+            Create New Agent
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className={cn(
+              'p-1 rounded-lg',
+              colors.gray[100],
+              'hover:bg-gray-200 dark:hover:bg-gray-600',
+              transitions.colors,
+              focus.ring
+            )}
+            aria-label="Close modal"
+          >
+            <svg className={iconSize.md} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
