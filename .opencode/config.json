@@ -51,12 +51,17 @@
     "auto_load": true,
     "installed": [
       "agentic-qe-testing",
+      "agentic-workflows",
       "backend-models-standards",
+      "cli-development",
       "context-engineering-memory",
       "debugging-strategies",
       "git-commit-message",
       "moai-adk-tool",
-      "systematic-debugging"
+      "opencode-primitives",
+      "react-testing-vitest",
+      "systematic-debugging",
+      "tauri-react-patterns"
     ]
   },
   "workflows": {
