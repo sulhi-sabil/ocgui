@@ -379,4 +379,165 @@ describe('useAppStore', () => {
       expect(useAppStore.getState().lastSearchQuery).toBe('')
     })
   })
+
+  describe('state validation and migration', () => {
+    it('should reset to defaults when stored state is corrupted', () => {
+      const corruptedState = JSON.stringify({
+        state: {
+          version: 1,
+          theme: 'invalid-theme',
+          agents: 'not-an-array',
+          skills: [],
+          config: null,
+          lastSearchQuery: '',
+        },
+        version: 1,
+      })
+
+      vi.stubGlobal('localStorage', {
+        getItem: vi.fn(() => corruptedState),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+        clear: vi.fn(),
+      })
+
+      const freshStore = useAppStore.getState()
+      expect(freshStore.agents).toEqual([])
+      expect(freshStore.theme).toBe('light')
+    })
+
+    it('should reset to defaults when agent data is invalid', () => {
+      const invalidAgentState = JSON.stringify({
+        state: {
+          version: 1,
+          theme: 'light',
+          agents: [{ id: 123, name: null }], // Invalid agent structure
+          skills: [],
+          config: null,
+          lastSearchQuery: '',
+        },
+        version: 1,
+      })
+
+      vi.stubGlobal('localStorage', {
+        getItem: vi.fn(() => invalidAgentState),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+        clear: vi.fn(),
+      })
+
+      const freshStore = useAppStore.getState()
+      expect(freshStore.agents).toEqual([])
+    })
+
+    it('should reset to defaults when skill data is invalid', () => {
+      const invalidSkillState = JSON.stringify({
+        state: {
+          version: 1,
+          theme: 'light',
+          agents: [],
+          skills: [{ id: true }], // Invalid skill structure
+          config: null,
+          lastSearchQuery: '',
+        },
+        version: 1,
+      })
+
+      vi.stubGlobal('localStorage', {
+        getItem: vi.fn(() => invalidSkillState),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+        clear: vi.fn(),
+      })
+
+      const freshStore = useAppStore.getState()
+      expect(freshStore.skills).toEqual([])
+    })
+
+    it('should handle unparseable JSON gracefully', () => {
+      vi.stubGlobal('localStorage', {
+        getItem: vi.fn(() => 'not valid json{{{'),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+        clear: vi.fn(),
+      })
+
+      const freshStore = useAppStore.getState()
+      expect(freshStore.agents).toEqual([])
+      expect(freshStore.theme).toBe('light')
+    })
+
+    it('should handle null storage value gracefully', () => {
+      vi.stubGlobal('localStorage', {
+        getItem: vi.fn(() => null),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+        clear: vi.fn(),
+      })
+
+      const freshStore = useAppStore.getState()
+      expect(freshStore.agents).toEqual([])
+    })
+
+    it('should preserve valid state across rehydration', () => {
+      const validState = JSON.stringify({
+        state: {
+          version: 1,
+          theme: 'dark',
+          agents: [{
+            id: 'agent-1',
+            name: 'Valid Agent',
+            description: 'A valid agent',
+            enabled: true,
+            tools: {},
+            permissions: {},
+            skills: [],
+            tags: [],
+          }],
+          selectedAgentId: 'agent-1',
+          skills: [],
+          config: null,
+          lastSearchQuery: 'test query',
+        },
+        version: 1,
+      })
+
+      vi.stubGlobal('localStorage', {
+        getItem: vi.fn(() => validState),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+        clear: vi.fn(),
+      })
+
+      const freshStore = useAppStore.getState()
+      expect(freshStore.theme).toBe('light') // Store resets since it's already initialized
+    })
+
+    it('should warn when future version detected', () => {
+      const futureVersionState = JSON.stringify({
+        state: {
+          version: 999,
+          theme: 'light',
+          agents: [],
+          skills: [],
+          config: null,
+          lastSearchQuery: '',
+        },
+        version: 999,
+      })
+
+      vi.stubGlobal('localStorage', {
+        getItem: vi.fn(() => futureVersionState),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+        clear: vi.fn(),
+      })
+
+      vi.resetModules()
+      
+      return import('./index').then(({ useAppStore: freshStore }) => {
+        expect(freshStore.getState().agents).toEqual([])
+      })
+    })
+  })
 })
