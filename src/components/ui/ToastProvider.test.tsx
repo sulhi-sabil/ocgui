@@ -161,4 +161,63 @@ describe('ToastProvider', () => {
     expect(contextValue!.toasts).toHaveLength(3)
     expect(contextValue!.toasts.map(t => t.message)).toEqual(['First', 'Second', 'Third'])
   })
+
+  it('enforces MAX_VISIBLE limit (5 toasts)', () => {
+    let contextValue: typeof ToastContext extends React.Context<infer T> ? T : never = null
+    
+    render(
+      <ToastProvider>
+        <ToastContext.Consumer>
+          {(value) => {
+            contextValue = value
+            return null
+          }}
+        </ToastContext.Consumer>
+      </ToastProvider>
+    )
+    
+    act(() => {
+      contextValue!.addToast('Toast 1')
+      contextValue!.addToast('Toast 2')
+      contextValue!.addToast('Toast 3')
+      contextValue!.addToast('Toast 4')
+      contextValue!.addToast('Toast 5')
+      contextValue!.addToast('Toast 6')
+      contextValue!.addToast('Toast 7')
+    })
+    
+    expect(contextValue!.toasts).toHaveLength(5)
+    expect(contextValue!.toasts.map(t => t.message)).toEqual([
+      'Toast 3', 'Toast 4', 'Toast 5', 'Toast 6', 'Toast 7'
+    ])
+  })
+
+  it('clears timeout when removing overflow toasts', () => {
+    let contextValue: typeof ToastContext extends React.Context<infer T> ? T : never = null
+    
+    render(
+      <ToastProvider>
+        <ToastContext.Consumer>
+          {(value) => {
+            contextValue = value
+            return null
+          }}
+        </ToastContext.Consumer>
+      </ToastProvider>
+    )
+    
+    act(() => {
+      for (let i = 1; i <= 7; i++) {
+        contextValue!.addToast(`Toast ${i}`)
+      }
+    })
+    
+    expect(contextValue!.toasts).toHaveLength(5)
+    
+    act(() => {
+      vi.advanceTimersByTime(5000)
+    })
+    
+    expect(contextValue!.toasts).toHaveLength(0)
+  })
 })
