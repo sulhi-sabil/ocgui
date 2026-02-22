@@ -75,6 +75,7 @@ jobs:
             - work on current workspace, dont work outside workspace. do projek config level, not global.
             - always fetch and pull from default branch before and after work
             - strick on one task before move to next task
+            - confirm .opencode/opencode.json exist
 
           PROMPT
           )" \
