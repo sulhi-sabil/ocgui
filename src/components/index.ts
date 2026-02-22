@@ -1,4 +1,4 @@
-export { AgentCard } from './AgentCard'
+export { AgentCard, type AgentAction } from './AgentCard'
 export { CreateAgentModal } from './CreateAgentModal'
 export { ErrorBoundary } from './ErrorBoundary'
 export { ThemeToggle } from './ThemeToggle'

@@ -21,7 +21,7 @@ describe('AgentCard', () => {
       <AgentCard
         agent={mockAgent}
         isSelected={false}
-        onSelect={() => {}}
+        onAction={() => {}}
       />
     )
     expect(screen.getByText('Test Agent')).toBeInTheDocument()
@@ -33,7 +33,7 @@ describe('AgentCard', () => {
       <AgentCard
         agent={mockAgent}
         isSelected={false}
-        onSelect={() => {}}
+        onAction={() => {}}
       />
     )
     expect(screen.getByText('Enabled')).toBeInTheDocument()
@@ -44,7 +44,7 @@ describe('AgentCard', () => {
       <AgentCard
         agent={{ ...mockAgent, enabled: false }}
         isSelected={false}
-        onSelect={() => {}}
+        onAction={() => {}}
       />
     )
     expect(screen.getByText('Disabled')).toBeInTheDocument()
@@ -55,7 +55,7 @@ describe('AgentCard', () => {
       <AgentCard
         agent={mockAgent}
         isSelected={false}
-        onSelect={() => {}}
+        onAction={() => {}}
       />
     )
     expect(screen.getByText('3 skills')).toBeInTheDocument()
@@ -67,7 +67,7 @@ describe('AgentCard', () => {
       <AgentCard
         agent={mockAgent}
         isSelected={false}
-        onSelect={() => {}}
+        onAction={() => {}}
       />
     )
     expect(screen.getByText('gpt-4')).toBeInTheDocument()
@@ -78,93 +78,59 @@ describe('AgentCard', () => {
       <AgentCard
         agent={{ ...mockAgent, model: undefined }}
         isSelected={false}
-        onSelect={() => {}}
+        onAction={() => {}}
       />
     )
     expect(screen.queryByText('gpt-4')).not.toBeInTheDocument()
   })
 
-  it('calls onSelect when card is clicked', () => {
-    const handleSelect = vi.fn()
+  it('calls onAction with "select" when card is clicked', () => {
+    const handleAction = vi.fn()
     render(
       <AgentCard
         agent={mockAgent}
         isSelected={false}
-        onSelect={handleSelect}
+        onAction={handleAction}
       />
     )
     fireEvent.click(screen.getByText('Test Agent').closest('div')!)
-    expect(handleSelect).toHaveBeenCalledTimes(1)
+    expect(handleAction).toHaveBeenCalledWith('select', 'test-agent-1')
   })
 
-  it('calls onToggleEnabled when status badge is clicked', () => {
-    const handleToggle = vi.fn()
+  it('calls onAction with "toggle" when status badge is clicked', () => {
+    const handleAction = vi.fn()
     render(
       <AgentCard
         agent={mockAgent}
         isSelected={false}
-        onSelect={() => {}}
-        onToggleEnabled={handleToggle}
+        onAction={handleAction}
       />
     )
     fireEvent.click(screen.getByText('Enabled'))
-    expect(handleToggle).toHaveBeenCalledTimes(1)
+    expect(handleAction).toHaveBeenCalledWith('toggle', 'test-agent-1')
   })
 
-  it('does not call onToggleEnabled when status badge is clicked without handler', () => {
+  it('shows action menu when showDuplicate or showEdit or showDelete is true', () => {
     render(
       <AgentCard
         agent={mockAgent}
         isSelected={false}
-        onSelect={() => {}}
-      />
-    )
-    const badge = screen.getByText('Enabled')
-    expect(badge).toBeDisabled()
-  })
-
-  it('shows action menu when onDuplicate is provided', () => {
-    render(
-      <AgentCard
-        agent={mockAgent}
-        isSelected={false}
-        onSelect={() => {}}
-        onDuplicate={() => {}}
+        onAction={() => {}}
+        showDuplicate
       />
     )
     expect(screen.getByLabelText('Agent actions')).toBeInTheDocument()
   })
 
-  it('shows action menu when onEdit is provided', () => {
+  it('does not show action menu when all show props are false', () => {
     render(
       <AgentCard
         agent={mockAgent}
         isSelected={false}
-        onSelect={() => {}}
-        onEdit={() => {}}
-      />
-    )
-    expect(screen.getByLabelText('Agent actions')).toBeInTheDocument()
-  })
-
-  it('shows action menu when onDelete is provided', () => {
-    render(
-      <AgentCard
-        agent={mockAgent}
-        isSelected={false}
-        onSelect={() => {}}
-        onDelete={() => {}}
-      />
-    )
-    expect(screen.getByLabelText('Agent actions')).toBeInTheDocument()
-  })
-
-  it('does not show action menu when no handlers are provided', () => {
-    render(
-      <AgentCard
-        agent={mockAgent}
-        isSelected={false}
-        onSelect={() => {}}
+        onAction={() => {}}
+        showDuplicate={false}
+        showEdit={false}
+        showDelete={false}
       />
     )
     expect(screen.queryByLabelText('Agent actions')).not.toBeInTheDocument()
@@ -175,7 +141,7 @@ describe('AgentCard', () => {
       <AgentCard
         agent={mockAgent}
         isSelected={true}
-        onSelect={() => {}}
+        onAction={() => {}}
       />
     )
     const card = container.querySelector('.scale-\\[1\\.02\\]')
@@ -183,30 +149,30 @@ describe('AgentCard', () => {
   })
 
   it('stops propagation when clicking status badge', () => {
-    const handleSelect = vi.fn()
+    const handleAction = vi.fn()
     render(
       <AgentCard
         agent={mockAgent}
         isSelected={false}
-        onSelect={handleSelect}
-        onToggleEnabled={() => {}}
+        onAction={handleAction}
       />
     )
     fireEvent.click(screen.getByText('Enabled'))
-    expect(handleSelect).not.toHaveBeenCalled()
+    expect(handleAction).toHaveBeenCalledTimes(1)
+    expect(handleAction).toHaveBeenCalledWith('toggle', 'test-agent-1')
   })
 
   it('stops propagation when clicking action menu trigger', () => {
-    const handleSelect = vi.fn()
+    const handleAction = vi.fn()
     render(
       <AgentCard
         agent={mockAgent}
         isSelected={false}
-        onSelect={handleSelect}
-        onDuplicate={() => {}}
+        onAction={handleAction}
+        showDuplicate
       />
     )
     fireEvent.click(screen.getByLabelText('Agent actions'))
-    expect(handleSelect).not.toHaveBeenCalled()
+    expect(handleAction).not.toHaveBeenCalled()
   })
 })
