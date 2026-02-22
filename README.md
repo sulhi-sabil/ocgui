@@ -39,7 +39,13 @@ npm run dev
 
 ## Core Features
 
-- **Agent Management** - Visual agent registry with enable/disable toggles
+### Implemented
+- **Agent Management** - Visual agent registry with create, edit, delete, duplicate, and enable/disable toggles
+- **Theme Support** - Light and dark theme with persistent preference
+- **Search** - Client-side agent search with keyboard shortcut (⌘K)
+- **Toast Notifications** - User feedback for actions
+
+### Planned
 - **Skill Composer** - Drag-and-drop skill composition interface
 - **Configuration Editor** - Schema-driven forms for opencode.json
 - **Execution Console** - Real-time CLI output streaming
@@ -50,7 +56,7 @@ npm run dev
 - **Frontend**: React + TypeScript + Radix UI
 - **Desktop Framework**: Tauri v2 (Rust)
 - **State Management**: Zustand
-- **Code Editor**: Monaco Editor
+- **Code Editor**: Monaco Editor (planned)
 
 ## Available Scripts
 
@@ -66,10 +72,10 @@ npm run dev
 
 ## Documentation
 
-- [Blueprint](./blueprint.md) - Complete project specification
 - [Changelog](./CHANGELOG.md) - Version history and changes
 - [Tasks](./docs/task.md) - Active development tasks
 - [Bugs](./docs/bug.md) - Known issues tracker
+- [AGENTS.md](./AGENTS.md) - Project conventions and guidelines
 
 ## Contributing
 
@@ -81,7 +87,7 @@ Contributions welcome!
 4. Push to branch (`git push origin feature/your-feature`)
 5. Open a Pull Request
 
-Please read the [Blueprint](./blueprint.md) to understand project direction before submitting PRs.
+Please read the [AGENTS.md](./AGENTS.md) to understand project conventions before submitting PRs.
 
 ## License
 
