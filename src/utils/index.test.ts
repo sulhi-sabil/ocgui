@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateId, formatDate, deepClone, validateAgent, validateSkill, mergeConfig, AGENT_TEMPLATES, createAgentFromTemplate, getTemplateKeys } from './index'
+import { generateId, formatDate, deepClone, validateAgent, validateSkill, validateTool, validateRun, mergeConfig, AGENT_TEMPLATES, createAgentFromTemplate, getTemplateKeys } from './index'
 
 describe('generateId', () => {
   it('should generate a unique ID string', () => {
@@ -848,6 +848,400 @@ describe('validateSkill', () => {
     }
     
     const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors.length).toBeGreaterThan(1)
+  })
+})
+
+describe('validateTool', () => {
+  it('should return valid for a proper tool', () => {
+    const tool = {
+      name: 'test-tool',
+      description: 'A test tool',
+      parameters: { type: 'object' },
+      permission: 'allow' as const,
+    }
+    
+    const result = validateTool(tool)
+    
+    expect(result.valid).toBe(true)
+    expect(result.errors).toHaveLength(0)
+  })
+
+  it('should fail for null input', () => {
+    const result = validateTool(null)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Tool must be an object')
+  })
+
+  it('should fail for non-object input', () => {
+    const result = validateTool('not an object')
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Tool must be an object')
+  })
+
+  it('should fail for missing name', () => {
+    const tool = {
+      description: 'A test',
+      permission: 'allow',
+    }
+    
+    const result = validateTool(tool)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Tool must have a string name')
+  })
+
+  it('should fail for missing description', () => {
+    const tool = {
+      name: 'test-tool',
+      permission: 'allow',
+    }
+    
+    const result = validateTool(tool)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Tool must have a string description')
+  })
+
+  it('should fail for non-object parameters', () => {
+    const tool = {
+      name: 'test-tool',
+      description: 'A test',
+      parameters: 'not-an-object',
+      permission: 'allow',
+    }
+    
+    const result = validateTool(tool)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Tool parameters must be an object')
+  })
+
+  it('should fail for invalid permission', () => {
+    const tool = {
+      name: 'test-tool',
+      description: 'A test',
+      permission: 'invalid',
+    }
+    
+    const result = validateTool(tool)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Tool permission must be "allow", "deny", or "ask"')
+  })
+
+  it('should accept "deny" permission', () => {
+    const tool = {
+      name: 'test-tool',
+      description: 'A test',
+      permission: 'deny' as const,
+    }
+    
+    const result = validateTool(tool)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should accept "ask" permission', () => {
+    const tool = {
+      name: 'test-tool',
+      description: 'A test',
+      permission: 'ask' as const,
+    }
+    
+    const result = validateTool(tool)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should accept tool without parameters', () => {
+    const tool = {
+      name: 'test-tool',
+      description: 'A test',
+      permission: 'allow' as const,
+    }
+    
+    const result = validateTool(tool)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should collect multiple errors', () => {
+    const tool = {
+      permission: 'invalid',
+    }
+    
+    const result = validateTool(tool)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors.length).toBeGreaterThan(1)
+  })
+})
+
+describe('validateRun', () => {
+  it('should return valid for a proper run', () => {
+    const run = {
+      id: 'run-id',
+      sessionId: 'session-id',
+      timestamp: Date.now(),
+      agent: 'test-agent',
+      model: 'gpt-4',
+      input: 'Hello',
+      output: 'Hi there',
+      toolsUsed: ['tool1', 'tool2'],
+      exitStatus: 0,
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(true)
+    expect(result.errors).toHaveLength(0)
+  })
+
+  it('should fail for null input', () => {
+    const result = validateRun(null)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Run must be an object')
+  })
+
+  it('should fail for non-object input', () => {
+    const result = validateRun('not an object')
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Run must be an object')
+  })
+
+  it('should fail for missing id', () => {
+    const run = {
+      sessionId: 'session-id',
+      timestamp: Date.now(),
+      agent: 'test-agent',
+      model: 'gpt-4',
+      input: 'Hello',
+      output: 'Hi',
+      toolsUsed: [],
+      exitStatus: 0,
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Run must have a string id')
+  })
+
+  it('should fail for missing sessionId', () => {
+    const run = {
+      id: 'run-id',
+      timestamp: Date.now(),
+      agent: 'test-agent',
+      model: 'gpt-4',
+      input: 'Hello',
+      output: 'Hi',
+      toolsUsed: [],
+      exitStatus: 0,
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Run must have a string sessionId')
+  })
+
+  it('should fail for non-number timestamp', () => {
+    const run = {
+      id: 'run-id',
+      sessionId: 'session-id',
+      timestamp: 'not-a-number',
+      agent: 'test-agent',
+      model: 'gpt-4',
+      input: 'Hello',
+      output: 'Hi',
+      toolsUsed: [],
+      exitStatus: 0,
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Run must have a number timestamp')
+  })
+
+  it('should fail for missing agent', () => {
+    const run = {
+      id: 'run-id',
+      sessionId: 'session-id',
+      timestamp: Date.now(),
+      model: 'gpt-4',
+      input: 'Hello',
+      output: 'Hi',
+      toolsUsed: [],
+      exitStatus: 0,
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Run must have a string agent')
+  })
+
+  it('should fail for missing model', () => {
+    const run = {
+      id: 'run-id',
+      sessionId: 'session-id',
+      timestamp: Date.now(),
+      agent: 'test-agent',
+      input: 'Hello',
+      output: 'Hi',
+      toolsUsed: [],
+      exitStatus: 0,
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Run must have a string model')
+  })
+
+  it('should fail for missing input', () => {
+    const run = {
+      id: 'run-id',
+      sessionId: 'session-id',
+      timestamp: Date.now(),
+      agent: 'test-agent',
+      model: 'gpt-4',
+      output: 'Hi',
+      toolsUsed: [],
+      exitStatus: 0,
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Run must have a string input')
+  })
+
+  it('should fail for missing output', () => {
+    const run = {
+      id: 'run-id',
+      sessionId: 'session-id',
+      timestamp: Date.now(),
+      agent: 'test-agent',
+      model: 'gpt-4',
+      input: 'Hello',
+      toolsUsed: [],
+      exitStatus: 0,
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Run must have a string output')
+  })
+
+  it('should fail for non-array toolsUsed', () => {
+    const run = {
+      id: 'run-id',
+      sessionId: 'session-id',
+      timestamp: Date.now(),
+      agent: 'test-agent',
+      model: 'gpt-4',
+      input: 'Hello',
+      output: 'Hi',
+      toolsUsed: 'not-an-array',
+      exitStatus: 0,
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Run must have a toolsUsed array')
+  })
+
+  it('should fail for non-string toolsUsed items', () => {
+    const run = {
+      id: 'run-id',
+      sessionId: 'session-id',
+      timestamp: Date.now(),
+      agent: 'test-agent',
+      model: 'gpt-4',
+      input: 'Hello',
+      output: 'Hi',
+      toolsUsed: ['valid', 123],
+      exitStatus: 0,
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Run toolsUsed must be strings')
+  })
+
+  it('should fail for non-number exitStatus', () => {
+    const run = {
+      id: 'run-id',
+      sessionId: 'session-id',
+      timestamp: Date.now(),
+      agent: 'test-agent',
+      model: 'gpt-4',
+      input: 'Hello',
+      output: 'Hi',
+      toolsUsed: [],
+      exitStatus: '0',
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Run must have a number exitStatus')
+  })
+
+  it('should accept empty toolsUsed array', () => {
+    const run = {
+      id: 'run-id',
+      sessionId: 'session-id',
+      timestamp: Date.now(),
+      agent: 'test-agent',
+      model: 'gpt-4',
+      input: 'Hello',
+      output: 'Hi',
+      toolsUsed: [],
+      exitStatus: 0,
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should accept non-zero exit status', () => {
+    const run = {
+      id: 'run-id',
+      sessionId: 'session-id',
+      timestamp: Date.now(),
+      agent: 'test-agent',
+      model: 'gpt-4',
+      input: 'Hello',
+      output: 'Error',
+      toolsUsed: [],
+      exitStatus: 1,
+    }
+    
+    const result = validateRun(run)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should collect multiple errors', () => {
+    const run = {
+      toolsUsed: 'invalid',
+    }
+    
+    const result = validateRun(run)
     
     expect(result.valid).toBe(false)
     expect(result.errors.length).toBeGreaterThan(1)
