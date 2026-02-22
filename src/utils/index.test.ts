@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateId, formatDate, deepClone, validateAgent, mergeConfig, AGENT_TEMPLATES, createAgentFromTemplate, getTemplateKeys } from './index'
+import { generateId, formatDate, deepClone, validateAgent, validateSkill, mergeConfig, AGENT_TEMPLATES, createAgentFromTemplate, getTemplateKeys } from './index'
 
 describe('generateId', () => {
   it('should generate a unique ID string', () => {
@@ -618,5 +618,238 @@ describe('getTemplateKeys', () => {
     
     expect(Array.isArray(keys)).toBe(true)
     expect(keys.length).toBe(4)
+  })
+})
+
+describe('validateSkill', () => {
+  it('should return valid for a proper skill', () => {
+    const skill = {
+      id: 'skill-id',
+      name: 'Test Skill',
+      description: 'A test skill',
+      content: 'skill content',
+      commands: ['/test'],
+      path: '/path/to/skill',
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(true)
+    expect(result.errors).toHaveLength(0)
+  })
+
+  it('should fail for null input', () => {
+    const result = validateSkill(null)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must be an object')
+  })
+
+  it('should fail for non-object input', () => {
+    const result = validateSkill('not an object')
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must be an object')
+  })
+
+  it('should fail for missing id', () => {
+    const skill = {
+      name: 'Test Skill',
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must have a string id')
+  })
+
+  it('should fail for missing name', () => {
+    const skill = {
+      id: 'skill-id',
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must have a string name')
+  })
+
+  it('should fail for non-string id', () => {
+    const skill = {
+      id: 123,
+      name: 'Test',
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must have a string id')
+  })
+
+  it('should fail for missing description', () => {
+    const skill = {
+      id: 'skill-id',
+      name: 'Test',
+      content: 'content',
+      commands: [],
+      path: '/path',
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must have a string description')
+  })
+
+  it('should fail for non-string description', () => {
+    const skill = {
+      id: 'skill-id',
+      name: 'Test',
+      description: 123,
+      content: 'content',
+      commands: [],
+      path: '/path',
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must have a string description')
+  })
+
+  it('should fail for missing content', () => {
+    const skill = {
+      id: 'skill-id',
+      name: 'Test',
+      description: 'A test',
+      commands: [],
+      path: '/path',
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must have a string content')
+  })
+
+  it('should fail for non-string content', () => {
+    const skill = {
+      id: 'skill-id',
+      name: 'Test',
+      description: 'A test',
+      content: 123,
+      commands: [],
+      path: '/path',
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must have a string content')
+  })
+
+  it('should fail for missing commands array', () => {
+    const skill = {
+      id: 'skill-id',
+      name: 'Test',
+      description: 'A test',
+      content: 'content',
+      path: '/path',
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must have a commands array')
+  })
+
+  it('should fail for non-array commands', () => {
+    const skill = {
+      id: 'skill-id',
+      name: 'Test',
+      description: 'A test',
+      content: 'content',
+      commands: 'not-an-array',
+      path: '/path',
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must have a commands array')
+  })
+
+  it('should fail for non-string command items', () => {
+    const skill = {
+      id: 'skill-id',
+      name: 'Test',
+      description: 'A test',
+      content: 'content',
+      commands: ['/valid', 123, '/also-valid'],
+      path: '/path',
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill commands must be strings')
+  })
+
+  it('should accept empty commands array', () => {
+    const skill = {
+      id: 'skill-id',
+      name: 'Test',
+      description: 'A test',
+      content: 'content',
+      commands: [],
+      path: '/path',
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(true)
+  })
+
+  it('should fail for missing path', () => {
+    const skill = {
+      id: 'skill-id',
+      name: 'Test',
+      description: 'A test',
+      content: 'content',
+      commands: [],
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must have a string path')
+  })
+
+  it('should fail for non-string path', () => {
+    const skill = {
+      id: 'skill-id',
+      name: 'Test',
+      description: 'A test',
+      content: 'content',
+      commands: [],
+      path: 123,
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Skill must have a string path')
+  })
+
+  it('should collect multiple errors', () => {
+    const skill = {
+      commands: 'invalid',
+      path: 123,
+    }
+    
+    const result = validateSkill(skill)
+    
+    expect(result.valid).toBe(false)
+    expect(result.errors.length).toBeGreaterThan(1)
   })
 })
