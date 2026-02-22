@@ -34,3 +34,63 @@ export const APP = {
   DESCRIPTION: 'Desktop Control Center for OpenCode CLI',
   MAX_CONTENT_WIDTH: 'max-w-7xl',
 } as const
+
+export const UI_TEXT = {
+  BUTTONS: {
+    ADD_AGENT: 'Add Agent',
+    CREATE_AGENT: 'Create Agent',
+    CREATE_FIRST_AGENT: 'Create Your First Agent',
+    CANCEL: 'Cancel',
+    DELETE: 'Delete',
+    DUPLICATE: 'Duplicate',
+    EDIT: 'Edit',
+    CLEAR_SEARCH: 'Clear Search',
+  },
+  PLACEHOLDERS: {
+    SEARCH_AGENTS: 'Search agents...',
+    AGENT_NAME: 'e.g., Code Reviewer',
+    AGENT_DESCRIPTION: 'Describe what this agent does...',
+    AGENT_MODEL: 'e.g., gpt-4, claude-3-opus',
+    AGENT_TAGS: 'e.g., code-review, testing, documentation',
+  },
+  LABELS: {
+    AGENT_NAME: 'Name',
+    AGENT_DESCRIPTION: 'Description',
+    AGENT_MODEL: 'Model Override (optional)',
+    AGENT_TAGS: 'Tags (optional)',
+    REQUIRED: '*',
+  },
+  HINTS: {
+    MODEL_DEFAULT: 'Leave empty to use default model from config',
+    TAGS_FORMAT: 'Comma-separated tags for categorization',
+  },
+  ERRORS: {
+    NAME_REQUIRED: 'Name is required',
+    DESCRIPTION_REQUIRED: 'Description is required',
+  },
+  MODAL: {
+    CREATE_AGENT_TITLE: 'Create New Agent',
+  },
+  DIALOG: {
+    DELETE_AGENT_TITLE: 'Delete Agent',
+    DELETE_AGENT_MESSAGE: 'Are you sure you want to delete "{name}"? This action cannot be undone.',
+  },
+  EMPTY_STATE: {
+    NO_AGENTS_TITLE: 'No agents yet',
+    NO_AGENTS_DESCRIPTION: 'Get started by creating your first agent. Agents help you automate tasks and orchestrate workflows.',
+    NO_MATCHES_TITLE: 'No matching agents found',
+    NO_MATCHES_DESCRIPTION: 'Try adjusting your search terms or clear the filter to see all agents.',
+  },
+  GETTING_STARTED: {
+    TITLE: 'Getting Started',
+    STEPS: [
+      'Configure your OpenCode CLI workspace',
+      'Import existing agents from AGENTS.md',
+      'Set up skill compositions and tool permissions',
+      'Execute and monitor agent runs',
+    ],
+  },
+  TAGS: {
+    MORE: '+{count} more',
+  },
+} as const
