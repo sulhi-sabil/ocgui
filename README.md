@@ -64,30 +64,28 @@ npm run dev
 |---------|-------------|
 | `npm run dev` | Start development server |
 | `npm run build` | Build for production |
-| `npm run tauri:dev` | Start Tauri in development mode |
-| `npm run tauri:build` | Build Tauri application for production |
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Run TypeScript check |
 | `npm test` | Run test suite |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Run tests with coverage |
+| `npm run tauri:dev` | Start Tauri in dev mode |
+| `npm run tauri:build` | Build Tauri application |
 
 ## Documentation
 
-- [Changelog](./CHANGELOG.md) - Version history and changes
+- [Contributing](./CONTRIBUTING.md) - How to contribute
+- [Changelog](./CHANGELOG.md) - Version history
+- [Blueprint](./blueprint.md) - Product specification
+- [AGENTS.md](./AGENTS.md) - Coding conventions
 - [Tasks](./docs/task.md) - Active development tasks
-- [Bugs](./docs/bug.md) - Known issues tracker
-- [AGENTS.md](./AGENTS.md) - Project conventions and guidelines
+- [Bugs](./docs/bug.md) - Known issues
 
 ## Contributing
 
-Contributions welcome! 
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, coding standards, and pull request guidelines.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit changes (`git commit -m 'Add your feature'`)
-4. Push to branch (`git push origin feature/your-feature`)
-5. Open a Pull Request
-
-Please read the [AGENTS.md](./AGENTS.md) to understand project conventions before submitting PRs.
+Quick start: Fork → Branch → Commit → Push → PR
 
 ## License
 
