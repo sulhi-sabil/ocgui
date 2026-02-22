@@ -34,3 +34,16 @@ export const APP = {
   DESCRIPTION: 'Desktop Control Center for OpenCode CLI',
   MAX_CONTENT_WIDTH: 'max-w-7xl',
 } as const
+
+export const SECURITY = {
+  MAX_ID_LENGTH: 256,
+  MAX_NAME_LENGTH: 256,
+  MAX_DESCRIPTION_LENGTH: 2048,
+  MAX_PATH_LENGTH: 4096,
+  MAX_INPUT_LENGTH: 100000,
+  MAX_QUERY_LIMIT: 10000,
+  // eslint-disable-next-line no-control-regex
+  DANGEROUS_CHARS_PATTERN: /[\x00-\x08\x0B\x0C\x0E-\x1F]/g,
+  PATH_TRAVERSAL_PATTERN: /\.\./,
+  ALLOWED_PROTOCOLS: ['file:', 'http:', 'https:'],
+} as const

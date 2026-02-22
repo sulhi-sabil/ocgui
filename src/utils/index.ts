@@ -1,6 +1,16 @@
 import type { Agent } from '../types'
 
 export { cn } from './cn'
+export {
+  escapeHtml,
+  sanitizeInput,
+  sanitizePath,
+  truncateInput,
+  sanitizeId,
+  isValidProtocol,
+  sanitizeForDisplay,
+  containsDangerousPatterns,
+} from './sanitize'
 
 export interface AgentTemplate {
   name: string
