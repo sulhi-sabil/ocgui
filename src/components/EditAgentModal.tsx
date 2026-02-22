@@ -44,7 +44,13 @@ export function EditAgentModal({ isOpen, onClose, agent }: EditAgentModalProps) 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
-      setTimeout(() => nameInputRef.current?.focus(), MODAL.FOCUS_DELAY_MS)
+      const focusTimeout = setTimeout(() => nameInputRef.current?.focus(), MODAL.FOCUS_DELAY_MS)
+      
+      return () => {
+        document.removeEventListener('keydown', handleEscape)
+        document.body.style.overflow = ''
+        clearTimeout(focusTimeout)
+      }
     }
 
     return () => {
