@@ -220,3 +220,48 @@ export function createAgentFromTemplate(
 export function getTemplateKeys(): string[] {
   return Object.keys(AGENT_TEMPLATES)
 }
+
+/**
+ * Validate skill configuration
+ */
+export function validateSkill(skill: unknown): { valid: boolean; errors: string[] } {
+  const errors: string[] = []
+  
+  if (!skill || typeof skill !== 'object') {
+    errors.push('Skill must be an object')
+    return { valid: false, errors }
+  }
+  
+  const s = skill as Record<string, unknown>
+  
+  if (!s.id || typeof s.id !== 'string') {
+    errors.push('Skill must have a string id')
+  }
+  
+  if (!s.name || typeof s.name !== 'string') {
+    errors.push('Skill must have a string name')
+  }
+  
+  if (s.description === undefined || typeof s.description !== 'string') {
+    errors.push('Skill must have a string description')
+  }
+  
+  if (s.content === undefined || typeof s.content !== 'string') {
+    errors.push('Skill must have a string content')
+  }
+  
+  if (!Array.isArray(s.commands)) {
+    errors.push('Skill must have a commands array')
+  } else {
+    const invalidCommands = s.commands.filter(c => typeof c !== 'string')
+    if (invalidCommands.length > 0) {
+      errors.push('Skill commands must be strings')
+    }
+  }
+  
+  if (!s.path || typeof s.path !== 'string') {
+    errors.push('Skill must have a string path')
+  }
+  
+  return { valid: errors.length === 0, errors }
+}
