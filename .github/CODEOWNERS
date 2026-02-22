@@ -22,8 +22,8 @@
 /package-lock.json @sulhi-sabil
 /tsconfig.json @sulhi-sabil
 /vite.config.ts @sulhi-sabil
-/tailwind.config.ts @sulhi-sabil
-/.eslintrc.cjs @sulhi-sabil
+/tailwind.config.js @sulhi-sabil
+/.eslintrc.json @sulhi-sabil
 
 # GitHub workflows
 /.github/workflows/ @sulhi-sabil
