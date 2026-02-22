@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { TOAST, ANIMATION, MODAL, SEARCH, AGENT, APP, UI_TEXT } from './index'
+import { TOAST, ANIMATION, MODAL, SEARCH, AGENT, SKILL, STORAGE, APP, UI_TEXT } from './index'
 
 describe('constants', () => {
   describe('TOAST', () => {
@@ -49,6 +49,18 @@ describe('constants', () => {
   describe('AGENT', () => {
     it('should have name copy suffix', () => {
       expect(AGENT.NAME_COPY_SUFFIX).toBe(' (Copy)')
+    })
+  })
+
+  describe('SKILL', () => {
+    it('should have name copy suffix', () => {
+      expect(SKILL.NAME_COPY_SUFFIX).toBe(' (Copy)')
+    })
+  })
+
+  describe('STORAGE', () => {
+    it('should have storage key', () => {
+      expect(STORAGE.KEY).toBe('ocgui-storage')
     })
   })
 
