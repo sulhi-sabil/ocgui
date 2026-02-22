@@ -6,6 +6,16 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        singleThread: false,
+        minThreads: 1,
+        maxThreads: 4,
+      },
+    },
+    testTimeout: 10000,
+    hookTimeout: 10000,
     coverage: {
       reporter: ['text', 'json', 'html'],
       exclude: [
@@ -13,6 +23,8 @@ export default defineConfig({
         'src/test/setup.ts',
       ],
     },
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    exclude: ['node_modules', 'dist', 'src-tauri'],
   },
   resolve: {
     alias: {
