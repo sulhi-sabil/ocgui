@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
 import type { Agent, Skill, Config, Run } from '../types'
 import { generateId } from '@utils/index'
+import { AGENT } from '@constants/index'
 
 const safeStorage: StateStorage = {
   getItem: (name: string): string | null => {
@@ -97,7 +98,7 @@ export const useAppStore = create<AppState>()(
         const duplicated: Agent = {
           ...agent,
           id: generateId(),
-          name: `${agent.name} (Copy)`,
+          name: `${agent.name}${AGENT.NAME_COPY_SUFFIX}`,
         }
         
         set((state) => ({ agents: [...state.agents, duplicated] }))
