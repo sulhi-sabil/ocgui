@@ -1,17 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { CreateAgentModal } from './CreateAgentModal'
-import { ToastProvider } from './ui/Toast'
-import { useAppStore } from '@store/index'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
 import { act } from '@testing-library/react'
-
-const renderWithProviders = (ui: React.ReactNode) => {
-  return render(
-    <ToastProvider>
-      {ui}
-    </ToastProvider>
-  )
-}
+import { CreateAgentModal } from './CreateAgentModal'
+import { useAppStore } from '@store/index'
+import { renderWithProviders } from '@test/utils'
 
 describe('CreateAgentModal', () => {
   const mockOnClose = vi.fn()

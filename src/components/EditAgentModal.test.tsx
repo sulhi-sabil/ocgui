@@ -1,30 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { EditAgentModal } from './EditAgentModal'
-import { ToastProvider } from './ui/Toast'
-import { useAppStore } from '@store/index'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
 import { act } from '@testing-library/react'
-import type { Agent } from '../types'
+import { EditAgentModal } from './EditAgentModal'
+import { useAppStore } from '@store/index'
+import { renderWithProviders } from '@test/utils'
+import { createMockAgent } from '@test/fixtures'
+import type { Agent } from '@/types'
 
-const renderWithProviders = (ui: React.ReactNode) => {
-  return render(
-    <ToastProvider>
-      {ui}
-    </ToastProvider>
-  )
-}
-
-const mockAgent: Agent = {
+const mockAgent = createMockAgent({
   id: 'test-agent-1',
   name: 'Test Agent',
   description: 'A test agent description',
-  model: 'gpt-4',
   tools: { tool1: 'read', tool2: 'write' },
   permissions: { file: 'read' },
   skills: ['skill1', 'skill2'],
   tags: ['testing', 'automation'],
-  enabled: true,
-}
+})
 
 describe('EditAgentModal', () => {
   const mockOnClose = vi.fn()
