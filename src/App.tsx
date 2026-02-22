@@ -14,49 +14,31 @@ import type { Agent } from './types'
 const CreateAgentModal = lazy(() => import('@components/CreateAgentModal'))
 const EditAgentModal = lazy(() => import('@components/EditAgentModal'))
 
-function App() {
-  const agents = useAppStore((state) => state.agents)
-  const selectedAgentId = useAppStore((state) => state.selectedAgentId)
+function useAgentCallbacks(agents: Agent[]) {
   const selectAgent = useAppStore((state) => state.selectAgent)
-  const lastSearchQuery = useAppStore((state) => state.lastSearchQuery)
-  const setLastSearchQuery = useAppStore((state) => state.setLastSearchQuery)
   const updateAgent = useAppStore((state) => state.updateAgent)
   const duplicateAgent = useAppStore((state) => state.duplicateAgent)
   const deleteAgent = useAppStore((state) => state.deleteAgent)
-  useTheme()
   const { addToast } = useToast()
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editingAgent, setEditingAgent] = useState<Agent | null>(null)
-  const [searchQuery, setSearchQuery] = useState(lastSearchQuery)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [agentToDelete, setAgentToDelete] = useState<Agent | null>(null)
-  const searchInputRef = useRef<HTMLInputElement>(null)
-
-  usePlatformShortcut('k', () => {
-    searchInputRef.current?.focus()
-  })
-
-  const { filteredAgents, hasResults, resultCount } = useAgentSearch(agents, searchQuery)
-
-  useEffect(() => {
-    setLastSearchQuery(searchQuery)
-  }, [searchQuery, setLastSearchQuery])
-
-  const openModal = useCallback(() => setIsModalOpen(true), [])
-  const closeModal = useCallback(() => setIsModalOpen(false), [])
+  
+  const agentsRef = useRef(agents)
+  agentsRef.current = agents
 
   const handleAgentAction = useCallback((action: AgentAction, agentId: string) => {
+    const agent = agentsRef.current.find(a => a.id === agentId)
+    
     switch (action) {
       case 'select':
         selectAgent(agentId)
         break
-      case 'toggle': {
-        const agent = agents.find(a => a.id === agentId)
+      case 'toggle':
         if (agent) {
           updateAgent(agentId, { enabled: !agent.enabled })
         }
         break
-      }
       case 'duplicate': {
         const duplicated = duplicateAgent(agentId)
         if (duplicated) {
@@ -64,28 +46,19 @@ function App() {
         }
         break
       }
-      case 'edit': {
-        const agent = agents.find(a => a.id === agentId)
+      case 'edit':
         if (agent) {
           setEditingAgent(agent)
           setIsEditModalOpen(true)
         }
         break
-      }
-      case 'delete': {
-        const agent = agents.find(a => a.id === agentId)
+      case 'delete':
         if (agent) {
           setAgentToDelete(agent)
         }
         break
-      }
     }
-  }, [selectAgent, agents, updateAgent, duplicateAgent, addToast])
-
-  const closeEditModal = useCallback(() => {
-    setIsEditModalOpen(false)
-    setEditingAgent(null)
-  }, [])
+  }, [selectAgent, updateAgent, duplicateAgent, addToast])
 
   const handleDeleteConfirm = useCallback(() => {
     if (agentToDelete) {
@@ -98,6 +71,55 @@ function App() {
   const handleDeleteCancel = useCallback(() => {
     setAgentToDelete(null)
   }, [])
+
+  const closeEditModal = useCallback(() => {
+    setIsEditModalOpen(false)
+    setEditingAgent(null)
+  }, [])
+
+  return {
+    handleAgentAction,
+    editingAgent,
+    isEditModalOpen,
+    closeEditModal,
+    agentToDelete,
+    handleDeleteConfirm,
+    handleDeleteCancel,
+  }
+}
+
+function App() {
+  const agents = useAppStore((state) => state.agents)
+  const selectedAgentId = useAppStore((state) => state.selectedAgentId)
+  const lastSearchQuery = useAppStore((state) => state.lastSearchQuery)
+  const setLastSearchQuery = useAppStore((state) => state.setLastSearchQuery)
+  useTheme()
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState(lastSearchQuery)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  const { filteredAgents, hasResults, resultCount } = useAgentSearch(agents, searchQuery)
+  
+  const {
+    handleAgentAction,
+    editingAgent,
+    isEditModalOpen,
+    closeEditModal,
+    agentToDelete,
+    handleDeleteConfirm,
+    handleDeleteCancel,
+  } = useAgentCallbacks(filteredAgents)
+
+  usePlatformShortcut('k', () => {
+    searchInputRef.current?.focus()
+  })
+
+  useEffect(() => {
+    setLastSearchQuery(searchQuery)
+  }, [searchQuery, setLastSearchQuery])
+
+  const openModal = useCallback(() => setIsModalOpen(true), [])
+  const closeModal = useCallback(() => setIsModalOpen(false), [])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
