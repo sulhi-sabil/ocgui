@@ -9,7 +9,7 @@ interface UseAgentSearchResult {
 
 /**
  * Hook for filtering agents based on a search query
- * Searches across agent name, description, model, and tags
+ * Searches across agent name, description, model, tags, and skills
  */
 export function useAgentSearch(
   agents: Agent[],
@@ -27,8 +27,9 @@ export function useAgentSearch(
       const descriptionMatch = agent.description.toLowerCase().includes(query)
       const modelMatch = agent.model?.toLowerCase().includes(query) ?? false
       const tagsMatch = agent.tags?.some(tag => tag.toLowerCase().includes(query)) ?? false
+      const skillsMatch = agent.skills?.some(skill => skill.toLowerCase().includes(query)) ?? false
       
-      return nameMatch || descriptionMatch || modelMatch || tagsMatch
+      return nameMatch || descriptionMatch || modelMatch || tagsMatch || skillsMatch
     })
   }, [agents, searchQuery])
 
