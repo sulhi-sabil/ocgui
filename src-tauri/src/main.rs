@@ -1,12 +1,84 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 use rusqlite::{Connection, Result as SqlResult, params};
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager, State};
 use std::process::Command;
+
+const ALLOWED_OPENCODE_SUBCOMMANDS: &[&str] = &[
+    "--version",
+    "--help",
+    "agent",
+    "config",
+    "run",
+    "status",
+    "list",
+];
+
+const MAX_PATH_LENGTH: usize = 4096;
+const MAX_INPUT_LENGTH: usize = 100000;
+const MAX_QUERY_LIMIT: i64 = 10000;
+
+fn is_safe_path(path: &Path, app_data_dir: &Path) -> bool {
+    let canonical_path = match path.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return false,
+    };
+    
+    let canonical_app_dir = match app_data_dir.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return false,
+    };
+    
+    canonical_path.starts_with(&canonical_app_dir)
+        || canonical_path.starts_with(PathBuf::from("/tmp"))
+        || canonical_path.starts_with(PathBuf::from("/var/tmp"))
+}
+
+fn validate_opencode_args(args: &[String]) -> Result<(), String> {
+    if args.is_empty() {
+        return Ok(());
+    }
+    
+    let first_arg = args[0].as_str();
+    
+    if first_arg.starts_with('-') {
+        if !ALLOWED_OPENCODE_SUBCOMMANDS.contains(&first_arg) {
+            return Err(format!("Disallowed flag: {}", first_arg));
+        }
+    } else if !ALLOWED_OPENCODE_SUBCOMMANDS.contains(&first_arg) {
+        return Err(format!("Disallowed subcommand: {}", first_arg));
+    }
+    
+    for arg in args {
+        if arg.len() > MAX_INPUT_LENGTH {
+            return Err("Argument exceeds maximum length".to_string());
+        }
+        if arg.contains('\0') {
+            return Err("Argument contains null byte".to_string());
+        }
+        if arg.starts_with("--") && arg.contains('=') {
+            let parts: Vec<&str> = arg.splitn(2, '=').collect();
+            if parts.len() == 2 && parts[1].contains("..") {
+                return Err("Argument contains path traversal pattern".to_string());
+            }
+        }
+    }
+    
+    Ok(())
+}
+
+fn sanitize_string_input(input: &str, max_len: usize) -> String {
+    let sanitized: String = input
+        .chars()
+        .filter(|c| !c.is_control() || *c == '\n' || *c == '\t')
+        .take(max_len)
+        .collect();
+    sanitized
+}
 
 const DB_VERSION: i32 = 2;
 
@@ -162,20 +234,32 @@ fn init_database(app_handle: &AppHandle) -> SqlResult<Connection> {
 
 #[tauri::command]
 fn add_run(state: State<DbState>, run: Run) -> Result<(), String> {
+    if run.id.len() > MAX_INPUT_LENGTH || run.session_id.len() > MAX_INPUT_LENGTH {
+        return Err("Input exceeds maximum length".to_string());
+    }
+    
     let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    
+    let sanitized_id = sanitize_string_input(&run.id, MAX_INPUT_LENGTH);
+    let sanitized_session_id = sanitize_string_input(&run.session_id, MAX_INPUT_LENGTH);
+    let sanitized_agent = sanitize_string_input(&run.agent, MAX_INPUT_LENGTH);
+    let sanitized_model = sanitize_string_input(&run.model, MAX_INPUT_LENGTH);
+    let sanitized_input = sanitize_string_input(&run.input, MAX_INPUT_LENGTH * 10);
+    let sanitized_output = sanitize_string_input(&run.output, MAX_INPUT_LENGTH * 10);
+    let sanitized_tools = sanitize_string_input(&run.tools_used, MAX_INPUT_LENGTH);
     
     conn.execute(
         "INSERT INTO runs_v2 (id, session_id, timestamp, agent, model, input, output, tools_used, exit_status)
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
         params![
-            &run.id,
-            &run.session_id,
+            sanitized_id,
+            sanitized_session_id,
             &run.timestamp,
-            &run.agent,
-            &run.model,
-            &run.input,
-            &run.output,
-            &run.tools_used,
+            sanitized_agent,
+            sanitized_model,
+            sanitized_input,
+            sanitized_output,
+            sanitized_tools,
             &run.exit_status
         ],
     ).map_err(|e| e.to_string())?;
@@ -185,6 +269,8 @@ fn add_run(state: State<DbState>, run: Run) -> Result<(), String> {
 
 #[tauri::command]
 fn get_runs(state: State<DbState>, limit: i64) -> Result<Vec<Run>, String> {
+    let safe_limit = limit.min(MAX_QUERY_LIMIT).max(1);
+    
     let conn = state.conn.lock().map_err(|e| e.to_string())?;
     
     let mut stmt = conn
@@ -193,7 +279,7 @@ fn get_runs(state: State<DbState>, limit: i64) -> Result<Vec<Run>, String> {
         .map_err(|e| e.to_string())?;
     
     let runs = stmt
-        .query_map([limit], |row| {
+        .query_map([safe_limit], |row| {
             Ok(Run {
                 id: row.get(0)?,
                 session_id: row.get(1)?,
@@ -291,12 +377,20 @@ fn get_runs_by_session(state: State<DbState>, session_id: String) -> Result<Vec<
 
 #[tauri::command]
 fn add_run_log(state: State<DbState>, log: RunLog) -> Result<i64, String> {
+    if log.run_id.len() > MAX_INPUT_LENGTH || log.log_line.len() > MAX_INPUT_LENGTH * 10 {
+        return Err("Input exceeds maximum length".to_string());
+    }
+    
     let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    
+    let sanitized_run_id = sanitize_string_input(&log.run_id, MAX_INPUT_LENGTH);
+    let sanitized_log_line = sanitize_string_input(&log.log_line, MAX_INPUT_LENGTH * 10);
+    let sanitized_log_type = sanitize_string_input(&log.log_type, 50);
     
     conn.execute(
         "INSERT INTO run_logs (run_id, log_line, log_type, timestamp)
          VALUES (?1, ?2, ?3, ?4)",
-        params![&log.run_id, &log.log_line, &log.log_type, &log.timestamp],
+        params![sanitized_run_id, sanitized_log_line, sanitized_log_type, &log.timestamp],
     ).map_err(|e| e.to_string())?;
     
     Ok(conn.last_insert_rowid())
@@ -350,6 +444,25 @@ fn setup_file_watcher(app_handle: AppHandle) -> Result<RecommendedWatcher, Strin
 
 #[tauri::command]
 fn watch_agents_file(app_handle: AppHandle, file_path: String) -> Result<(), String> {
+    if file_path.len() > MAX_PATH_LENGTH {
+        return Err("Path exceeds maximum length".to_string());
+    }
+    
+    if file_path.contains('\0') {
+        return Err("Path contains null byte".to_string());
+    }
+    
+    let path = PathBuf::from(&file_path);
+    
+    let app_data_dir = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("Failed to get app data directory: {}", e))?;
+    
+    if !is_safe_path(&path, &app_data_dir) {
+        return Err("Path is not within allowed directories".to_string());
+    }
+    
     let watcher = setup_file_watcher(app_handle)?;
     
     let mut watcher = watcher;
@@ -368,6 +481,8 @@ fn greet(name: &str) -> String {
 
 #[tauri::command]
 async fn run_opencode_command(args: Vec<String>) -> Result<String, String> {
+    validate_opencode_args(&args)?;
+    
     let output = Command::new("opencode")
         .args(&args)
         .output()
