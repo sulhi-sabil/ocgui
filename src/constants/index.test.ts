@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { TOAST, ANIMATION, MODAL, SEARCH, AGENT, APP } from './index'
+import { TOAST, ANIMATION, MODAL, SEARCH, AGENT, APP, UI_TEXT } from './index'
 
 describe('constants', () => {
   describe('TOAST', () => {
@@ -63,6 +63,46 @@ describe('constants', () => {
 
     it('should have max content width', () => {
       expect(APP.MAX_CONTENT_WIDTH).toBe('max-w-7xl')
+    })
+  })
+
+  describe('UI_TEXT', () => {
+    it('should have button labels', () => {
+      expect(UI_TEXT.BUTTONS.ADD_AGENT).toBe('Add Agent')
+      expect(UI_TEXT.BUTTONS.CREATE_AGENT).toBe('Create Agent')
+      expect(UI_TEXT.BUTTONS.CANCEL).toBe('Cancel')
+      expect(UI_TEXT.BUTTONS.DELETE).toBe('Delete')
+      expect(UI_TEXT.BUTTONS.DUPLICATE).toBe('Duplicate')
+      expect(UI_TEXT.BUTTONS.EDIT).toBe('Edit')
+    })
+
+    it('should have placeholders', () => {
+      expect(UI_TEXT.PLACEHOLDERS.SEARCH_AGENTS).toBe('Search agents...')
+      expect(UI_TEXT.PLACEHOLDERS.AGENT_NAME).toBe('e.g., Code Reviewer')
+    })
+
+    it('should have error messages', () => {
+      expect(UI_TEXT.ERRORS.NAME_REQUIRED).toBe('Name is required')
+      expect(UI_TEXT.ERRORS.DESCRIPTION_REQUIRED).toBe('Description is required')
+    })
+
+    it('should have dialog messages', () => {
+      expect(UI_TEXT.DIALOG.DELETE_AGENT_TITLE).toBe('Delete Agent')
+      expect(UI_TEXT.DIALOG.DELETE_AGENT_MESSAGE).toContain('{name}')
+    })
+
+    it('should have empty state text', () => {
+      expect(UI_TEXT.EMPTY_STATE.NO_AGENTS_TITLE).toBe('No agents yet')
+      expect(UI_TEXT.EMPTY_STATE.NO_MATCHES_TITLE).toBe('No matching agents found')
+    })
+
+    it('should have getting started steps', () => {
+      expect(UI_TEXT.GETTING_STARTED.TITLE).toBe('Getting Started')
+      expect(UI_TEXT.GETTING_STARTED.STEPS).toHaveLength(4)
+    })
+
+    it('should have tags more template', () => {
+      expect(UI_TEXT.TAGS.MORE).toBe('+{count} more')
     })
   })
 })

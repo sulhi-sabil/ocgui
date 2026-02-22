@@ -8,6 +8,7 @@ import { usePlatformShortcut } from '@hooks/useKeyboardShortcut'
 import { useToast } from '@components/ui/Toast'
 import { cn } from '@utils/cn'
 import { iconSize, strokeWidth, grid, colors } from '@styles/tokens'
+import { UI_TEXT, APP } from '@constants/index'
 import type { Agent } from './types'
 
 const CreateAgentModal = lazy(() => import('@components/CreateAgentModal'))
@@ -87,10 +88,10 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              OpenCode GUI
+              {APP.NAME}
             </h1>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Desktop Control Center for OpenCode CLI
+              {APP.DESCRIPTION}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -98,7 +99,7 @@ function App() {
               <svg className={cn(iconSize.sm, 'mr-2')} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              Add Agent
+              {UI_TEXT.BUTTONS.ADD_AGENT}
             </Button>
             <ThemeToggle />
           </div>
@@ -121,7 +122,7 @@ function App() {
               ref={searchInputRef}
               value={searchQuery}
               onChange={setSearchQuery}
-              placeholder="Search agents..."
+              placeholder={UI_TEXT.PLACEHOLDERS.SEARCH_AGENTS}
               className="w-full sm:w-72"
               shortcutHint="⌘K"
             />
@@ -129,20 +130,20 @@ function App() {
           
           {!hasResults ? (
             <EmptyState
-              title={searchQuery ? 'No matching agents found' : 'No agents yet'}
+              title={searchQuery ? UI_TEXT.EMPTY_STATE.NO_MATCHES_TITLE : UI_TEXT.EMPTY_STATE.NO_AGENTS_TITLE}
               description={
                 searchQuery
-                  ? 'Try adjusting your search terms or clear the filter to see all agents.'
-                  : 'Get started by creating your first agent. Agents help you automate tasks and orchestrate workflows.'
+                  ? UI_TEXT.EMPTY_STATE.NO_MATCHES_DESCRIPTION
+                  : UI_TEXT.EMPTY_STATE.NO_AGENTS_DESCRIPTION
               }
               icon={
                 <svg className={cn(iconSize.xl, colors.primary.text)} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={strokeWidth.default} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               }
-              actionLabel={searchQuery ? undefined : 'Create Your First Agent'}
+              actionLabel={searchQuery ? undefined : UI_TEXT.BUTTONS.CREATE_FIRST_AGENT}
               onAction={searchQuery ? undefined : openModal}
-              secondaryActionLabel={searchQuery ? 'Clear Search' : undefined}
+              secondaryActionLabel={searchQuery ? UI_TEXT.BUTTONS.CLEAR_SEARCH : undefined}
               onSecondaryAction={searchQuery ? () => setSearchQuery('') : undefined}
             />
           ) : (
@@ -165,13 +166,12 @@ function App() {
 
         <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
           <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-            Getting Started
+            {UI_TEXT.GETTING_STARTED.TITLE}
           </h3>
           <ul className="text-sm text-blue-800 dark:text-blue-200 list-disc list-inside space-y-1">
-            <li>Configure your OpenCode CLI workspace</li>
-            <li>Import existing agents from AGENTS.md</li>
-            <li>Set up skill compositions and tool permissions</li>
-            <li>Execute and monitor agent runs</li>
+            {UI_TEXT.GETTING_STARTED.STEPS.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
           </ul>
         </div>
       </main>
@@ -185,10 +185,10 @@ function App() {
         isOpen={agentToDelete !== null}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Delete Agent"
-        message={`Are you sure you want to delete "${agentToDelete?.name}"? This action cannot be undone.`}
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
+        title={UI_TEXT.DIALOG.DELETE_AGENT_TITLE}
+        message={UI_TEXT.DIALOG.DELETE_AGENT_MESSAGE.replace('{name}', agentToDelete?.name || '')}
+        confirmLabel={UI_TEXT.BUTTONS.DELETE}
+        cancelLabel={UI_TEXT.BUTTONS.CANCEL}
         variant="danger"
       />
     </div>

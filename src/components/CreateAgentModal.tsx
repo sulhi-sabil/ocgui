@@ -5,7 +5,7 @@ import { useToast } from './ui/Toast'
 import { generateId } from '@utils/index'
 import { cn } from '@utils/cn'
 import { colors, zIndex, modal, formInput, focus, label, typography, iconSize, transitions } from '@styles/tokens'
-import { MODAL } from '@constants/index'
+import { MODAL, UI_TEXT } from '@constants/index'
 import type { Agent } from '../types'
 
 interface CreateAgentModalProps {
@@ -51,10 +51,10 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
     
     const newErrors: Record<string, string> = {}
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required'
+      newErrors.name = UI_TEXT.ERRORS.NAME_REQUIRED
     }
     if (!formData.description.trim()) {
-      newErrors.description = 'Description is required'
+      newErrors.description = UI_TEXT.ERRORS.DESCRIPTION_REQUIRED
     }
     
     if (Object.keys(newErrors).length > 0) {
@@ -94,7 +94,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
       <div className={modal.container}>
         <div className="flex items-center justify-between mb-4">
           <h2 id="modal-title" className={modal.title}>
-            Create New Agent
+            {UI_TEXT.MODAL.CREATE_AGENT_TITLE}
           </h2>
           <button
             type="button"
@@ -120,7 +120,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               htmlFor="name" 
               className={cn(label.base, label.default)}
             >
-              Name *
+              {UI_TEXT.LABELS.AGENT_NAME} {UI_TEXT.LABELS.REQUIRED}
             </label>
             <input
               ref={nameInputRef}
@@ -129,7 +129,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className={cn(formInput.base, formInput.default, focus.ring)}
-              placeholder="e.g., Code Reviewer"
+              placeholder={UI_TEXT.PLACEHOLDERS.AGENT_NAME}
             />
             {errors.name && (
               <p className={cn('mt-1', typography.body, colors.error.text)}>{errors.name}</p>
@@ -141,7 +141,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               htmlFor="description" 
               className={cn(label.base, label.default)}
             >
-              Description *
+              {UI_TEXT.LABELS.AGENT_DESCRIPTION} {UI_TEXT.LABELS.REQUIRED}
             </label>
             <textarea
               id="description"
@@ -149,7 +149,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className={cn(formInput.base, formInput.default, focus.ring)}
               rows={3}
-              placeholder="Describe what this agent does..."
+              placeholder={UI_TEXT.PLACEHOLDERS.AGENT_DESCRIPTION}
             />
             {errors.description && (
               <p className={cn('mt-1', typography.body, colors.error.text)}>{errors.description}</p>
@@ -161,7 +161,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               htmlFor="model" 
               className={cn(label.base, label.default)}
             >
-              Model Override (optional)
+              {UI_TEXT.LABELS.AGENT_MODEL}
             </label>
             <input
               type="text"
@@ -169,10 +169,10 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               value={formData.model}
               onChange={(e) => setFormData({ ...formData, model: e.target.value })}
               className={cn(formInput.base, formInput.default, focus.ring)}
-              placeholder="e.g., gpt-4, claude-3-opus"
+              placeholder={UI_TEXT.PLACEHOLDERS.AGENT_MODEL}
             />
             <p className={cn('mt-1', typography.small, colors.gray[500])}>
-              Leave empty to use default model from config
+              {UI_TEXT.HINTS.MODEL_DEFAULT}
             </p>
           </div>
 
@@ -181,7 +181,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               htmlFor="tags" 
               className={cn(label.base, label.default)}
             >
-              Tags (optional)
+              {UI_TEXT.LABELS.AGENT_TAGS}
             </label>
             <input
               type="text"
@@ -189,19 +189,19 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
               value={formData.tags}
               onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
               className={cn(formInput.base, formInput.default, focus.ring)}
-              placeholder="e.g., code-review, testing, documentation"
+              placeholder={UI_TEXT.PLACEHOLDERS.AGENT_TAGS}
             />
             <p className={cn('mt-1', typography.small, colors.gray[500])}>
-              Comma-separated tags for categorization
+              {UI_TEXT.HINTS.TAGS_FORMAT}
             </p>
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" onClick={onClose} className="flex-1">
-              Cancel
+              {UI_TEXT.BUTTONS.CANCEL}
             </Button>
             <Button type="submit" className="flex-1">
-              Create Agent
+              {UI_TEXT.BUTTONS.CREATE_AGENT}
             </Button>
           </div>
         </form>
