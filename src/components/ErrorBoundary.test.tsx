@@ -67,6 +67,51 @@ describe('ErrorBoundary', () => {
     expect(reloadMock).toHaveBeenCalledTimes(1)
   })
 
+  it('has a try again button that resets the error boundary', () => {
+    const onReset = vi.fn()
+    
+    render(
+      <ErrorBoundary onReset={onReset}>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    )
+
+    expect(screen.getByText('Something went wrong')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByText('Try Again'))
+    
+    expect(onReset).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows stack trace toggle button when component stack exists', () => {
+    render(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    )
+
+    expect(screen.getByText(/Show stack trace/)).toBeInTheDocument()
+  })
+
+  it('toggles stack trace visibility', () => {
+    render(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    )
+
+    const toggleButton = screen.getByText(/Show stack trace/)
+    expect(screen.queryByText(/Hide stack trace/)).not.toBeInTheDocument()
+    
+    fireEvent.click(toggleButton)
+    
+    expect(screen.getByText(/Hide stack trace/)).toBeInTheDocument()
+    
+    fireEvent.click(screen.getByText(/Hide stack trace/))
+    
+    expect(screen.getByText(/Show stack trace/)).toBeInTheDocument()
+  })
+
   it('logs the error to console', () => {
     render(
       <ErrorBoundary>
@@ -81,9 +126,33 @@ describe('ErrorBoundary', () => {
     )
   })
 
+  it('logs error context to console', () => {
+    render(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    )
+
+    expect(consoleErrorMock).toHaveBeenCalledWith(
+      'Error context:',
+      expect.objectContaining({
+        message: 'Test error',
+        name: 'Error',
+        timestamp: expect.any(String),
+        componentStack: expect.any(String),
+      })
+    )
+  })
+
   it('does not show error message when error is null', () => {
     class TestErrorBoundary extends ErrorBoundary {
-      public state = { hasError: true, error: null }
+      public state = { 
+        hasError: true, 
+        error: null, 
+        errorInfo: null, 
+        errorContext: null, 
+        showStackTrace: false 
+      }
     }
 
     render(
@@ -92,7 +161,7 @@ describe('ErrorBoundary', () => {
       </TestErrorBoundary>
     )
 
-    expect(screen.queryByRole('pre')).not.toBeInTheDocument()
+    expect(screen.queryByText('Test error')).not.toBeInTheDocument()
   })
 
   it('renders complex children tree correctly', () => {
@@ -106,5 +175,26 @@ describe('ErrorBoundary', () => {
     )
     expect(screen.getByText('Nested')).toBeInTheDocument()
     expect(screen.getByText('Content')).toBeInTheDocument()
+  })
+
+  it('displays error timestamp', () => {
+    render(
+      <ErrorBoundary>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    )
+
+    expect(screen.getByText(/Error occurred at/)).toBeInTheDocument()
+  })
+
+  it('renders custom fallback when provided', () => {
+    render(
+      <ErrorBoundary fallback={<div>Custom error UI</div>}>
+        <ThrowError shouldThrow={true} />
+      </ErrorBoundary>
+    )
+
+    expect(screen.getByText('Custom error UI')).toBeInTheDocument()
+    expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument()
   })
 })
