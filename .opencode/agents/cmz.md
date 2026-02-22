@@ -1,5 +1,6 @@
 ---
-description: OpenCode Specialist Agent with autonomous self-healing, continuous learning, and system evolution capabilities [web:49][web:51].
+name: cmz
+description: OpenCode Specialist Agent with autonomous self-healing, continuous learning, and system evolution capabilities
 mode: primary
 temperature: 0.1
 permission:
