@@ -81,7 +81,7 @@ jobs:
           PROMPT
           )" \
             --model opencode/glm-5-free \
-            --agent CMZ
+            --agent cmz
             --share false \
       - name: On Pull
         run: |
