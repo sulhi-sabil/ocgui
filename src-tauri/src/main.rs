@@ -80,7 +80,7 @@ fn sanitize_string_input(input: &str, max_len: usize) -> String {
     sanitized
 }
 
-const DB_VERSION: i32 = 2;
+const DB_VERSION: i32 = 3;
 
 pub struct DbState {
     conn: Arc<Mutex<Connection>>,
@@ -227,6 +227,20 @@ fn init_database(app_handle: &AppHandle) -> SqlResult<Connection> {
         )?;
         
         set_db_version(&conn, 2)?;
+    }
+    
+    if current_version < 3 {
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_runs_v2_agent_timestamp ON runs_v2(agent, timestamp DESC)",
+            [],
+        )?;
+        
+        conn.execute(
+            "DROP TABLE IF EXISTS runs",
+            [],
+        )?;
+        
+        set_db_version(&conn, 3)?;
     }
     
     Ok(conn)
