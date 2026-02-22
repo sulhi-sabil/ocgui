@@ -1,10 +1,10 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
-import type { Agent, Skill, Config, Run } from '../types'
+import type { Agent, Skill, Config, Run, AgentSortBy, SortOrder } from '../types'
 import { generateId, validateAgent, validateSkill } from '@utils/index'
 import { AGENT, SKILL, STORAGE } from '@constants/index'
 
-const CURRENT_STORE_VERSION = 2
+const CURRENT_STORE_VERSION = 3
 
 const safeStorage: StateStorage = {
   getItem: (name: string): string | null => {
@@ -39,6 +39,8 @@ interface PersistedState {
   skills: Skill[]
   config: Config | null
   lastSearchQuery: string
+  agentSortBy: AgentSortBy
+  agentSortOrder: SortOrder
 }
 
 type Migration = (state: Partial<PersistedState>) => Partial<PersistedState>
@@ -80,6 +82,22 @@ const migrations: Record<number, Migration> = {
     return {
       ...migrated,
       version: 2,
+    }
+  },
+  2: (state) => {
+    const migrated = { ...state }
+    
+    if (typeof migrated.agentSortBy !== 'string' || !['name', 'status', 'skills', 'tools'].includes(migrated.agentSortBy)) {
+      migrated.agentSortBy = AGENT.DEFAULT_SORT_BY
+    }
+    
+    if (typeof migrated.agentSortOrder !== 'string' || !['asc', 'desc'].includes(migrated.agentSortOrder)) {
+      migrated.agentSortOrder = AGENT.DEFAULT_SORT_ORDER
+    }
+    
+    return {
+      ...migrated,
+      version: 3,
     }
   },
 }
@@ -124,6 +142,12 @@ function validatePersistedState(state: Partial<PersistedState> | null): Persiste
       : [],
     config: state.config && typeof state.config === 'object' ? state.config : null,
     lastSearchQuery: typeof state.lastSearchQuery === 'string' ? state.lastSearchQuery : '',
+    agentSortBy: ['name', 'status', 'skills', 'tools'].includes(state.agentSortBy as string) 
+      ? state.agentSortBy as AgentSortBy 
+      : AGENT.DEFAULT_SORT_BY,
+    agentSortOrder: ['asc', 'desc'].includes(state.agentSortOrder as string) 
+      ? state.agentSortOrder as SortOrder 
+      : AGENT.DEFAULT_SORT_ORDER,
   }
 }
 
@@ -164,6 +188,12 @@ interface AppState {
   // Search State
   lastSearchQuery: string
   setLastSearchQuery: (query: string) => void
+  
+  // Sort State
+  agentSortBy: AgentSortBy
+  agentSortOrder: SortOrder
+  setAgentSortBy: (sortBy: AgentSortBy) => void
+  setAgentSortOrder: (order: SortOrder) => void
   
   // Reset
   reset: () => void
@@ -247,6 +277,11 @@ export const useAppStore = create<AppState>()(
       lastSearchQuery: '',
       setLastSearchQuery: (query) => set({ lastSearchQuery: query }),
       
+      agentSortBy: AGENT.DEFAULT_SORT_BY,
+      agentSortOrder: AGENT.DEFAULT_SORT_ORDER,
+      setAgentSortBy: (agentSortBy) => set({ agentSortBy }),
+      setAgentSortOrder: (agentSortOrder) => set({ agentSortOrder }),
+      
       reset: () => set({
         version: CURRENT_STORE_VERSION,
         agents: [],
@@ -256,6 +291,8 @@ export const useAppStore = create<AppState>()(
         runs: [],
         theme: 'light',
         lastSearchQuery: '',
+        agentSortBy: AGENT.DEFAULT_SORT_BY,
+        agentSortOrder: AGENT.DEFAULT_SORT_ORDER,
       }),
     }),
     {
@@ -270,6 +307,8 @@ export const useAppStore = create<AppState>()(
         skills: state.skills,
         config: state.config,
         lastSearchQuery: state.lastSearchQuery,
+        agentSortBy: state.agentSortBy,
+        agentSortOrder: state.agentSortOrder,
       }),
       migrate: (persistedState, version) => {
         const migrated = migrateState(persistedState, version)
@@ -284,6 +323,8 @@ export const useAppStore = create<AppState>()(
           skills: [],
           config: null,
           lastSearchQuery: '',
+          agentSortBy: AGENT.DEFAULT_SORT_BY,
+          agentSortOrder: AGENT.DEFAULT_SORT_ORDER,
         }
       },
     }

@@ -87,3 +87,6 @@ export interface RunLog {
   logType: 'info' | 'error' | 'warning' | 'tool_call';
   timestamp: number;
 }
+
+export type AgentSortBy = 'name' | 'status' | 'skills' | 'tools'
+export type SortOrder = 'asc' | 'desc'

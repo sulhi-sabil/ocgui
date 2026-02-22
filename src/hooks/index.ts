@@ -1,4 +1,5 @@
 export { useKeyboardShortcut, usePlatformShortcut } from './useKeyboardShortcut'
 export { useAgentSearch } from './useAgentSearch'
+export { useAgentSort } from './useAgentSort'
 export { useTheme } from './useTheme'
 export { useDebouncedValue } from './useDebouncedValue'

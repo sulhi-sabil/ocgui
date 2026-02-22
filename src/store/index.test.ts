@@ -346,6 +346,29 @@ describe('useAppStore', () => {
     })
   })
 
+  describe('sort', () => {
+    it('should have initial sort state', () => {
+      expect(useAppStore.getState().agentSortBy).toBe('name')
+      expect(useAppStore.getState().agentSortOrder).toBe('asc')
+    })
+
+    it('should set agentSortBy', () => {
+      act(() => {
+        useAppStore.getState().setAgentSortBy('status')
+      })
+
+      expect(useAppStore.getState().agentSortBy).toBe('status')
+    })
+
+    it('should set agentSortOrder', () => {
+      act(() => {
+        useAppStore.getState().setAgentSortOrder('desc')
+      })
+
+      expect(useAppStore.getState().agentSortOrder).toBe('desc')
+    })
+  })
+
   describe('reset', () => {
     it('should reset all state to initial values', () => {
       act(() => {
@@ -356,6 +379,8 @@ describe('useAppStore', () => {
         useAppStore.getState().setTheme('dark')
         useAppStore.getState().setLastSearchQuery('test')
         useAppStore.getState().selectAgent('agent-1')
+        useAppStore.getState().setAgentSortBy('status')
+        useAppStore.getState().setAgentSortOrder('desc')
       })
 
       expect(useAppStore.getState().agents).toHaveLength(1)
@@ -365,6 +390,8 @@ describe('useAppStore', () => {
       expect(useAppStore.getState().theme).toBe('dark')
       expect(useAppStore.getState().lastSearchQuery).toBe('test')
       expect(useAppStore.getState().selectedAgentId).toBe('agent-1')
+      expect(useAppStore.getState().agentSortBy).toBe('status')
+      expect(useAppStore.getState().agentSortOrder).toBe('desc')
 
       act(() => {
         useAppStore.getState().reset()
@@ -377,12 +404,14 @@ describe('useAppStore', () => {
       expect(useAppStore.getState().runs).toEqual([])
       expect(useAppStore.getState().theme).toBe('light')
       expect(useAppStore.getState().lastSearchQuery).toBe('')
+      expect(useAppStore.getState().agentSortBy).toBe('name')
+      expect(useAppStore.getState().agentSortOrder).toBe('asc')
     })
   })
 
   describe('migrations', () => {
     it('should have current version in state', () => {
-      expect(useAppStore.getState().version).toBe(2)
+      expect(useAppStore.getState().version).toBe(3)
     })
 
     it('should reset with current version', () => {
@@ -391,7 +420,7 @@ describe('useAppStore', () => {
         useAppStore.getState().reset()
       })
 
-      expect(useAppStore.getState().version).toBe(2)
+      expect(useAppStore.getState().version).toBe(3)
     })
   })
 })

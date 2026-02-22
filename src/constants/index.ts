@@ -27,6 +27,8 @@ export const SEARCH = {
 export const AGENT = {
   DEFAULT_MODEL: undefined,
   NAME_COPY_SUFFIX: ' (Copy)',
+  DEFAULT_SORT_BY: 'name' as const,
+  DEFAULT_SORT_ORDER: 'asc' as const,
 } as const
 
 export const SKILL = {
@@ -67,6 +69,7 @@ export const UI_TEXT = {
     AGENT_MODEL: 'Model Override (optional)',
     AGENT_TAGS: 'Tags (optional)',
     REQUIRED: '*',
+    SORT_BY: 'Sort by',
   },
   HINTS: {
     MODEL_DEFAULT: 'Leave empty to use default model from config',
@@ -100,5 +103,13 @@ export const UI_TEXT = {
   },
   TAGS: {
     MORE: '+{count} more',
+  },
+  SORT: {
+    NAME: 'Name',
+    STATUS: 'Status',
+    SKILLS: 'Skills',
+    TOOLS: 'Tools',
+    ASC: 'Ascending',
+    DESC: 'Descending',
   },
 } as const
