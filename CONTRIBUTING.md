@@ -110,7 +110,7 @@ Specialized labels for AI agent contributions:
 - `devops-engineer` - DevOps engineering tasks
 - `security-engineer` - Security-related changes
 - `performance-engineer` - Performance optimization
-- And more specialized roles...
+- `technical-writer` - Documentation and technical writing improvements
 
 ## Coding Standards
 
