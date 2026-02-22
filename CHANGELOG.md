@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- MIT LICENSE file
+- Table of contents to blueprint.md for improved navigation
+- Centralized constants module for application-wide configuration
+- API service layer for SQLite database operations
+- Agent template utilities for agent scaffolding
+- Delete agent functionality with confirmation dialog (ConfirmDialog component)
+- React-testing-vitest and opencode-primitives skills
+- Rust toolchain configuration for reproducible builds
+- Validate and CI scripts for development workflow
+
+### Fixed
+
+- Tags validation in validateAgent function
+- Missing tags property in AgentCard test mock
+- Error handling for Zustand persist storage
+
+### Changed
+
 - Core UI components (Button, SearchInput, Toast, EmptyState)
 - Agent management components (AgentCard, CreateAgentModal)
 - Theme toggle with dark mode support
