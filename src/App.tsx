@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, lazy, Suspense, useCallback } from 'react'
+import { shallow } from 'zustand/shallow'
 import { useAppStore } from '@store/index'
 import { AgentCard } from '@components/AgentCard'
 import { ThemeToggle } from '@components/ThemeToggle'
@@ -12,14 +13,28 @@ import { iconSize, strokeWidth, grid, colors } from '@styles/tokens'
 const CreateAgentModal = lazy(() => import('@components/CreateAgentModal'))
 
 function App() {
-  const agents = useAppStore((state) => state.agents)
-  const selectedAgentId = useAppStore((state) => state.selectedAgentId)
-  const selectAgent = useAppStore((state) => state.selectAgent)
-  const theme = useAppStore((state) => state.theme)
-  const lastSearchQuery = useAppStore((state) => state.lastSearchQuery)
-  const setLastSearchQuery = useAppStore((state) => state.setLastSearchQuery)
-  const updateAgent = useAppStore((state) => state.updateAgent)
-  const duplicateAgent = useAppStore((state) => state.duplicateAgent)
+  const {
+    agents,
+    selectedAgentId,
+    selectAgent,
+    theme,
+    lastSearchQuery,
+    setLastSearchQuery,
+    updateAgent,
+    duplicateAgent,
+  } = useAppStore(
+    (state) => ({
+      agents: state.agents,
+      selectedAgentId: state.selectedAgentId,
+      selectAgent: state.selectAgent,
+      theme: state.theme,
+      lastSearchQuery: state.lastSearchQuery,
+      setLastSearchQuery: state.setLastSearchQuery,
+      updateAgent: state.updateAgent,
+      duplicateAgent: state.duplicateAgent,
+    }),
+    shallow
+  )
   const { addToast } = useToast()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState(lastSearchQuery)
