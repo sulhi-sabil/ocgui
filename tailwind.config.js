@@ -7,6 +7,10 @@ export default {
   ],
   theme: {
     extend: {
+      zIndex: {
+        60: '60',
+        70: '70',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
