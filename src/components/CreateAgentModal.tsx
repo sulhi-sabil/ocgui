@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import { useAppStore } from '@store/index'
 import { Button } from './ui/Button'
 import { useToast } from './ui/Toast'
 import { generateId } from '@utils/index'
 import { cn } from '@utils/cn'
-import { colors, zIndex, modal, formInput, focus, label, typography, iconSize, transitions } from '@styles/tokens'
+import { colors, zIndex, modal, focus, transitions, iconSize } from '@styles/tokens'
 import { MODAL } from '@constants/index'
+import { useAgentForm } from '@hooks/index'
+import { AgentFormFields } from './AgentFormFields'
 import type { Agent } from '../types'
 
 interface CreateAgentModalProps {
@@ -17,13 +19,7 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
   const addAgent = useAppStore((state) => state.addAgent)
   const addToast = useToast().addToast
   const nameInputRef = useRef<HTMLInputElement>(null)
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    model: '',
-    tags: '',
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const { formData, errors, setFormData, validate, reset, getAgentData } = useAgentForm()
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -49,37 +45,26 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
     
-    const newErrors: Record<string, string> = {}
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required'
-    }
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required'
-    }
-    
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
-    }
+    if (!validate()) return
 
+    const agentData = getAgentData()
     const newAgent: Agent = {
       id: generateId(),
-      name: formData.name.trim(),
-      description: formData.description.trim(),
-      model: formData.model.trim() || undefined,
+      name: agentData.name,
+      description: agentData.description,
+      model: agentData.model,
       tools: {},
       permissions: {},
       skills: [],
-      tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+      tags: agentData.tags,
       enabled: true,
     }
 
     addAgent(newAgent)
     addToast(`Agent "${newAgent.name}" created successfully`, 'success')
-    setFormData({ name: '', description: '', model: '', tags: '' })
-    setErrors({})
+    reset()
     onClose()
-  }, [formData, addAgent, addToast, onClose])
+  }, [validate, getAgentData, addAgent, addToast, reset, onClose])
 
   if (!isOpen) return null
 
@@ -115,86 +100,12 @@ export function CreateAgentModal({ isOpen, onClose }: CreateAgentModalProps) {
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label 
-              htmlFor="name" 
-              className={cn(label.base, label.default)}
-            >
-              Name *
-            </label>
-            <input
-              ref={nameInputRef}
-              type="text"
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className={cn(formInput.base, formInput.default, focus.ring)}
-              placeholder="e.g., Code Reviewer"
-            />
-            {errors.name && (
-              <p className={cn('mt-1', typography.body, colors.error.text)}>{errors.name}</p>
-            )}
-          </div>
-
-          <div>
-            <label 
-              htmlFor="description" 
-              className={cn(label.base, label.default)}
-            >
-              Description *
-            </label>
-            <textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className={cn(formInput.base, formInput.default, focus.ring)}
-              rows={3}
-              placeholder="Describe what this agent does..."
-            />
-            {errors.description && (
-              <p className={cn('mt-1', typography.body, colors.error.text)}>{errors.description}</p>
-            )}
-          </div>
-
-          <div>
-            <label 
-              htmlFor="model" 
-              className={cn(label.base, label.default)}
-            >
-              Model Override (optional)
-            </label>
-            <input
-              type="text"
-              id="model"
-              value={formData.model}
-              onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-              className={cn(formInput.base, formInput.default, focus.ring)}
-              placeholder="e.g., gpt-4, claude-3-opus"
-            />
-            <p className={cn('mt-1', typography.small, colors.gray[500])}>
-              Leave empty to use default model from config
-            </p>
-          </div>
-
-          <div>
-            <label 
-              htmlFor="tags" 
-              className={cn(label.base, label.default)}
-            >
-              Tags (optional)
-            </label>
-            <input
-              type="text"
-              id="tags"
-              value={formData.tags}
-              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-              className={cn(formInput.base, formInput.default, focus.ring)}
-              placeholder="e.g., code-review, testing, documentation"
-            />
-            <p className={cn('mt-1', typography.small, colors.gray[500])}>
-              Comma-separated tags for categorization
-            </p>
-          </div>
+          <AgentFormFields
+            ref={nameInputRef}
+            formData={formData}
+            errors={errors}
+            onFormDataChange={setFormData}
+          />
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" onClick={onClose} className="flex-1">

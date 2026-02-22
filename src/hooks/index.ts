@@ -1,3 +1,5 @@
 export { useKeyboardShortcut, usePlatformShortcut } from './useKeyboardShortcut'
 export { useAgentSearch } from './useAgentSearch'
 export { useTheme } from './useTheme'
+export { useAgentForm } from './useAgentForm'
+export type { AgentFormData, AgentFormErrors, UseAgentFormReturn } from './useAgentForm'
