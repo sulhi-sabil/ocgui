@@ -379,4 +379,19 @@ describe('useAppStore', () => {
       expect(useAppStore.getState().lastSearchQuery).toBe('')
     })
   })
+
+  describe('migrations', () => {
+    it('should have current version in state', () => {
+      expect(useAppStore.getState().version).toBe(2)
+    })
+
+    it('should reset with current version', () => {
+      act(() => {
+        useAppStore.getState().setTheme('dark')
+        useAppStore.getState().reset()
+      })
+
+      expect(useAppStore.getState().version).toBe(2)
+    })
+  })
 })
